@@ -1,7 +1,7 @@
 [project]
 name = "late-ming-mechanism-lab"
 version = "0.1.0"
-description = "Add your description here"
+description = "Historical mechanism laboratory for the late Ming Shaanxi-Henan crisis (1625-1644)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -32,11 +32,36 @@ dependencies = [
 ]
 
 [project.scripts]
-late-ming-mechanism-lab = "late_ming_mechanism_lab:main"
+late-ming-lab = "late_ming_lab.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.6,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "late_ming_lab"
+module-root = "src"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+    "live_ustc: requires a live USTC endpoint and credentials; excluded from the default run",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
 
 [dependency-groups]
 dev = [
