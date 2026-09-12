@@ -1,9 +1,9 @@
 # System Overview
 
-Status: P03 (household survival under agricultural shock). Space, climate and the household
-layer exist; markets, elites, armies, rebels, fiscal extraction and runtime-LLM decisions do
-not. The only spatial dataset is the toy fixture and the only cohorts are the toy endowments:
-neither is history.
+Status: P04 (market, credit and local elites). Space, climate, households, a county grain
+market with endogenous prices, intercounty trade, merchant houses and elite lending now exist;
+taxation, relief policy, armies, rebels and runtime-LLM decisions do not. The only spatial
+dataset is the toy fixture and every endowment is an assumption: none of it is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -252,6 +252,52 @@ both sides of the ledger cancels out: `tests/invariants/test_household_mass_bala
 that everything reported as eaten was debited from a granary in the same event. That test fails
 against the pre-fix code, where grain bought on the ladder was eaten but never debited.
 
+## Market, credit and local elites (P04)
+
+### What exists now
+
+| Concern | Module | Contract |
+| --- | --- | --- |
+| County inventory and price | `systems/markets.py` | `MarketClearingSystem` posts one price per priced node each month; `price = reference × (target cover / inventory)^elasticity`, clamped to declared bounds; a node with no modelled demand posts the reference price |
+| Intercounty trade | `systems/markets.py` | merchants arbitrage along `G_trade`: margin = destination − origin − transport cost; capacity, risk loss and exporter stock all bind; the loss is a separate `TRADE_LOSS` event |
+| Unit mappings | `evidence/parameters.py` | P02 left `cost` and `capacity` dimensionless; P04 declares one cost unit = silver per shi moved and one capacity unit = shi per month, with zero capacity meaning autarky |
+| Violence hook | `networks/disruption.py` | `TradeDisruption` scales a link's risk and capacity and can block it outright; P06 drives it from armed-group activity |
+| Merchant layer | `actors/merchants.py` | one house per node the trade graph reaches, with silver, grain and goods; every purchase and sale is logged from both sides |
+| Elite layer | `actors/elites.py` | rent, lending, land purchase, relief, tax mediation; **claims are derived** from household debt, so borrower and lender records cannot drift |
+| Credit | `systems/elites.py` | `LocalCredit` lends against collateral, bounded by both the borrower's limit and the lender's silver |
+| Relief and mediation | `systems/elites.py` | `EliteActionSystem` (phase 08) releases grain to cohorts whose measured distress exceeds a threshold, and asks a `TaxMediationPolicy` how much of a tax demand it would advance |
+| Analysis | `analysis/concentration.py` | price dispersion, land distribution, land concentration, debt distribution, trade summary, first-distress ticks |
+
+### The P03 placeholders are gone
+
+P03 resolved shortfalls with fixed prices and a synthetic lender, and paid rent to nobody. All of
+that is deleted: households now buy at the posted market price, borrow from the local elite at
+that elite's own terms, sell land to it, and pay rent into its granary. `HouseholdParameters` no
+longer has any price or credit field, and a test asserts that those five fields cannot come back.
+
+### Measured answers, and what they are not
+
+Questions A to D are run by `experiments/market_credit.py` on the toy economy over the full
+window. They are statements about these rules, this topology and these endowments, not about
+markets or elites in general, and nothing here is calibrated.
+
+| Question | Change | Measured result |
+| --- | --- | --- |
+| A integration and dispersion | tradable capacity 0x to 10x, merchant stock 1x to 100x | integration **raised** mean max/min price dispersion from 1.79 to 2.93; more capacity lowered it only to 2.31; thin stocks (10x) raised it further; abundant stock (100x) pinned every node to the price floor |
+| B transport cost and trade | cost multiplier 0.5x to 4x | shipped grain fell 6,470 → 5,438 → 2,728 → 0 shi, monotonically |
+| C credit and collapse | lending on vs off under a severe shock | first below-floor month 38.5 vs 33.4; unmet share 0.253 vs 0.260; forced land sales 4,481 vs 11,874 mu |
+| D credit and land | no credit, cheap credit, dear credit | elite land share 0.252 → 0.219 → 0.221; cohort land Gini 0.526 → 0.496 → 0.499; total claims 31k → 87k → 2.60M tael |
+
+The A result is negative and is explained rather than hidden: arbitrage drains the selling node,
+and with merchant stock a tenth of the declared target cover a single consignment is a large
+share of it, so trade widens the spread instead of narrowing it. The price rule's fixed target
+cover is the likely culprit and is recorded as an open item for P08/P09, not patched here.
+
+The D result is likewise measured, not assumed: in this configuration credit *substitutes* for
+distress sales, so concentration is lower with credit than without it, and a dearer rate adds a
+little back while multiplying the claims stock thirtyfold — a placeholder pathology, since P04
+has no bankruptcy, write-off or rescheduling rule.
+
 ## Deterministic kernel (P01)
 
 The kernel is history-free by design: it owns time, randomness, event recording, provenance
@@ -309,8 +355,9 @@ Python 3.12 · `uv`. Dependencies are added when a phase needs them, not in adva
 src/late_ming_lab/
 ├── core/        config.py, clock.py, rng.py, events.py, tick.py, kernel.py, manifest.py,
 │                hashing.py                       (implemented in P01)
-├── actors/      households.py, fixtures.py        (implemented in P03)
-│                elites, merchants, government, military, armed_groups
+├── actors/      households.py, merchants.py, elites.py, exchange.py, ledger.py,
+│                fixtures.py                       (implemented in P03-P04)
+│                government, military, armed_groups
 ├── systems/     calendar.py, climate.py          (implemented in P02)
 │                agriculture, households, markets, credit, taxation, relief,
 │                migration, military_finance, insurgency, violence
@@ -319,8 +366,8 @@ src/late_ming_lab/
 ├── policies/    base, rules, utility, random_policy, ustc_v41
 ├── evidence/    provenance.py (P01), grades.py (P02); registry, parameters (P08)
 ├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
-├── analysis/    distress.py                      (implemented in P03)
-├── experiments/ household_shock.py               (implemented in P03)
+├── analysis/    distress.py, concentration.py    (implemented in P03-P04)
+├── experiments/ assembly.py, household_shock.py, market_credit.py  (P03-P04)
 ├── calibration/ cli/ ui/
 ```
 
