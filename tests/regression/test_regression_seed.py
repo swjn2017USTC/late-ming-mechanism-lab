@@ -37,7 +37,13 @@ CLIMATE_SIMULATION_DIGEST = "6a03cce6cfdc4e8c426f19ec839f7d8ea3e2a0d9628e8e03c80
 CLIMATE_EVENT_COUNT = 240 * 6
 
 #: The P05 fiscal economy: county governments, assessment, collection and official relief.
-FISCAL_DIGEST = "8155e41b15a8b6019962da68b5c1c4ab5cf9922d1849d8b5faf6c204496b7d16"
+#:
+#: Re-pinned in P06 for instrumentation only: the county's monthly state record now carries the
+#: military decomposition (``military_pay_tael``, ``military_grain_shi``), both zero when no
+#: garrison is wired. Verified by row-level diff against the P05 log: 480 of 28764 events changed,
+#: each gaining those two keys and nothing else, and event count is unchanged. The P06 report
+#: records the re-pin.
+FISCAL_DIGEST = "5889e3304509d8fab993f1d02c55555990b94f9ebf2ea333aa6de93796aac420"
 FISCAL_EVENT_COUNT = 28764
 
 #: Same, with the whole P04 economy (market, merchants, elites, credit): two short windows.

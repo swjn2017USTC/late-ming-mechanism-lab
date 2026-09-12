@@ -34,12 +34,15 @@ COUNTY_SILVER_SINKS = {
     "TAX_COLLECTION_COST",
     "OFFICIAL_RELIEF_COST",
     "GOVERNMENT_GRAIN_PURCHASE",
+    "MILITARY_PAY_OUTLAY",
 }
 COUNTY_GRAIN_SOURCES = {
     "GOVERNMENT_GRAIN_PURCHASE",
 }
 COUNTY_GRAIN_SINKS = {
     "OFFICIAL_RELIEF",
+    "GOVERNMENT_GRAIN_ISSUE",
+    "GRANARY_GRAIN_SEIZED",
 }
 
 #: Channels a household can pay through; one payment per channel per tick is the rule.
