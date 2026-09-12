@@ -12,12 +12,14 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
+from late_ming_lab.actors.exchange import CreditSource, GrainMarket
 from late_ming_lab.actors.households import (
-    BALANCE_TOLERANCE,
     CohortClass,
     HouseholdCohortAgent,
     HouseholdPopulation,
 )
+from late_ming_lab.actors.ledger import BALANCE_TOLERANCE
+from late_ming_lab.core.tick import TickContext
 from late_ming_lab.evidence.parameters import core_default_household_parameters
 from late_ming_lab.networks.nodes import AgrarianZone
 
@@ -52,21 +54,35 @@ def _cohort(endowment: dict[str, float], *, adults: float) -> HouseholdCohortAge
     return cohort
 
 
-@settings(max_examples=75, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@settings(
+    max_examples=75,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+)
 @given(
     endowment=ENDOWMENTS,
     impacts=IMPACT_SEQUENCES,
     demand=st.floats(min_value=0.0, max_value=1.0),
 )
 def test_balances_stay_non_negative_and_reconcile(
-    endowment: dict[str, float], impacts: list[float], demand: float
+    tick_context: TickContext,
+    market: GrainMarket,
+    credit: CreditSource,
+    endowment: dict[str, float],
+    impacts: list[float],
+    demand: float,
 ) -> None:
     cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
 
     for impact in impacts:
         cohort.accumulate_climate_impact(impact)
         cohort.monthly_budget(
-            parameters=PARAMETERS, labour_demand_factor=demand, rule_version="property"
+            tick_context,
+            parameters=PARAMETERS,
+            labour_demand_factor=demand,
+            market=market,
+            credit=credit,
+            rule_version="property",
         )
         cohort.check_balances()
 
@@ -80,17 +96,30 @@ def test_balances_stay_non_negative_and_reconcile(
         assert balance >= -BALANCE_TOLERANCE
 
 
-@settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@settings(
+    max_examples=50,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+)
 @given(endowment=ENDOWMENTS, impacts=IMPACT_SEQUENCES)
 def test_consumption_never_exceeds_what_the_ladder_could_assemble(
-    endowment: dict[str, float], impacts: list[float]
+    tick_context: TickContext,
+    market: GrainMarket,
+    credit: CreditSource,
+    endowment: dict[str, float],
+    impacts: list[float],
 ) -> None:
     cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
 
     for impact in impacts:
         cohort.accumulate_climate_impact(impact)
         events = cohort.monthly_budget(
-            parameters=PARAMETERS, labour_demand_factor=0.5, rule_version="property"
+            tick_context,
+            parameters=PARAMETERS,
+            labour_demand_factor=0.5,
+            market=market,
+            credit=credit,
+            rule_version="property",
         )
         consumption = next(event for event in events if event.event_type.value == "CONSUMPTION")
         need = consumption.trigger["need_shi"]
@@ -105,10 +134,18 @@ def test_consumption_never_exceeds_what_the_ladder_could_assemble(
         assert consumption.trigger["grain_delta_shi"] == -eaten
 
 
-@settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@settings(
+    max_examples=50,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+)
 @given(endowment=ENDOWMENTS, impacts=IMPACT_SEQUENCES)
 def test_grain_is_conserved_across_a_sequence_of_months(
-    endowment: dict[str, float], impacts: list[float]
+    tick_context: TickContext,
+    market: GrainMarket,
+    credit: CreditSource,
+    endowment: dict[str, float],
+    impacts: list[float],
 ) -> None:
     """Flow conservation: everything eaten was earned, harvested, bought or taken from stock."""
     cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
@@ -119,7 +156,12 @@ def test_grain_is_conserved_across_a_sequence_of_months(
     for impact in impacts:
         cohort.accumulate_climate_impact(impact)
         for event in cohort.monthly_budget(
-            parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="property"
+            tick_context,
+            parameters=PARAMETERS,
+            labour_demand_factor=0.0,
+            market=market,
+            credit=credit,
+            rule_version="property",
         ):
             trigger = event.trigger
             if event.event_type.value == "CONSUMPTION":
@@ -134,7 +176,11 @@ def test_grain_is_conserved_across_a_sequence_of_months(
     assert eaten >= -BALANCE_TOLERANCE
 
 
-@settings(max_examples=25, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@settings(
+    max_examples=25,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+)
 @given(endowment=ENDOWMENTS)
 def test_population_invariants_hold_after_arbitrary_transitions(
     endowment: dict[str, float],

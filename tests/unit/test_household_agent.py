@@ -1,10 +1,18 @@
-"""Cohort accounting and the coping ladder, one step at a time."""
+"""Cohort accounting and the coping ladder, one step at a time.
+
+The ladder is exercised against test counterparties (see `tests/conftest.py`) so the assertions
+are about the household's own behaviour: which rung it reaches, what it records, and that its
+balance sheet still reconciles afterwards.
+"""
 
 from __future__ import annotations
+
+from collections.abc import Callable
 
 import pytest
 from pydantic import ValidationError
 
+from late_ming_lab.actors.exchange import CreditSource, GrainMarket
 from late_ming_lab.actors.households import (
     ASSETS_DELTA,
     DEBT_DELTA,
@@ -18,10 +26,15 @@ from late_ming_lab.actors.households import (
     HouseholdLedgerError,
     HouseholdPopulation,
 )
+from late_ming_lab.core.tick import TickContext
 from late_ming_lab.evidence.parameters import core_default_household_parameters
 from late_ming_lab.networks.nodes import AgrarianZone
 
+CreditSourceFactory = Callable[..., CreditSource]
+GrainMarketFactory = Callable[..., GrainMarket]
+
 PARAMETERS = core_default_household_parameters()
+MARKET_PRICE = 1.5
 
 
 def _cohort(**overrides: float) -> HouseholdCohortAgent:
@@ -44,11 +57,18 @@ def _cohort(**overrides: float) -> HouseholdCohortAgent:
     return cohort
 
 
-def test_a_self_sufficient_month_eats_from_storage_and_records_no_distress() -> None:
+def test_a_self_sufficient_month_eats_from_storage_and_records_no_distress(
+    tick_context: TickContext, market: GrainMarket, credit: CreditSource
+) -> None:
     cohort = _cohort(grain_shi=10_000.0)
 
     events = cohort.monthly_budget(
-        parameters=PARAMETERS, labour_demand_factor=1.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=1.0,
+        market=market,
+        credit=credit,
+        rule_version="test",
     )
 
     consumption = next(e for e in events if e.event_type is CohortEventType.CONSUMPTION)
@@ -62,48 +82,126 @@ def test_a_self_sufficient_month_eats_from_storage_and_records_no_distress() -> 
     )
 
 
-def test_the_ladder_escalates_only_as_far_as_the_shortfall_requires() -> None:
+def test_the_ladder_escalates_only_as_far_as_the_shortfall_requires(
+    tick_context: TickContext,
+    market: GrainMarket,
+    credit: CreditSource,
+    credit_factory: CreditSourceFactory,
+) -> None:
     # Silver on hand covers the floor: the household stays at the top of the ladder.
     covered = _cohort(grain_shi=0.0, silver_tael=100.0)
-    covered.monthly_budget(parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test")
+    covered.monthly_budget(
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=credit,
+        rule_version="test",
+    )
 
     assert covered.coping_stage is CopingStage.REDUCING_CONSUMPTION
     assert covered.debt_tael == 0.0
 
-    # With no silver but real collateral, the household borrows rather than selling anything.
+    # No silver but real collateral: the household borrows rather than selling anything.
     borrowing = _cohort(grain_shi=0.0, silver_tael=0.0)
-    borrowing.monthly_budget(parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test")
+    borrowing.monthly_budget(
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=credit,
+        rule_version="test",
+    )
 
     assert borrowing.coping_stage is CopingStage.BORROWING
     assert borrowing.land_mu == 800.0
     assert borrowing.movable_assets_tael == 200.0
+    assert borrowing.debt_tael > 0.0
 
-    # No silver, no collateral, no land: nothing on the ladder can cover the floor.
+    # No credit, no silver, no goods: land goes next.
+    no_credit = credit_factory(loan_to_value=0.0)
+    selling_land = _cohort(grain_shi=0.0, silver_tael=0.0, movable_assets_tael=0.0)
+    selling_land.monthly_budget(
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=no_credit,
+        rule_version="test",
+    )
+
+    assert selling_land.coping_stage is CopingStage.SELLING_LAND
+    assert selling_land.land_mu < 800.0
+
+    # Nothing left to sell: the floor cannot be met at all.
     destitute = _cohort(grain_shi=0.0, silver_tael=0.0, movable_assets_tael=0.0, land_mu=0.0)
-    destitute.monthly_budget(parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test")
+    destitute.monthly_budget(
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=no_credit,
+        rule_version="test",
+    )
 
     assert destitute.coping_stage is CopingStage.DESTITUTE
 
 
-def test_borrowing_requests_are_recorded_even_when_capacity_is_exhausted() -> None:
+def test_borrowing_requests_are_recorded_even_when_capacity_is_exhausted(
+    tick_context: TickContext, market: GrainMarket, credit_factory: CreditSourceFactory
+) -> None:
+    no_credit = credit_factory(loan_to_value=0.0)
     cohort = _cohort(grain_shi=0.0, silver_tael=0.0, movable_assets_tael=0.0, land_mu=0.0)
 
     events = cohort.monthly_budget(
-        parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=no_credit,
+        rule_version="test",
     )
 
     request = next(e for e in events if e.event_type is CohortEventType.BORROWING_REQUEST)
     assert request.trigger["granted_tael"] == 0.0
-    assert request.outcome == "no-capacity"
+    assert request.outcome.startswith("no-capacity:")
     assert cohort.debt_tael == 0.0
 
 
-def test_land_is_sold_last_and_only_after_movable_assets() -> None:
-    no_credit = PARAMETERS.model_validate({**PARAMETERS.model_dump(), "loan_to_value": 0.0})
+def test_a_market_that_cannot_deliver_stops_the_rung(
+    tick_context: TickContext, credit: CreditSource, market_factory: GrainMarketFactory
+) -> None:
+    """A rung fails because the counterparty cannot deliver, not because a formula says so."""
+    broke_market = market_factory(grain_shi=0.0, silver_tael=0.0)
+    cohort = _cohort(grain_shi=0.0, silver_tael=100.0)
+
+    events = cohort.monthly_budget(
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=broke_market,
+        credit=credit,
+        rule_version="test",
+    )
+
+    assert not [e for e in events if e.event_type is CohortEventType.GRAIN_PURCHASE]
+    assert cohort.grain_shi == 0.0
+    assert cohort.coping_stage is not CopingStage.SELF_SUFFICIENT
+
+
+def test_land_is_sold_last_and_only_after_movable_assets(
+    tick_context: TickContext, market: GrainMarket, credit_factory: CreditSourceFactory
+) -> None:
+    no_credit = credit_factory(loan_to_value=0.0)
     cohort = _cohort(grain_shi=0.0, silver_tael=0.0, movable_assets_tael=10.0, land_mu=20.0)
 
     events = cohort.monthly_budget(
-        parameters=no_credit, labour_demand_factor=0.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=no_credit,
+        rule_version="test",
     )
     order = [event.event_type for event in events]
 
@@ -113,11 +211,19 @@ def test_land_is_sold_last_and_only_after_movable_assets() -> None:
     assert cohort.coping_stage in (CopingStage.SELLING_LAND, CopingStage.DESTITUTE)
 
 
-def test_distress_is_unmet_need_and_is_never_negative() -> None:
+def test_distress_is_unmet_need_and_is_never_negative(
+    tick_context: TickContext, market: GrainMarket, credit_factory: CreditSourceFactory
+) -> None:
+    no_credit = credit_factory(loan_to_value=0.0)
     cohort = _cohort(grain_shi=0.0, silver_tael=0.0, movable_assets_tael=0.0, land_mu=0.0)
 
     events = cohort.monthly_budget(
-        parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=no_credit,
+        rule_version="test",
     )
     consumption = next(e for e in events if e.event_type is CohortEventType.CONSUMPTION)
 
@@ -156,7 +262,11 @@ def test_every_primitive_records_its_delta_and_reconciles() -> None:
         grain_shi=12.0, wage_shi_per_adult=0.3, labour_demand_factor=0.5, rule_version="test"
     )
     cohort.record_borrowing_request(
-        requested_tael=4.0, granted_tael=4.0, capacity_tael=10.0, rule_version="test"
+        requested_tael=4.0,
+        granted_tael=4.0,
+        capacity_tael=10.0,
+        lender_id="elite::toy-sx-a",
+        rule_version="test",
     )
     cohort.record_grain_purchase(
         shi=2.0, price_tael_per_shi=1.5, occasion="test", rule_version="test"
@@ -193,7 +303,7 @@ def test_a_good_harvest_repays_debt_out_of_the_surplus() -> None:
 
     event = cohort.record_repayment_from_harvest(
         repaid_tael=6.0,
-        price_tael_per_shi=PARAMETERS.grain_reference_price_tael_per_shi,
+        price_tael_per_shi=0.6,
         rule_version="test",
     )
 
@@ -203,11 +313,18 @@ def test_a_good_harvest_repays_debt_out_of_the_surplus() -> None:
     cohort.check_balances()
 
 
-def test_the_coping_stage_escalates_once_and_resets_after_a_harvest() -> None:
+def test_the_coping_stage_escalates_once_and_resets_after_a_harvest(
+    tick_context: TickContext, market: GrainMarket, credit: CreditSource
+) -> None:
     cohort = _cohort(grain_shi=0.0, silver_tael=0.0)
 
     first = cohort.monthly_budget(
-        parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=credit,
+        rule_version="test",
     )
     transitions = [e for e in first if e.event_type is CohortEventType.COPING_TRANSITION]
     assert len(transitions) == 1
@@ -215,7 +332,12 @@ def test_the_coping_stage_escalates_once_and_resets_after_a_harvest() -> None:
     assert escalated is CopingStage.BORROWING
 
     second = cohort.monthly_budget(
-        parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="test"
+        tick_context,
+        parameters=PARAMETERS,
+        labour_demand_factor=0.0,
+        market=market,
+        credit=credit,
+        rule_version="test",
     )
     assert cohort.coping_stage >= escalated
     assert all(
@@ -277,6 +399,35 @@ def test_the_snapshot_reports_the_whole_balance_sheet() -> None:
         assert key in snapshot.trigger
 
 
+def test_market_sales_and_transfers_record_their_deltas() -> None:
+    cohort = _cohort(grain_shi=1_000.0)
+
+    sale = cohort.record_market_sale(
+        shi=100.0, price_tael_per_shi=0.6, buyer_id="merchant::toy-sx-a", rule_version="test"
+    )
+    relief = cohort.record_relief(grain_shi=20.0, donor_id="elite::toy-sx-a", rule_version="test")
+    advanced = cohort.record_tax_mediation(
+        advanced_tael=5.0, mediator_id="elite::toy-sx-a", rule_version="test"
+    )
+
+    assert sale.trigger[GRAIN_DELTA] == -100.0
+    assert sale.trigger[SILVER_DELTA] == 60.0
+    assert relief.trigger[GRAIN_DELTA] == 20.0
+    assert advanced.trigger[DEBT_DELTA] == 5.0
+    assert advanced.trigger[SILVER_DELTA] == 5.0
+    cohort.check_balances()
+
+
+def test_surplus_for_sale_keeps_the_declared_year_of_need() -> None:
+    cohort = _cohort(grain_shi=10_000.0)
+
+    assert cohort.surplus_for_sale(parameters=PARAMETERS) == pytest.approx(
+        10_000.0 - PARAMETERS.annual_need_shi(cohort.adults)
+    )
+    cohort.grain_shi = 10.0
+    assert cohort.surplus_for_sale(parameters=PARAMETERS) == 0.0
+
+
 def test_population_tracks_the_rolling_distress_window() -> None:
     cohort = _cohort()
     population = HouseholdPopulation((cohort,))
@@ -320,22 +471,30 @@ def test_population_invariants_reconcile_every_cohort() -> None:
         population.check_invariants()
 
 
-def test_food_bought_on_the_ladder_is_eaten_exactly_once() -> None:
+def test_food_bought_on_the_ladder_is_eaten_exactly_once(
+    tick_context: TickContext, market: GrainMarket, credit_factory: CreditSourceFactory
+) -> None:
     """Regression: a purchase must be credited once and debited once, never eaten twice."""
     no_wage = PARAMETERS.model_validate(
         {**PARAMETERS.model_dump(), "wage_grain_shi_per_adult_month": 0.0}
     )
+    no_credit = credit_factory(loan_to_value=0.0)
     cohort = _cohort(grain_shi=0.0, silver_tael=1_000.0, movable_assets_tael=0.0, land_mu=0.0)
     initial_grain = cohort.grain_shi
     eaten = purchased = 0.0
 
     for _ in range(6):
         for event in cohort.monthly_budget(
-            parameters=no_wage, labour_demand_factor=0.0, rule_version="test"
+            tick_context,
+            parameters=no_wage,
+            labour_demand_factor=0.0,
+            market=market,
+            credit=no_credit,
+            rule_version="test",
         ):
             if event.event_type is CohortEventType.CONSUMPTION:
                 eaten += event.trigger["eaten_shi"]
-                assert event.trigger["grain_delta_shi"] == -event.trigger["eaten_shi"]
+                assert event.trigger[GRAIN_DELTA] == -event.trigger["eaten_shi"]
             elif event.event_type is CohortEventType.GRAIN_PURCHASE:
                 purchased += event.trigger["purchased_shi"]
 

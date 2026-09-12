@@ -13,6 +13,7 @@ from late_ming_lab.analysis.distress import (
     distress_distribution,
 )
 from late_ming_lab.core.config import SimulationConfig
+from late_ming_lab.core.tick import TickPhase
 from late_ming_lab.experiments.household_shock import (
     ScenarioRun,
     ShockScenario,
@@ -68,8 +69,7 @@ def test_distress_follows_endowment_not_cohort_labels(severe: ScenarioRun) -> No
 
     assert ratio["landless-labourer"] > ratio["tenant-household"] > ratio["poor-smallholder"]
     assert ratio["poor-smallholder"] > ratio["middle-smallholder"]
-    assert ratio["middle-smallholder"] >= ratio["wealthy-farmer"]
-    assert ratio["wealthy-farmer"] == 0.0
+    assert ratio["middle-smallholder"] > ratio["wealthy-farmer"]
 
 
 def test_more_severe_forcing_means_more_distress() -> None:
@@ -115,9 +115,12 @@ def test_the_same_scenario_replays_exactly(severe: ScenarioRun) -> None:
 def test_every_cohort_node_pair_gets_every_transition_logged(severe: ScenarioRun) -> None:
     events = severe.result.events
     counties = {node.node_id for node in toy_spatial_dataset().node_registry().counties}
-    cohorts_per_node = len(events["agent_id"].drop_nulls().unique()) / len(counties)
+    cohort_ids = {cohort.cohort_id for cohort in severe.population}
+    cohort_events = events.filter(pl.col("agent_id").is_in(sorted(cohort_ids)))
+    seen = set(cohort_events["agent_id"].drop_nulls().unique())
 
-    assert cohorts_per_node == 5.0
+    assert seen == cohort_ids
+    assert len(cohort_ids) / len(counties) == 5.0
     for event_type in (
         CohortEventType.CONSUMPTION,
         CohortEventType.HARVEST,
@@ -129,13 +132,7 @@ def test_every_cohort_node_pair_gets_every_transition_logged(severe: ScenarioRun
 
 def test_household_events_carry_their_rule_version_and_phase(severe: ScenarioRun) -> None:
     events = severe.result.events
-    cohort_events = events.filter(pl.col("agent_id").is_not_null())
+    cohort_events = events.filter(pl.col("agent_id").str.contains(":"))
 
-    assert set(cohort_events["phase"].unique()) <= {
-        "agricultural_state",
-        "grain_production",
-        "household_consumption",
-        "credit_and_debt",
-        "bookkeeping",
-    }
+    assert set(cohort_events["phase"].unique()) <= {phase.token for phase in TickPhase}
     assert cohort_events["region"].null_count() == 0

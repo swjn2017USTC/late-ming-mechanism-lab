@@ -7,9 +7,10 @@ the event representation, the configuration defaults or the climate draw order c
 purpose — which is exactly what a regression seed is for. Update them deliberately, in the
 commit that changes the contract, never to make a red test go green.
 
-The household baselines pin more than the clock: they fix the order in which climate draws are
-consumed, the production function, the coping ladder and the harvest-repayment rule. A change
-to any of them moves the digest, which is the point.
+The household and market baselines pin more than the clock: they fix the order in which climate
+draws are consumed, the production function, the coping ladder, the price rule, the clearing
+order, arbitrage and the credit rules. A change to any of them moves the digest, which is the
+point.
 """
 
 from __future__ import annotations
@@ -18,6 +19,11 @@ from late_ming_lab.core.config import DEFAULT_ROOT_SEED, SimulationConfig
 from late_ming_lab.core.kernel import SimulationKernel
 from late_ming_lab.core.manifest import make_run_id
 from late_ming_lab.experiments.household_shock import ScenarioRun, ShockScenario, run_scenario
+from late_ming_lab.experiments.market_credit import (
+    MarketRun,
+    MarketScenario,
+    run_market_scenario,
+)
 from late_ming_lab.networks.fixtures import toy_spatial_dataset
 from late_ming_lab.systems.calendar import core_default_calendar
 from late_ming_lab.systems.climate import ClimateSystem, SyntheticClimate
@@ -30,11 +36,17 @@ REGRESSION_EVENT_COUNT = 240
 CLIMATE_SIMULATION_DIGEST = "6a03cce6cfdc4e8c426f19ec839f7d8ea3e2a0d9628e8e03c80fb2f238ce0755"
 CLIMATE_EVENT_COUNT = 240 * 6
 
+#: Same, with the whole P04 economy (market, merchants, elites, credit): two short windows.
+MARKET_BASELINE_DIGEST = "fcb3dfdc3863db49eb9a8a9dadf6b0221b22a9e55359d66790f8f9681ef1584c"
+MARKET_BASELINE_EVENT_COUNT = 10618
+MARKET_SEVERE_DIGEST = "dcfe82695ef95465d58fddd552b0dbb5dcf9bb26f9b49a39e9cd90f067dd7bb8"
+MARKET_SEVERE_EVENT_COUNT = 14108
+
 #: Same, with the toy cohort population: a normal year and a severe synthetic shock.
-HOUSEHOLD_BASELINE_DIGEST = "db26e7fdd019ec8a9497eb0de7a16ee990920407fc9adc5be7c9ba4c5c8335c8"
-HOUSEHOLD_BASELINE_EVENT_COUNT = 20895
-HOUSEHOLD_SEVERE_DIGEST = "2694229cff6499fe91d01956a10d9aac5bd40b243c39e4741dd78e222c5c6097"
-HOUSEHOLD_SEVERE_EVENT_COUNT = 28740
+HOUSEHOLD_BASELINE_DIGEST = "076ca261fbf514661fd471c06ef067cd9eb00a745834c6d9ad306a87acf2206e"
+HOUSEHOLD_BASELINE_EVENT_COUNT = 25606
+HOUSEHOLD_SEVERE_DIGEST = "55f0b4c6253668ffcaa6c457b6e17ceeb23b2e63737183d7e551be36b1349249"
+HOUSEHOLD_SEVERE_EVENT_COUNT = 33606
 
 
 def _regression_run() -> SimulationKernel:
@@ -108,6 +120,33 @@ def test_household_regression_runs_match_their_pinned_baselines() -> None:
     assert baseline.result.summary.simulation_digest == HOUSEHOLD_BASELINE_DIGEST
     assert severe.result.summary.event_count == HOUSEHOLD_SEVERE_EVENT_COUNT
     assert severe.result.summary.simulation_digest == HOUSEHOLD_SEVERE_DIGEST
+
+
+def _market_runs() -> tuple[MarketRun, MarketRun]:
+    compact = SimulationConfig.model_validate({"tick_count": 96, "warmup_ticks": 24})
+    return (
+        run_market_scenario(MarketScenario("market-baseline"), config=compact),
+        run_market_scenario(
+            MarketScenario("market-severe", monthly_event_probability=0.5, severity_floor=0.6),
+            config=compact,
+        ),
+    )
+
+
+def test_market_regression_runs_match_their_pinned_baselines() -> None:
+    baseline, severe = _market_runs()
+
+    assert baseline.result.summary.event_count == MARKET_BASELINE_EVENT_COUNT
+    assert baseline.result.summary.simulation_digest == MARKET_BASELINE_DIGEST
+    assert severe.result.summary.event_count == MARKET_SEVERE_EVENT_COUNT
+    assert severe.result.summary.simulation_digest == MARKET_SEVERE_DIGEST
+
+
+def test_market_regression_run_replays_exactly() -> None:
+    first, _ = _market_runs()
+    second, _ = _market_runs()
+
+    assert first.result.events.equals(second.result.events)
 
 
 def test_household_forcing_replays_and_the_shock_changes_it() -> None:

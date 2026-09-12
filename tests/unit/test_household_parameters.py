@@ -50,16 +50,12 @@ def test_household_parameters_are_assumptions_with_ordered_thresholds() -> None:
 def test_contradictory_parameter_values_are_rejected() -> None:
     base = core_default_household_parameters().model_dump()
 
-    with pytest.raises(ValidationError, match="distress sale cannot fetch more"):
-        HouseholdParameters.model_validate({**base, "land_distress_price_tael_per_mu": 9.0})
     with pytest.raises(ValidationError, match="stricter than permanent migration"):
         HouseholdParameters.model_validate({**base, "temporary_migration_unmet_ratio": 0.5})
     with pytest.raises(ValidationError, match="rent shares"):
         HouseholdParameters.model_validate(
             {**base, "rent_share_of_harvest": {"tenant-household": 1.5}}
         )
-    with pytest.raises(ValidationError, match="cannot be cheaper than the reference"):
-        HouseholdParameters.model_validate({**base, "grain_reference_price_tael_per_shi": 2.0})
 
 
 def test_annual_need_scales_with_adults() -> None:

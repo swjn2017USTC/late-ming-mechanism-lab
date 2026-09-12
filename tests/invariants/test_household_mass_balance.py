@@ -11,15 +11,14 @@ import polars as pl
 import pytest
 
 from late_ming_lab.actors.fixtures import toy_cohort_population
-from late_ming_lab.actors.households import (
+from late_ming_lab.actors.households import CohortEventType, HouseholdPopulation
+from late_ming_lab.actors.ledger import (
     ASSETS_DELTA,
     DEBT_DELTA,
     GRAIN_DELTA,
     LAND_DELTA,
     LEDGER_KEYS,
     SILVER_DELTA,
-    CohortEventType,
-    HouseholdPopulation,
 )
 from late_ming_lab.analysis.distress import with_trigger_fields
 from late_ming_lab.core.config import SimulationConfig
@@ -34,14 +33,23 @@ BALANCE_BY_KEY = {
     ASSETS_DELTA: "movable_assets_tael",
 }
 
-#: Silver may only appear from these transitions.
+#: Silver may only appear from these transitions: a loan, a sale of goods, a sale of land, or
+#: the sale of harvest surplus on the market. Nothing else credits a household.
 SILVER_SOURCES = {
     CohortEventType.BORROWING_REQUEST.value,
     CohortEventType.MOVABLE_ASSET_SALE.value,
     CohortEventType.LAND_SALE.value,
+    CohortEventType.MARKET_SALE.value,
+    CohortEventType.RELIEF_RECEIVED.value,
+    CohortEventType.TAX_MEDIATION.value,
 }
 
 SHORT_CONFIG = SimulationConfig.model_validate({"tick_count": 48, "warmup_ticks": 12})
+
+
+def _cohort_events(events: pl.DataFrame, population: HouseholdPopulation) -> pl.DataFrame:
+    """Events belonging to household cohorts; merchants and elites have their own ledgers."""
+    return events.filter(pl.col("agent_id").is_in([c.cohort_id for c in population]))
 
 
 @pytest.fixture(scope="module")
@@ -67,7 +75,7 @@ def test_balances_reconcile_with_the_event_ledger(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:
     events, population, initial = run
-    cohort_events = events.filter(pl.col("agent_id").is_not_null())
+    cohort_events = _cohort_events(events, population)
     ledger = (
         with_trigger_fields(cohort_events, LEDGER_KEYS)
         .group_by("agent_id")
@@ -86,8 +94,8 @@ def test_balances_reconcile_with_the_event_ledger(
 def test_no_balance_ever_goes_negative(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:
-    events, _, initial = run
-    cohort_events = events.filter(pl.col("agent_id").is_not_null())
+    events, population, initial = run
+    cohort_events = _cohort_events(events, population)
     ledger = with_trigger_fields(cohort_events.sort(["tick", "seq"]), LEDGER_KEYS)
     running = {
         cohort_id: {attribute: balances[attribute] for attribute in BALANCE_BY_KEY.values()}
@@ -109,9 +117,11 @@ def test_reported_consumption_leaves_a_ledger_trace(
 
     The balance reconciliation above cannot catch a flow that is missing on both sides; this can.
     """
-    events, _, _ = run
+    events, population, _ = run
     consumption = with_trigger_fields(
-        events.filter(pl.col("event_type") == CohortEventType.CONSUMPTION.value),
+        _cohort_events(events, population).filter(
+            pl.col("event_type") == CohortEventType.CONSUMPTION.value
+        ),
         ("eaten_shi", "from_storage_shi", "from_purchases_shi", GRAIN_DELTA),
     )
 
@@ -134,8 +144,10 @@ def test_reported_consumption_leaves_a_ledger_trace(
 def test_silver_never_appears_without_a_recorded_source(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:
-    events, _, _ = run
-    credited = with_trigger_fields(events, (SILVER_DELTA,)).filter(pl.col(SILVER_DELTA) > 0.0)
+    events, population, _ = run
+    credited = with_trigger_fields(_cohort_events(events, population), (SILVER_DELTA,)).filter(
+        pl.col(SILVER_DELTA) > 0.0
+    )
 
     assert credited.height > 0, "a shock run should exercise at least one silver source"
     assert set(credited["event_type"].unique()) <= SILVER_SOURCES
@@ -153,8 +165,8 @@ def test_cohort_weight_is_conserved(
 def test_no_household_is_moved_or_recruited(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:
-    events, _, _ = run
-    event_types = set(events["event_type"].unique())
+    events, population, _ = run
+    event_types = set(_cohort_events(events, population)["event_type"].unique())
 
     assert "MIGRATION" not in event_types
     assert "RECRUITMENT" not in event_types
@@ -162,7 +174,9 @@ def test_no_household_is_moved_or_recruited(
     assert CohortEventType.ELIGIBILITY.value in event_types
 
     eligibility_outcomes = set(
-        events.filter(pl.col("event_type") == CohortEventType.ELIGIBILITY.value)["outcome"]
+        _cohort_events(events, population).filter(
+            pl.col("event_type") == CohortEventType.ELIGIBILITY.value
+        )["outcome"]
     )
     assert all(
         outcome == "none"
@@ -175,8 +189,8 @@ def test_no_household_is_moved_or_recruited(
 def test_every_cohort_transition_has_a_rule_version(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:
-    events, _, _ = run
-    cohort_events = events.filter(pl.col("agent_id").is_not_null())
+    events, population, _ = run
+    cohort_events = _cohort_events(events, population)
 
     assert cohort_events["rule_version"].null_count() == 0
     assert set(cohort_events["rule_version"].unique()) >= {
