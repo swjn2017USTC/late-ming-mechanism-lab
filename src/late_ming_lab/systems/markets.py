@@ -465,7 +465,7 @@ class MarketClearingSystem:
 
 
 def _identity(actor: NodeBound) -> str:
-    for attribute in ("cohort_id", "elite_id", "merchant_id"):
+    for attribute in ("cohort_id", "elite_id", "merchant_id", "government_id"):
         value = getattr(actor, attribute, None)
         if isinstance(value, str):
             return value

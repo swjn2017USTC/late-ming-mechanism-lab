@@ -18,12 +18,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from late_ming_lab.actors.elites import (
-    EliteLayer,
-    LocalEliteAgent,
-    NoTaxMediation,
-    TaxMediationPolicy,
-)
+from late_ming_lab.actors.elites import EliteLayer, LocalEliteAgent
 from late_ming_lab.actors.exchange import CreditDecision, NodeBound, TradeOutcome
 from late_ming_lab.actors.households import (
     HouseholdCohortAgent,
@@ -123,7 +118,11 @@ class LocalCredit:
 
 
 class EliteActionSystem:
-    """Tick phase 08: private relief, tax mediation, and the elite's monthly state record."""
+    """Tick phase 08: private relief and the elite's monthly state record.
+
+    Tax mediation lives in the tax system now: the demand being mediated is the assessed
+    obligation, which only the fiscal layer knows.
+    """
 
     name: str = "elite-actions"
     phase: TickPhase = TickPhase.RELIEF
@@ -136,71 +135,20 @@ class EliteActionSystem:
         parameters: EliteParameters,
         household_parameters: HouseholdParameters,
         book: MarketBook,
-        tax_mediation: TaxMediationPolicy | None = None,
-        tax_demand_tael_per_household: float = 0.0,
     ) -> None:
         self._elites = elites
         self._population = population
         self._parameters = parameters
         self._household_parameters = household_parameters
         self._book = book
-        self._tax_mediation = tax_mediation or NoTaxMediation()
-        self._tax_demand_tael_per_household = tax_demand_tael_per_household
-
-    @property
-    def tax_mediation(self) -> TaxMediationPolicy:
-        return self._tax_mediation
-
-    @property
-    def tax_demand_tael_per_household(self) -> float:
-        return self._tax_demand_tael_per_household
 
     def step(self, ctx: TickContext) -> None:
         for house in self._elites:
-            self._mediate_tax(ctx, house)
             self._release_relief(ctx, house)
             self._record_state(ctx, house)
         self._elites.check_invariants()
 
     # ------------------------------------------------------------------ actions
-
-    def _mediate_tax(self, ctx: TickContext, house: LocalEliteAgent) -> None:
-        """Advance part of a client's obligation; there is no demand before P05."""
-        if self._tax_demand_tael_per_household <= 0.0:
-            return
-        for cohort in self._local_cohorts(house.node_id):
-            if cohort.households <= 0.0:
-                continue
-            demand = self._tax_demand_tael_per_household * cohort.households
-            advanced = self._tax_mediation.advance_tael(
-                parameters=self._parameters,
-                client_land_mu=cohort.land_mu,
-                demand_tael=demand,
-            )
-            advanced = min(advanced, house.silver_tael)
-            if advanced <= 0.0:
-                continue
-            emit_elite_event(
-                ctx,
-                house,
-                house.record_tax_mediation(
-                    advanced_tael=advanced,
-                    client_id=cohort.cohort_id,
-                    demand_tael=demand,
-                    rule_version=TAX_MEDIATION_RULE_VERSION,
-                ),
-                self.phase,
-            )
-            emit_cohort_event(
-                ctx,
-                cohort,
-                cohort.record_tax_mediation(
-                    advanced_tael=advanced,
-                    mediator_id=house.elite_id,
-                    rule_version=TAX_MEDIATION_RULE_VERSION,
-                ),
-                self.phase,
-            )
 
     def _release_relief(self, ctx: TickContext, house: LocalEliteAgent) -> None:
         """Release grain to the households that are measurably short of food."""
