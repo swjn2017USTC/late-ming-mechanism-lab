@@ -195,3 +195,20 @@ class EventLogger:
 
     def to_frame(self) -> pl.DataFrame:
         return events_to_frame(self._events)
+
+    def events_for_tick(self, tick: int) -> tuple[Event, ...]:
+        """Events already emitted for ``tick``.
+
+        Systems are coupled through the event log, not through shared mutable state: a later
+        phase reads what an earlier phase recorded for the same tick.
+        """
+        if not 0 <= tick < self._tick_count:
+            raise TickOutOfRange(f"tick {tick} outside [0, {self._tick_count})")
+        collected: list[Event] = []
+        for event in reversed(self._events):
+            if event.tick < tick:
+                break
+            if event.tick == tick:
+                collected.append(event)
+        collected.reverse()
+        return tuple(collected)

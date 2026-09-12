@@ -83,6 +83,28 @@ class ZoneCalendar(BaseModel):
             month for month, phase in sorted(self.phases.items()) if phase is CropPhase.HARVEST
         )
 
+    @property
+    def harvest_ticks(self) -> tuple[int, ...]:
+        """Months in which a crop is actually taken in.
+
+        A run of consecutive harvest months is one harvest observed over several weeks, so the
+        tick is the last month of each run; two separated runs are two crops (winter wheat and
+        a summer crop on the north China plain). Counting every harvest month would collect the
+        same crop twice.
+        """
+        ticks: list[int] = []
+        run: list[int] = []
+        for month in ALL_MONTHS:
+            if self.phases[month] is CropPhase.HARVEST:
+                run.append(month)
+                continue
+            if run:
+                ticks.append(run[-1])
+                run = []
+        if run:
+            ticks.append(run[-1])
+        return tuple(ticks)
+
     def sensitivity_for(self, month: int) -> float:
         _require_month(month)
         return self.shock_sensitivity[month]
