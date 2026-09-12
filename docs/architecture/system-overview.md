@@ -1,8 +1,9 @@
 # System Overview
 
-Status: P02 (space, time and climate skeleton). No households, markets, armies, rebels or
-runtime-LLM decisions exist yet; the only spatial dataset in the repository is the toy
-fixture, which is not history.
+Status: P03 (household survival under agricultural shock). Space, climate and the household
+layer exist; markets, elites, armies, rebels, fiscal extraction and runtime-LLM decisions do
+not. The only spatial dataset is the toy fixture and the only cohorts are the toy endowments:
+neither is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -158,6 +159,85 @@ mode as `outcome` and the mode-specific `rule_version`. Boundary nodes receive n
 - every zone used by a dataset has a calendar entry, or the run refuses to start;
 - an observed series must be graded `A`–`D` and must cover every node-month it is asked for.
 
+## Household survival (P03)
+
+### Cohorts, not families
+
+`HouseholdCohortAgent` represents ``households`` households of one endowment archetype in one
+county node. Five archetypes exist (landless labourer, tenant, poor/middle smallholder, wealthy
+farmer); the cohort weight is a count of households, never a named family, and no
+household-level inventory is invented.
+
+Units, fixed once and used everywhere: grain in ``shi`` (石), silver in ``tael`` (两), land in
+``mu`` (畝), time in months.
+
+| Concern | Module | Contract |
+| --- | --- | --- |
+| Balance sheet | `actors/households.py` | weight, adults, land, grain, silver, debt, movable assets, season impact, coping stage, three eligibility flags |
+| Cohort fixture | `actors/fixtures.py` | five archetypes per county node, every value graded `S`, marked as not social history |
+| Production | `systems/agriculture.py` | `cultivated = min(land, adults × capacity)`, `yield_fraction = max(0, 1 − scale × Σ(severity × sensitivity))`, `harvest = cultivated × yield × yield_fraction` |
+| Consumption and ladder | `systems/household_survival.py` | the ladder below, run once per cohort per month |
+| Debt | `systems/household_survival.py` | interest accrues monthly; repayment only from silver above a reserve, or from grain above a year's need at harvest |
+| Eligibility | `systems/household_survival.py` | trailing 12-month unmet share of the subsistence floor against declared thresholds |
+
+### The coping ladder
+
+```text
+1 stored grain and in-kind wages
+2 discretionary consumption cut down to the floor
+3 silver on hand (a stored resource, spent before borrowing)
+4 borrow: request recorded even when no capacity exists
+5 sell movable assets
+6 sell land
+7 eligibility flags: temporary migration, permanent migration, recruitment
+```
+
+Whatever remains of the floor after step 6 is **unmet need** — a physical ledger quantity, not a
+sentiment. The stage reached in a month is the furthest step used; it is sticky within a crop
+year and resets after a harvest that covers the year's need. There is no anger, grievance or
+rebellion scalar in any of this, and P03 moves nobody: it records who *could* move.
+
+### Enforcement, not documentation
+
+- every balance field is validated on assignment, so a negative grain, silver, land, assets or
+  debt balance raises immediately;
+- balances change only through accounting primitives that record their delta, and each delta is
+  written into the event that explains it — the event log *is* the ledger;
+- `check_balances` reconciles every balance against its recorded deltas, and the bookkeeping
+  system runs it for every cohort every month, so a change made outside the ledger surfaces as
+  an error rather than a gift;
+- `tests/invariants/test_household_mass_balance.py` rebuilds every cohort's balances from the
+  event log of a real run and compares them with the reported state, and replays the log to show
+  that no balance ever went negative;
+- silver may only enter a cohort from a recorded source: borrowing, movable-asset sale or land
+  sale (the invariant test asserts exactly that set).
+
+### Placeholders that P04 and P05 replace
+
+The ladder needs prices and a lender to be exercisable, so P03 declares fixed, assumption-graded
+substitutes: a reference grain price, a distress grain price, land collateral and distress
+values, a loan-to-value cap, an interest rate, an in-kind wage that follows the local harvest,
+and rent as a share of the harvest paid to an unmodelled landlord. None of it is a market: no
+price responds to anything, no counterparty exists, and every one of these is a sensitivity
+target until the evidence ledger replaces it.
+
+### What the toy experiment shows
+
+Five scenarios over the full 1625–1644 window differ only in the synthetic forcing. Mean unmet
+share of the subsistence floor, by archetype:
+
+| severity floor | landless | tenant | poor smallholder | middle smallholder | wealthy farmer |
+| --- | --- | --- | --- | --- | --- |
+| 0.0 (baseline) | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 |
+| 0.2 (mild) | 0.001 | 0.000 | 0.000 | 0.000 | 0.000 |
+| 0.4 (moderate) | 0.118 | 0.046 | 0.000 | 0.000 | 0.000 |
+| 0.6 (severe) | 0.388 | 0.269 | 0.007 | 0.000 | 0.000 |
+| 0.8 (extreme) | 0.610 | 0.506 | 0.140 | 0.000 | 0.000 |
+
+The ordering is emergent, not encoded: no rule mentions a cohort class, and the gradient comes
+from endowment, collateral and the ladder's order. The severity axis is a scenario parameter,
+not an estimate of any historical drought — no calibration exists yet, and none is claimed.
+
 ## Deterministic kernel (P01)
 
 The kernel is history-free by design: it owns time, randomness, event recording, provenance
@@ -215,7 +295,8 @@ Python 3.12 · `uv`. Dependencies are added when a phase needs them, not in adva
 src/late_ming_lab/
 ├── core/        config.py, clock.py, rng.py, events.py, tick.py, kernel.py, manifest.py,
 │                hashing.py                       (implemented in P01)
-├── actors/      households, elites, merchants, government, military, armed_groups
+├── actors/      households.py, fixtures.py        (implemented in P03)
+│                elites, merchants, government, military, armed_groups
 ├── systems/     calendar.py, climate.py          (implemented in P02)
 │                agriculture, households, markets, credit, taxation, relief,
 │                migration, military_finance, insurgency, violence
@@ -224,12 +305,14 @@ src/late_ming_lab/
 ├── policies/    base, rules, utility, random_policy, ustc_v41
 ├── evidence/    provenance.py (P01), grades.py (P02); registry, parameters (P08)
 ├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
-├── calibration/ experiments/ analysis/ cli/ ui/
+├── analysis/    distress.py                      (implemented in P03)
+├── experiments/ household_shock.py               (implemented in P03)
+├── calibration/ cli/ ui/
 ```
 
 Implemented so far: `late_ming_lab/__init__.py`, `cli.py` (`--version`, `smoke-run`),
-`core/`, `evidence/`, `networks/`, `systems/`, `storage/`. Everything else is created by the
-phase that needs it.
+`analysis/`, `actors/`, `core/`, `evidence/`, `experiments/`, `networks/`, `systems/`,
+`storage/`. Everything else is created by the phase that needs it.
 
 ## Phase roadmap
 
