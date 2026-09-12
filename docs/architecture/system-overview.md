@@ -1,7 +1,8 @@
 # System Overview
 
-Status: P01 (deterministic simulation kernel). No historical content exists yet: no
-counties, households, markets, armies, rebels or runtime-LLM decisions.
+Status: P02 (space, time and climate skeleton). No households, markets, armies, rebels or
+runtime-LLM decisions exist yet; the only spatial dataset in the repository is the toy
+fixture, which is not history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -107,6 +108,56 @@ version, RNG draw, and outcome. Any state change that matters must be explainabl
 - same code + config + seed + policy → same output, except live LLM decisions, whose traces
   must be recordable and replayable.
 
+## Space, time and climate (P02)
+
+### Nodes, not polygons
+
+Space is a set of administrative seats with approximate catchments: no county polygons, no
+area, no border geometry. The reasoning, the rejected alternatives and the costs are in
+`docs/adr/0001-node-and-catchment-geography.md`.
+
+| Concern | Module | Contract |
+| --- | --- | --- |
+| Nodes | `networks/nodes.py` | `CountyNode` (county or boundary), province, agrarian zone for counties, external roles for boundary nodes, optional **sourced** point with precision and uncertainty |
+| Edges | `networks/edges.py` | `EdgeMetrics` (`distance_km > 0`, `cost > 0`, `capacity > 0`, `risk ∈ [0,1]`, all finite) plus per-graph `EdgeSemantics` |
+| Graphs | `networks/trade.py`, `migration.py`, `military.py`, `graphs.py` | Three separate graphs; counties in every graph; each graph connected; boundary nodes only where their role allows; graph node sets differ |
+| Dataset | `networks/dataset.py` | Versioned `spatial-dataset-v1`; node ids unique; endpoints exist; no duplicate edge; distance is pair-level and must agree across graphs while costs may differ |
+| Real data | `networks/adapter.py` | One node table plus three edge tables, every row graded; a row without provenance is rejected, not defaulted |
+| Toy fixture | `networks/fixtures.py` | Five county nodes (three loess dryland, two north China plain) and three boundary nodes, every value graded `S`; **not** geography |
+| Calendar | `systems/calendar.py` | Per zone and month: crop phase and anomaly sensitivity; Gregorian months only; every entry grade `S` |
+| Climate | `systems/climate.py` | `BaselineClimate`, `ObservedHistoricalClimate`, `SyntheticClimate`, and `ClimateSystem` (tick phase 01) |
+
+### Climate forcing
+
+A shock is a severity in `[0, 1]` for one node and month — a forcing, not a yield and not a
+price. The production function (P03) turns it into crop outcomes, weighted by the calendar; the
+climate layer does not contain a crop model.
+
+| Mode | Behaviour | Rule version |
+| --- | --- | --- |
+| `baseline` | Always zero severity; consumes no randomness | `climate-baseline-v1` |
+| `observed-historical` | Replays a sourced series; no randomness; fails closed on a gap; a series graded `S` is refused | `climate-observed-v1` |
+| `synthetic` | Draws from `climate_rng` with declared parameters | `climate-synthetic-v1` |
+
+Synthetic draws are taken **unconditionally** — occurrence first, magnitude second, for every
+node and month in canonical node-id order — so changing a parameter changes what the draws
+mean without shifting them. That is what makes common random numbers usable in the P10
+counterfactuals, and `tests/regression/test_regression_seed.py` pins the draw sequence.
+
+Each tick emits one `CLIMATE_SHOCK` event per county node, carrying `severity`, the calendar
+`sensitivity`, their product as `impact`, the month, the two named draws (synthetic only), the
+mode as `outcome` and the mode-specific `rule_version`. Boundary nodes receive no climate.
+
+### Space and climate invariants
+
+- a county node always has an agrarian zone, and a boundary node never does;
+- assumed coordinates are impossible: a `NodeLocation` graded `S` is refused by the model;
+- an edge endpoint must exist, and a boundary endpoint must declare the role its graph needs;
+- a pair of places states one distance, whatever graph it appears in;
+- every graph is connected and contains every county node;
+- every zone used by a dataset has a calendar entry, or the run refuses to start;
+- an observed series must be graded `A`–`D` and must cover every node-month it is asked for.
+
 ## Deterministic kernel (P01)
 
 The kernel is history-free by design: it owns time, randomness, event recording, provenance
@@ -165,18 +216,20 @@ src/late_ming_lab/
 ├── core/        config.py, clock.py, rng.py, events.py, tick.py, kernel.py, manifest.py,
 │                hashing.py                       (implemented in P01)
 ├── actors/      households, elites, merchants, government, military, armed_groups
-├── systems/     agriculture, households, markets, credit, taxation, relief,
+├── systems/     calendar.py, climate.py          (implemented in P02)
+│                agriculture, households, markets, credit, taxation, relief,
 │                migration, military_finance, insurgency, violence
-├── networks/    trade, migration, military
+├── networks/    nodes.py, edges.py, trade.py, migration.py, military.py, graphs.py,
+│                dataset.py, adapter.py, fixtures.py   (implemented in P02)
 ├── policies/    base, rules, utility, random_policy, ustc_v41
-├── evidence/    provenance.py (P01); registry, parameters (P08)
+├── evidence/    provenance.py (P01), grades.py (P02); registry, parameters (P08)
 ├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
 ├── calibration/ experiments/ analysis/ cli/ ui/
 ```
 
 Implemented so far: `late_ming_lab/__init__.py`, `cli.py` (`--version`, `smoke-run`),
-`core/`, `evidence/provenance.py`, `storage/`. Everything else is created by the phase that
-needs it.
+`core/`, `evidence/`, `networks/`, `systems/`, `storage/`. Everything else is created by the
+phase that needs it.
 
 ## Phase roadmap
 

@@ -11,11 +11,18 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P01 (Simulation Kernel / Reproducibility) complete. The repository now holds a
-history-free deterministic kernel — configuration, monthly clock, subsystem RNG streams,
-immutable event log, run manifest, Parquet output, DuckDB query helper — and no historical
-content: no counties, households, markets, armies or LLM decisions. Phase plan:
-`docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P01.md`.
+P02 (Historical Space / Time / Climate) complete. The repository holds a history-free
+deterministic kernel (P01) and a spatial–temporal–environmental skeleton (P02): county and
+boundary nodes with provenance, three separate movement graphs, a monthly agricultural
+calendar, and a climate-forcing interface with baseline, observed-historical and synthetic
+modes. There are still no households, markets, armies, rebels or LLM decisions.
+
+The only spatial dataset in the repository is the five-county toy fixture, which is **not
+history** — every value in it is graded `S` (an assumption). Real geography enters through
+`networks/adapter.py`, with provenance columns, and nowhere else. Why space is nodes and
+catchments rather than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
+
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P02.md`.
 
 ```bash
 uv run late-ming-lab smoke-run            # 240 ticks, 1625-01 → 1644-12, into outputs/runs/
