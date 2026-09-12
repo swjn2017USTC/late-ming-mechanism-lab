@@ -5,14 +5,13 @@ environment; it never represents a named family and never invents household-leve
 quantities are cohort totals in the units declared in :mod:`late_ming_lab.evidence.parameters`
 (grain in ``shi``, silver in ``tael``, land in ``mu``).
 
-Two rules are enforced in code rather than documented only:
+The two accounting rules it obeys come from
+:class:`~late_ming_lab.actors.ledger.LedgerAgent`: no balance may go negative, and no balance may
+move without a recorded, logged explanation.
 
-- **no negative balance** — every field is validated on assignment, so a bug that would drive
-  grain, silver, land, assets or debt below zero raises immediately;
-- **no unsourced balance change** — balances change only through the accounting primitives
-  below, each of which records its delta and emits the event that explains it. Balances are
-  reconciled against the recorded deltas on every check, so an assignment that bypassed the
-  ledger surfaces as a mismatch instead of a silent gift.
+Where a household needs a counterparty — grain to buy, silver to borrow, a buyer for its land —
+it asks for one through :mod:`late_ming_lab.actors.exchange`. It does not know whether the
+merchant layer or the elite layer answers, and it cannot conjure grain or silver on its own.
 
 The coping ladder lives in :meth:`HouseholdCohortAgent.monthly_budget` because it is the
 household's own behaviour. What it does *not* contain is any anger, grievance or rebellion
@@ -22,33 +21,51 @@ nothing else.
 
 from __future__ import annotations
 
-import math
 from collections import deque
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 from types import MappingProxyType
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import Field, PrivateAttr
 
+from late_ming_lab.actors.exchange import CreditSource, GrainMarket
+from late_ming_lab.actors.ledger import (
+    ASSETS_DELTA,
+    DEBT_DELTA,
+    GRAIN_DELTA,
+    LAND_DELTA,
+    SILVER_DELTA,
+    LedgerAgent,
+    LedgerError,
+)
 from late_ming_lab.core.events import Event
 from late_ming_lab.core.tick import TickContext, TickPhase
 from late_ming_lab.evidence.parameters import HouseholdParameters
 from late_ming_lab.networks.nodes import AgrarianZone
 
+#: P02/P03 named the domain error this way; the shared ledger raises :class:`LedgerError`.
+HouseholdLedgerError = LedgerError
+
+#: Names re-exported for the ledger contract this actor satisfies.
+__all__ = [
+    "ASSETS_DELTA",
+    "DEBT_DELTA",
+    "GRAIN_DELTA",
+    "LAND_DELTA",
+    "SILVER_DELTA",
+    "CohortClass",
+    "CohortEvent",
+    "CohortEventType",
+    "CopingStage",
+    "HouseholdCohortAgent",
+    "HouseholdLedgerError",
+    "HouseholdPopulation",
+    "emit_cohort_event",
+]
+
 COHORT_ID_PATTERN = r"^[a-z0-9][a-z0-9._:-]*$"
 DISTRESS_WINDOW_MONTHS = 12
-
-#: Trigger keys that carry a balance change; the event log *is* the ledger.
-GRAIN_DELTA = "grain_delta_shi"
-SILVER_DELTA = "silver_delta_tael"
-LAND_DELTA = "land_delta_mu"
-DEBT_DELTA = "debt_delta_tael"
-ASSETS_DELTA = "assets_delta_tael"
-
-LEDGER_KEYS: tuple[str, ...] = (GRAIN_DELTA, SILVER_DELTA, LAND_DELTA, DEBT_DELTA, ASSETS_DELTA)
-
-BALANCE_TOLERANCE = 1e-9
 
 HOUSEHOLD_RULE_VERSION = "household-survival-v1"
 HARVEST_RULE_VERSION = "harvest-v1"
@@ -92,16 +109,15 @@ class CohortEventType(StrEnum):
     MOVABLE_ASSET_SALE = "MOVABLE_ASSET_SALE"
     LAND_SALE = "LAND_SALE"
     COPING_TRANSITION = "COPING_TRANSITION"
+    MARKET_SALE = "MARKET_SALE"
+    RELIEF_RECEIVED = "RELIEF_RECEIVED"
+    TAX_MEDIATION = "TAX_MEDIATION"
     HARVEST = "HARVEST"
     RENT_PAYMENT = "RENT_PAYMENT"
     DEBT_INTEREST = "DEBT_INTEREST"
     DEBT_REPAYMENT = "DEBT_REPAYMENT"
     ELIGIBILITY = "ELIGIBILITY"
     COHORT_STATE = "COHORT_STATE"
-
-
-class HouseholdLedgerError(RuntimeError):
-    """Raised when a cohort's balances disagree with the deltas it recorded."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -129,10 +145,8 @@ def emit_cohort_event(
     )
 
 
-class HouseholdCohortAgent(BaseModel):
+class HouseholdCohortAgent(LedgerAgent):
     """One weighted cohort of households with its balance sheet and coping state."""
-
-    model_config = ConfigDict(validate_assignment=True, extra="forbid")
 
     cohort_id: str = Field(pattern=COHORT_ID_PATTERN, max_length=128)
     node_id: str = Field(pattern=COHORT_ID_PATTERN, max_length=64)
@@ -153,20 +167,16 @@ class HouseholdCohortAgent(BaseModel):
     permanent_migration_eligible: bool = False
     recruitment_eligible: bool = False
 
-    _ledger: dict[str, float] = PrivateAttr(default_factory=dict)
-    _initial: dict[str, float] = PrivateAttr(default_factory=dict)
     _land_reference_value: float = PrivateAttr(default=0.0)
+    _initial_households: float = PrivateAttr(default=0.0)
 
     def model_post_init(self, _context: object) -> None:
-        self._ledger = dict.fromkeys(LEDGER_KEYS, 0.0)
-        self._initial = {
-            "households": self.households,
-            "grain": self.grain_shi,
-            "silver": self.silver_tael,
-            "land": self.land_mu,
-            "debt": self.debt_tael,
-            "assets": self.movable_assets_tael,
-        }
+        super().model_post_init(_context)
+        self._initial_households = self.households
+
+    @property
+    def ledger_name(self) -> str:
+        return self.cohort_id
 
     # ------------------------------------------------------------------ derived quantities
 
@@ -187,84 +197,19 @@ class HouseholdCohortAgent(BaseModel):
         """Reference value of what the cohort can pledge; not a market price."""
         return self.movable_assets_tael + self.land_mu * self._land_reference_value
 
-    @property
-    def ledger_deltas(self) -> Mapping[str, float]:
-        return MappingProxyType(self._ledger)
+    def check_balances(self) -> None:
+        super().check_balances()
+        if self.households != self._initial_households:
+            raise HouseholdLedgerError(
+                f"{self.cohort_id}: cohort weight changed from {self._initial_households} to "
+                f"{self.households}; P03-P04 record eligibility but move no household"
+            )
 
     def set_land_reference_value(self, value: float) -> None:
         """Collateral valuation used for credit capacity; declared by the run's parameters."""
         if value <= 0:
             raise ValueError("land reference value must be positive")
         self._land_reference_value = value
-
-    # ------------------------------------------------------------------ accounting core
-
-    def _apply(
-        self,
-        *,
-        grain: float = 0.0,
-        silver: float = 0.0,
-        land: float = 0.0,
-        debt: float = 0.0,
-        assets: float = 0.0,
-        impacts: tuple[tuple[str, float], ...] = (),
-    ) -> None:
-        """Apply a balance change; the only place balances ever move.
-
-        The new balances are checked before anything is written, so a rejected change leaves the
-        cohort exactly as it was instead of half-moved.
-        """
-        candidates = (
-            ("grain_shi", self.grain_shi + grain),
-            ("silver_tael", self.silver_tael + silver),
-            ("land_mu", self.land_mu + land),
-            ("debt_tael", self.debt_tael + debt),
-            ("movable_assets_tael", self.movable_assets_tael + assets),
-        )
-        for name, value in candidates:
-            if not math.isfinite(value) or value < 0.0:
-                raise HouseholdLedgerError(
-                    f"{self.cohort_id}: refusing an impossible balance change; {name} would "
-                    f"become {value}"
-                )
-        self.grain_shi, self.silver_tael, self.land_mu, self.debt_tael, self.movable_assets_tael = (
-            candidates[0][1],
-            candidates[1][1],
-            candidates[2][1],
-            candidates[3][1],
-            candidates[4][1],
-        )
-        for key, value in impacts:
-            self._ledger[key] = self._ledger[key] + value
-
-    def check_balances(self) -> None:
-        """Reconcile every balance against its recorded deltas and check conservation."""
-        initial = self._initial
-        expected = {
-            "grain": initial["grain"] + self._ledger[GRAIN_DELTA],
-            "silver": initial["silver"] + self._ledger[SILVER_DELTA],
-            "land": initial["land"] + self._ledger[LAND_DELTA],
-            "debt": initial["debt"] + self._ledger[DEBT_DELTA],
-            "assets": initial["assets"] + self._ledger[ASSETS_DELTA],
-        }
-        actual = {
-            "grain": self.grain_shi,
-            "silver": self.silver_tael,
-            "land": self.land_mu,
-            "debt": self.debt_tael,
-            "assets": self.movable_assets_tael,
-        }
-        for name, value in expected.items():
-            if not math.isclose(actual[name], value, rel_tol=1e-9, abs_tol=BALANCE_TOLERANCE):
-                raise HouseholdLedgerError(
-                    f"{self.cohort_id}: {name} is {actual[name]} but the recorded deltas "
-                    f"account for {value}; a balance changed without an entry"
-                )
-        if self.households != initial["households"]:
-            raise HouseholdLedgerError(
-                f"{self.cohort_id}: cohort weight changed from {initial['households']} to "
-                f"{self.households}; P03 records eligibility but moves no household"
-            )
 
     # ------------------------------------------------------------------ transitions
 
@@ -348,6 +293,7 @@ class HouseholdCohortAgent(BaseModel):
         requested_tael: float,
         granted_tael: float,
         capacity_tael: float,
+        lender_id: str,
         rule_version: str,
     ) -> CohortEvent:
         self._apply(
@@ -366,7 +312,7 @@ class HouseholdCohortAgent(BaseModel):
                 SILVER_DELTA: granted_tael,
                 DEBT_DELTA: granted_tael,
             },
-            outcome="granted" if granted_tael > 0 else "no-capacity",
+            outcome=(f"granted-by:{lender_id}" if granted_tael > 0 else f"no-capacity:{lender_id}"),
         )
 
     def record_grain_purchase(
@@ -441,6 +387,71 @@ class HouseholdCohortAgent(BaseModel):
             outcome="distress-sale",
         )
 
+    def surplus_for_sale(self, *, parameters: HouseholdParameters) -> float:
+        """Grain a household will sell: everything above the retention it keeps for itself."""
+        keep = parameters.surplus_keep_ratio_of_annual_need * parameters.annual_need_shi(
+            self.adults
+        )
+        return max(0.0, self.grain_shi - keep)
+
+    def record_market_sale(
+        self, *, shi: float, price_tael_per_shi: float, buyer_id: str, rule_version: str
+    ) -> CohortEvent:
+        """Sell harvest surplus to the local market for silver."""
+        proceeds = shi * price_tael_per_shi
+        self._apply(
+            grain=-shi,
+            silver=proceeds,
+            impacts=((GRAIN_DELTA, -shi), (SILVER_DELTA, proceeds)),
+        )
+        return CohortEvent(
+            event_type=CohortEventType.MARKET_SALE,
+            rule_version=rule_version,
+            trigger={
+                "sold_shi": shi,
+                "price_tael_per_shi": price_tael_per_shi,
+                "proceeds_tael": proceeds,
+                GRAIN_DELTA: -shi,
+                SILVER_DELTA: proceeds,
+            },
+            outcome=f"sold-to:{buyer_id}",
+        )
+
+    def record_relief(self, *, grain_shi: float, donor_id: str, rule_version: str) -> CohortEvent:
+        """Grain received as private relief; a transfer, not production."""
+        self._apply(grain=grain_shi, impacts=((GRAIN_DELTA, grain_shi),))
+        return CohortEvent(
+            event_type=CohortEventType.RELIEF_RECEIVED,
+            rule_version=rule_version,
+            trigger={
+                "relief_shi": grain_shi,
+                GRAIN_DELTA: grain_shi,
+                "grain_shi": self.grain_shi,
+            },
+            outcome=f"relieved-by:{donor_id}",
+        )
+
+    def record_tax_mediation(
+        self, *, advanced_tael: float, mediator_id: str, rule_version: str
+    ) -> CohortEvent:
+        """Record an obligation advanced on this household's behalf as a claim on it."""
+        self._apply(
+            silver=advanced_tael,
+            debt=advanced_tael,
+            impacts=((SILVER_DELTA, advanced_tael), (DEBT_DELTA, advanced_tael)),
+        )
+        return CohortEvent(
+            event_type=CohortEventType.TAX_MEDIATION,
+            rule_version=rule_version,
+            trigger={
+                "advanced_tael": advanced_tael,
+                "debt_tael": self.debt_tael,
+                SILVER_DELTA: advanced_tael,
+                DEBT_DELTA: advanced_tael,
+            },
+            outcome=f"advanced-by:{mediator_id}",
+        )
+
     def record_harvest(
         self,
         *,
@@ -466,7 +477,7 @@ class HouseholdCohortAgent(BaseModel):
         )
 
     def record_rent_payment(
-        self, *, grain_shi: float, share: float, rule_version: str
+        self, *, grain_shi: float, share: float, landlord_id: str, rule_version: str
     ) -> CohortEvent:
         self._apply(grain=-grain_shi, impacts=((GRAIN_DELTA, -grain_shi),))
         return CohortEvent(
@@ -477,7 +488,7 @@ class HouseholdCohortAgent(BaseModel):
                 "rent_share_of_harvest": share,
                 GRAIN_DELTA: -grain_shi,
             },
-            outcome="paid-to-unmodelled-landlord",
+            outcome=f"paid-to:{landlord_id}",
         )
 
     def record_debt_interest(
@@ -652,9 +663,12 @@ class HouseholdCohortAgent(BaseModel):
 
     def monthly_budget(
         self,
+        ctx: TickContext,
         *,
         parameters: HouseholdParameters,
         labour_demand_factor: float,
+        market: GrainMarket,
+        credit: CreditSource,
         rule_version: str,
     ) -> tuple[CohortEvent, ...]:
         """Run the declared coping ladder for one month and return the recorded transitions.
@@ -672,9 +686,11 @@ class HouseholdCohortAgent(BaseModel):
 
         Silver on hand is spent after the consumption cut and before borrowing, because a
         household that cannot reach the floor first accepts eating less and then pays for the
-        rest; borrowing starts only when its own silver is gone. Whatever part of the floor is
-        still unmet after the whole ladder is recorded as unmet need, which raises the cohort's
-        distress ratio and nothing else.
+        rest. Every rung is executed against a counterparty — the local grain market for food and
+        movables, the local elite for credit and land — so a rung fails when the counterparty
+        cannot deliver, not when a formula says so. Whatever part of the floor is still unmet
+        after the whole ladder is recorded as unmet need, which raises the cohort's distress
+        ratio and nothing else.
 
         ``labour_demand_factor`` is the local harvest's yield fraction: a failed harvest means
         little work and little wage. It is a declared placeholder for the labour market that
@@ -682,7 +698,7 @@ class HouseholdCohortAgent(BaseModel):
         """
         need = parameters.subsistence_grain_per_adult_month_shi * self.adults
         floor = need * parameters.minimum_consumption_fraction
-        price = parameters.distress_grain_price_tael_per_shi
+        price = market.price_tael_per_shi
 
         demand = labour_demand_factor
         events: list[CohortEvent] = [
@@ -697,43 +713,99 @@ class HouseholdCohortAgent(BaseModel):
         eaten_from_storage = self.eat_from_storage(need)
         purchased = 0.0
         gap = max(0.0, floor - eaten_from_storage)
-
-        if gap > 0:
-            purchase_events, bought = self._buy_with_silver(
-                gap, price=price, occasion="silver-on-hand", rule_version=rule_version
-            )
-            events.extend(purchase_events)
-            purchased += bought
-            gap = max(0.0, gap - bought)
-
         used_credit = used_assets = used_land = False
 
         if gap > 0:
-            purchase_events, bought = self._borrow_and_buy(
-                gap, price=price, parameters=parameters, rule_version=rule_version
+            bought = self._buy_food(
+                ctx,
+                market,
+                gap=gap,
+                price=price,
+                occasion="silver-on-hand",
+                events=events,
+                rule_version=rule_version,
             )
-            events.extend(purchase_events)
-            used_credit = bought > 0
             purchased += bought
             gap = max(0.0, gap - bought)
 
         if gap > 0:
-            purchase_events, bought = self._sell_movables_and_buy(
-                gap, price=price, rule_version=rule_version
+            requested = gap * price
+            decision = credit.borrow(
+                ctx,
+                self,
+                requested_tael=requested,
+                collateral_tael=self.collateral_value_tael,
+                existing_debt_tael=self.debt_tael,
             )
-            events.extend(purchase_events)
-            used_assets = bought > 0
-            purchased += bought
-            gap = max(0.0, gap - bought)
+            events.append(
+                self.record_borrowing_request(
+                    requested_tael=requested,
+                    granted_tael=decision.granted_tael,
+                    capacity_tael=decision.capacity_tael,
+                    lender_id=decision.lender_id,
+                    rule_version=rule_version,
+                )
+            )
+            if decision.granted_tael > 0:
+                bought = self._buy_food(
+                    ctx,
+                    market,
+                    gap=gap,
+                    price=price,
+                    occasion=f"borrowed-from:{decision.lender_id}",
+                    events=events,
+                    rule_version=rule_version,
+                )
+                used_credit = bought > 0
+                purchased += bought
+                gap = max(0.0, gap - bought)
 
         if gap > 0:
-            purchase_events, bought = self._sell_land_and_buy(
-                gap, price=price, parameters=parameters, rule_version=rule_version
+            outcome = market.buy_movables(
+                ctx, self, wanted_tael=gap * price, max_tael=self.movable_assets_tael
             )
-            events.extend(purchase_events)
-            used_land = bought > 0
-            purchased += bought
-            gap = max(0.0, gap - bought)
+            if outcome.quantity > 0:
+                events.append(
+                    self.record_movable_asset_sale(
+                        proceeds_tael=outcome.quantity, rule_version=rule_version
+                    )
+                )
+                bought = self._buy_food(
+                    ctx,
+                    market,
+                    gap=gap,
+                    price=price,
+                    occasion=f"asset-sale-to:{outcome.counterparty_id}",
+                    events=events,
+                    rule_version=rule_version,
+                )
+                used_assets = bought > 0
+                purchased += bought
+                gap = max(0.0, gap - bought)
+
+        if gap > 0:
+            land_price = credit.land_price_tael_per_mu
+            outcome = credit.sell_land(ctx, self, wanted_tael=gap * price, max_mu=self.land_mu)
+            if outcome.quantity > 0:
+                events.append(
+                    self.record_land_sale(
+                        mu=outcome.quantity,
+                        price_tael_per_mu=land_price,
+                        rule_version=rule_version,
+                    )
+                )
+                bought = self._buy_food(
+                    ctx,
+                    market,
+                    gap=gap,
+                    price=price,
+                    occasion=f"land-sale-to:{outcome.counterparty_id}",
+                    events=events,
+                    rule_version=rule_version,
+                )
+                used_land = bought > 0
+                purchased += bought
+                gap = max(0.0, gap - bought)
 
         # Food bought this month is eaten this month; the draw is debited here so that a
         # purchase is credited once and debited once. Only purchased grain can remain to eat:
@@ -768,6 +840,33 @@ class HouseholdCohortAgent(BaseModel):
             events.append(transition)
         return tuple(events)
 
+    def _buy_food(
+        self,
+        ctx: TickContext,
+        market: GrainMarket,
+        *,
+        gap: float,
+        price: float,
+        occasion: str,
+        events: list[CohortEvent],
+        rule_version: str,
+    ) -> float:
+        """Buy what the market can deliver with the silver on hand; returns the shi delivered."""
+        if self.silver_tael <= 0.0 or gap <= 0.0:
+            return 0.0
+        outcome = market.buy_grain(ctx, self, shi_wanted=gap, max_silver=self.silver_tael)
+        if outcome.quantity <= 0.0:
+            return 0.0
+        events.append(
+            self.record_grain_purchase(
+                shi=outcome.quantity,
+                price_tael_per_shi=price,
+                occasion=occasion,
+                rule_version=rule_version,
+            )
+        )
+        return outcome.quantity
+
     def _stage_reached(
         self,
         *,
@@ -789,92 +888,6 @@ class HouseholdCohortAgent(BaseModel):
         if consumed < need:
             return CopingStage.REDUCING_CONSUMPTION
         return CopingStage.SELF_SUFFICIENT
-
-    def _buy_with_silver(
-        self, gap_shi: float, *, price: float, occasion: str, rule_version: str
-    ) -> tuple[list[CohortEvent], float]:
-        if self.silver_tael <= 0:
-            return [], 0.0
-        event = self.record_grain_purchase(
-            shi=min(gap_shi, self.silver_tael / price),
-            price_tael_per_shi=price,
-            occasion=occasion,
-            rule_version=rule_version,
-        )
-        return [event], event.trigger["purchased_shi"]
-
-    def _borrow_and_buy(
-        self,
-        gap_shi: float,
-        *,
-        price: float,
-        parameters: HouseholdParameters,
-        rule_version: str,
-    ) -> tuple[list[CohortEvent], float]:
-        capacity = max(0.0, parameters.loan_to_value * self.collateral_value_tael - self.debt_tael)
-        required = gap_shi * price
-        granted = min(required, capacity)
-        events = [
-            self.record_borrowing_request(
-                requested_tael=required,
-                granted_tael=granted,
-                capacity_tael=capacity,
-                rule_version=rule_version,
-            )
-        ]
-        if granted <= 0:
-            return events, 0.0
-        purchase = self.record_grain_purchase(
-            shi=min(gap_shi, granted / price),
-            price_tael_per_shi=price,
-            occasion="borrowed",
-            rule_version=rule_version,
-        )
-        events.append(purchase)
-        return events, purchase.trigger["purchased_shi"]
-
-    def _sell_movables_and_buy(
-        self, gap_shi: float, *, price: float, rule_version: str
-    ) -> tuple[list[CohortEvent], float]:
-        proceeds = min(self.movable_assets_tael, gap_shi * price)
-        if proceeds <= 0:
-            return [], 0.0
-        events = [self.record_movable_asset_sale(proceeds_tael=proceeds, rule_version=rule_version)]
-        events.append(
-            self.record_grain_purchase(
-                shi=min(gap_shi, proceeds / price),
-                price_tael_per_shi=price,
-                occasion="asset-sale",
-                rule_version=rule_version,
-            )
-        )
-        return events, events[-1].trigger["purchased_shi"]
-
-    def _sell_land_and_buy(
-        self,
-        gap_shi: float,
-        *,
-        price: float,
-        parameters: HouseholdParameters,
-        rule_version: str,
-    ) -> tuple[list[CohortEvent], float]:
-        required = gap_shi * price
-        land_price = parameters.land_distress_price_tael_per_mu
-        mu = min(self.land_mu, required / land_price)
-        if mu <= 0:
-            return [], 0.0
-        events = [
-            self.record_land_sale(mu=mu, price_tael_per_mu=land_price, rule_version=rule_version)
-        ]
-        events.append(
-            self.record_grain_purchase(
-                shi=min(gap_shi, (mu * land_price) / price),
-                price_tael_per_shi=price,
-                occasion="land-sale",
-                rule_version=rule_version,
-            )
-        )
-        return events, events[-1].trigger["purchased_shi"]
 
 
 class HouseholdPopulation:

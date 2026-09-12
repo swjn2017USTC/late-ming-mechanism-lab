@@ -21,6 +21,8 @@ from late_ming_lab.networks.nodes import AgrarianZone
 
 CROP_PARAMETERS_VERSION: Final[str] = "crop-parameters-v1"
 HOUSEHOLD_PARAMETERS_VERSION: Final[str] = "household-parameters-v1"
+MARKET_PARAMETERS_VERSION: Final[str] = "market-parameters-v1"
+ELITE_PARAMETERS_VERSION: Final[str] = "elite-parameters-v1"
 
 
 class CropParameters(BaseModel):
@@ -45,11 +47,11 @@ class CropParameters(BaseModel):
 
 
 class HouseholdParameters(BaseModel):
-    """Subsistence, coping-ladder and placeholder-credit parameters.
+    """Subsistence and coping-ladder parameters.
 
-    The credit and price entries are *not* a market: they are fixed assumed terms used to
-    resolve a subsistence shortfall, so that the coping ladder can be exercised at all. P04
-    replaces them with an endogenous market and an explicit lender.
+    Prices, credit terms and the lender live in :class:`MarketParameters` and
+    :class:`EliteParameters`: the household decides *what* to do down the ladder, and the market
+    and the elite decide what it can actually buy, borrow and sell.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -67,21 +69,16 @@ class HouseholdParameters(BaseModel):
         ),
     )
 
-    grain_reference_price_tael_per_shi: float = Field(
-        gt=0,
+    land_reference_value_tael_per_mu: float = Field(
+        gt=0, description="collateral value of land as the borrower values it"
+    )
+    surplus_keep_ratio_of_annual_need: float = Field(
+        ge=0,
         description=(
-            "reference (non-crisis) price used to value grain in kind, for example when a "
-            "household repays a loan out of its harvest"
+            "grain kept before a household sells its harvest surplus on the market; 1.0 keeps "
+            "a full year of need"
         ),
     )
-    distress_grain_price_tael_per_shi: float = Field(
-        gt=0, description="price a household faces when it must buy grain short of food"
-    )
-    land_reference_value_tael_per_mu: float = Field(gt=0)
-    land_distress_price_tael_per_mu: float = Field(gt=0)
-
-    loan_to_value: float = Field(ge=0)
-    interest_rate_monthly: float = Field(ge=0)
     debt_repayment_silver_reserve_tael_per_household: float = Field(ge=0)
     debt_repayment_grain_ratio_of_annual_need: float = Field(ge=0)
 
@@ -98,14 +95,6 @@ class HouseholdParameters(BaseModel):
 
     @model_validator(mode="after")
     def _ordered_thresholds_and_rent(self) -> HouseholdParameters:
-        if self.land_distress_price_tael_per_mu > self.land_reference_value_tael_per_mu:
-            raise ValueError(
-                "a distress sale cannot fetch more than the collateral reference value"
-            )
-        if self.distress_grain_price_tael_per_shi < self.grain_reference_price_tael_per_shi:
-            raise ValueError(
-                "buying grain short of food cannot be cheaper than the reference price"
-            )
         if not (self.temporary_migration_unmet_ratio <= self.permanent_migration_unmet_ratio):
             raise ValueError(
                 "temporary-migration eligibility cannot be stricter than permanent migration"
@@ -143,12 +132,8 @@ def core_default_household_parameters() -> HouseholdParameters:
         subsistence_grain_per_adult_month_shi=0.25,
         minimum_consumption_fraction=0.75,
         wage_grain_shi_per_adult_month=0.3,
-        grain_reference_price_tael_per_shi=0.6,
-        distress_grain_price_tael_per_shi=1.5,
         land_reference_value_tael_per_mu=5.0,
-        land_distress_price_tael_per_mu=2.5,
-        loan_to_value=0.5,
-        interest_rate_monthly=0.005,
+        surplus_keep_ratio_of_annual_need=1.0,
         debt_repayment_silver_reserve_tael_per_household=0.5,
         debt_repayment_grain_ratio_of_annual_need=1.0,
         harvest_recovery_grain_ratio=0.5,
@@ -158,8 +143,125 @@ def core_default_household_parameters() -> HouseholdParameters:
         recruitment_max_land_per_household_mu=2.0,
         rent_share_of_harvest={"tenant-household": 0.4},
         provenance=DataProvenance.assumption(
-            "development-scale subsistence need, consumption floor, in-kind wage, distress "
-            "prices, credit terms, rent share and eligibility thresholds; grade S, to be "
+            "development-scale subsistence need, consumption floor, in-kind wage, surplus "
+            "retention, rent share and eligibility thresholds; grade S, to be replaced by "
+            "sourced parameter cards in P08"
+        ),
+    )
+
+
+class MarketParameters(BaseModel):
+    """Grain-market parameters: price formation, transport and trade risk.
+
+    Prices are endogenous here — the market's own inventory moves them — but the *form* of the
+    price rule, its reference level and the transport conversion are declared assumptions
+    (grade ``S``, sensitivity targets), not estimates.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = MARKET_PARAMETERS_VERSION
+
+    reference_price_tael_per_shi: float = Field(gt=0)
+    price_elasticity: float = Field(gt=0)
+    target_cover_months: float = Field(gt=0)
+    price_floor_ratio: float = Field(gt=0, le=1)
+    price_ceiling_ratio: float = Field(ge=1)
+
+    transport_cost_tael_per_cost_unit_per_shi: float = Field(
+        gt=0,
+        description=(
+            "converts a G_trade cost (declared dimensionless in P02) into silver per shi moved"
+        ),
+    )
+    capacity_unit_shi_per_month: float = Field(
+        ge=0,
+        description=(
+            "converts a G_trade capacity (declared dimensionless in P02) into shi per month; "
+            "zero means no intercounty trade at all, the autarky reference"
+        ),
+    )
+    risk_loss_fraction_scale: float = Field(
+        ge=0, description="fraction of a consignment lost = link risk x this scale"
+    )
+    minimum_trade_margin_tael_per_shi: float = Field(ge=0)
+    max_export_share_of_stock: float = Field(gt=0, le=1)
+
+    provenance: DataProvenance
+
+    @model_validator(mode="after")
+    def _ordered_bounds(self) -> MarketParameters:
+        if self.price_floor_ratio > 1.0:
+            raise ValueError("the price floor cannot sit above the reference price")
+        if self.price_ceiling_ratio < 1.0:
+            raise ValueError("the price ceiling cannot sit below the reference price")
+        return self
+
+    def transport_cost_tael_per_shi(self, edge_cost: float) -> float:
+        return edge_cost * self.transport_cost_tael_per_cost_unit_per_shi
+
+
+class EliteParameters(BaseModel):
+    """Elite action parameters: lending, land purchase, relief and tax mediation.
+
+    These are rules, not verdicts. A higher rate or a lower relief share is not "bad"; the phase
+    measures what each rule produces, including the possibility that lending both delays
+    collapse and concentrates land.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = ELITE_PARAMETERS_VERSION
+
+    land_purchase_price_tael_per_mu: float = Field(gt=0)
+    loan_to_value: float = Field(ge=0)
+    interest_rate_monthly: float = Field(ge=0)
+    max_lending_share_of_silver: float = Field(gt=0, le=1)
+
+    relief_eligibility_unmet_ratio: float = Field(ge=0, le=1)
+    relief_share_of_grain_stock: float = Field(ge=0, le=1)
+    relief_carry_over_ratio_of_local_need: float = Field(ge=0)
+    grain_sale_carry_over_ratio_of_local_need: float = Field(ge=0)
+
+    tax_mediation_advance_share: float = Field(ge=0, le=1)
+
+    provenance: DataProvenance
+
+
+def core_default_market_parameters() -> MarketParameters:
+    """Development-scale market assumptions for the toy dataset."""
+    return MarketParameters(
+        reference_price_tael_per_shi=0.6,
+        price_elasticity=0.8,
+        target_cover_months=6.0,
+        price_floor_ratio=0.5,
+        price_ceiling_ratio=6.0,
+        transport_cost_tael_per_cost_unit_per_shi=0.35,
+        capacity_unit_shi_per_month=1.0,
+        risk_loss_fraction_scale=1.0,
+        minimum_trade_margin_tael_per_shi=0.1,
+        max_export_share_of_stock=0.5,
+        provenance=DataProvenance.assumption(
+            "development-scale price rule, transport conversion and trade margin; grade S, to "
+            "be replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+def core_default_elite_parameters() -> EliteParameters:
+    """Development-scale elite assumptions for the toy dataset."""
+    return EliteParameters(
+        land_purchase_price_tael_per_mu=2.5,
+        loan_to_value=0.5,
+        interest_rate_monthly=0.005,
+        max_lending_share_of_silver=0.8,
+        relief_eligibility_unmet_ratio=0.05,
+        relief_share_of_grain_stock=0.05,
+        relief_carry_over_ratio_of_local_need=1.0,
+        grain_sale_carry_over_ratio_of_local_need=1.0,
+        tax_mediation_advance_share=0.5,
+        provenance=DataProvenance.assumption(
+            "development-scale lending, land price, relief and mediation rules; grade S, to be "
             "replaced by sourced parameter cards in P08"
         ),
     )

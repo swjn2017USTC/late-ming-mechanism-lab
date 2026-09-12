@@ -12,12 +12,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Final
 
+from late_ming_lab.actors.elites import EliteLayer, LocalEliteAgent
 from late_ming_lab.actors.households import (
     CohortClass,
     HouseholdCohortAgent,
     HouseholdPopulation,
 )
+from late_ming_lab.actors.merchants import MerchantHouse, MerchantLayer
 from late_ming_lab.evidence.grades import DataProvenance
+from late_ming_lab.networks.graphs import SpatialGraphs
 from late_ming_lab.networks.nodes import SpatialNodes
 
 #: Adults per household is not modelled in detail; one assumption covers all classes.
@@ -123,3 +126,57 @@ def toy_cohort_population(
         if node.zone is not None
     ]
     return HouseholdPopulation(cohorts)
+
+
+# ---------------------------------------------------------------------- P04 counterparties
+
+#: Per-household endowments of the local interest, in the units of the model; grade S.
+MERCHANT_SILVER_TAEL_PER_NODE: Final[float] = 1_200.0
+MERCHANT_GRAIN_SHI_PER_NODE: Final[float] = 900.0
+ELITE_HOUSEHOLDS_PER_NODE: Final[float] = 20.0
+ELITE_LAND_MU_PER_NODE: Final[float] = 9_000.0
+ELITE_GRAIN_SHI_PER_NODE: Final[float] = 4_000.0
+ELITE_SILVER_TAEL_PER_NODE: Final[float] = 3_000.0
+
+
+def toy_merchant_layer(graphs: SpatialGraphs, *, stock_scale: float = 1.0) -> MerchantLayer:
+    """One merchant house at every node the trade graph reaches.
+
+    County nodes hold the market; boundary nodes that appear as trade links hold a house too,
+    because a consignment needs a buyer at the far end of the link. ``stock_scale`` exists
+    because the reference endowments are arbitrary: 900 shi at a node whose cohorts need 2,100
+    shi a month is a fourteenth of the declared six-month cover, and the phase's first mechanism
+    question is exactly whether such thin stocks let arbitrage equalise anything.
+    """
+    if stock_scale <= 0:
+        raise ValueError("merchant stock scale must be positive")
+    return MerchantLayer(
+        tuple(
+            MerchantHouse(
+                node_id=node_id,
+                silver_tael=MERCHANT_SILVER_TAEL_PER_NODE * stock_scale,
+                grain_shi=MERCHANT_GRAIN_SHI_PER_NODE * stock_scale,
+            )
+            for node_id in sorted(graphs.trade.nodes)
+        )
+    )
+
+
+def toy_elite_layer(nodes: SpatialNodes) -> EliteLayer:
+    """One aggregated elite house per county node.
+
+    The initial elite claim on households is not set here: claims are derived from household
+    debt, so the households' own opening debts define it.
+    """
+    return EliteLayer(
+        tuple(
+            LocalEliteAgent(
+                node_id=node.node_id,
+                households=ELITE_HOUSEHOLDS_PER_NODE,
+                land_mu=ELITE_LAND_MU_PER_NODE,
+                grain_shi=ELITE_GRAIN_SHI_PER_NODE,
+                silver_tael=ELITE_SILVER_TAEL_PER_NODE,
+            )
+            for node in nodes.counties
+        )
+    )
