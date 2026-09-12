@@ -11,12 +11,14 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P04 (Market / Credit / Local Elite) complete. The repository holds a history-free deterministic
-kernel (P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with
-an explicit coping ladder (P03), and a county grain market with endogenous prices, intercounty
-trade, merchant houses and elite lending, land purchase and private relief (P04). Mass-balance
-and double-entry invariants are enforced in code and rebuilt from the event log in tests. There
-are still no taxes, armies, rebels or LLM decisions.
+P05 (Fiscal Extraction / Governance / Relief) complete. The repository holds a history-free
+deterministic kernel (P01), a spatial–temporal–environmental skeleton (P02), weighted household
+cohorts with an explicit coping ladder (P03), a county grain market with merchant houses and
+elite lending, land purchase and private relief (P04), and a county fiscal apparatus (P05):
+assessment against a tax base, collection effort and cost, receipts, arrears, official relief and
+elite tax mediation, with state capacity kept as five separate capacities and never one number.
+Mass-balance, double-entry and fiscal-accounting invariants are enforced in code and rebuilt from
+the event log in tests. There are still no armies, rebels, actual migration or LLM decisions.
 
 Everything shipped so far is an assumption, not history: the five-county toy fixture and the
 toy cohort endowments are graded `S` throughout, and the shock experiment's severity axis is a
@@ -24,7 +26,7 @@ scenario parameter, never an estimate of a historical drought. Real geography en
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P04.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P05.md`.
 
 ```bash
 uv run late-ming-lab smoke-run            # 240 ticks, 1625-01 → 1644-12, into outputs/runs/

@@ -1,9 +1,9 @@
 # System Overview
 
-Status: P04 (market, credit and local elites). Space, climate, households, a county grain
-market with endogenous prices, intercounty trade, merchant houses and elite lending now exist;
-taxation, relief policy, armies, rebels and runtime-LLM decisions do not. The only spatial
-dataset is the toy fixture and every endowment is an assumption: none of it is history.
+Status: P05 (fiscal extraction, governance and relief). Space, climate, households, a county
+grain market, merchant houses, elite lending and now a county fiscal apparatus exist; armies,
+rebels, migration itself and runtime-LLM decisions do not. The only spatial dataset is the toy
+fixture and every endowment and rate is an assumption: none of it is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -298,6 +298,76 @@ distress sales, so concentration is lower with credit than without it, and a dea
 little back while multiplying the claims stock thirtyfold — a placeholder pathology, since P04
 has no bankruptcy, write-off or rescheduling rule.
 
+## Fiscal extraction, governance and relief (P05)
+
+### The county
+
+`CountyGovernment` owns a treasury, a relief granary and five capacities. The capacities are
+kept apart on purpose (RULES 4): `StateCapacity` has exactly five fields, no mean, no index and
+no total, and a test asserts that no aggregate can be added unnoticed.
+
+| Capacity | What it bounds | How it shows up |
+| --- | --- | --- |
+| `TaxCollectionCapacity` | the share of an assessed obligation the apparatus can reach | `reach = min(1, tax_collection + coercion × effort)` |
+| `InformationCapacity` | how much of the true base it can see | hidden elite land = `elite_hidden_share × (1 − information)` |
+| `ReliefCapacity` | the share of assessed relief need it can deliver | caps release against local need |
+| `CoercionCapacity` | the extra reach it can force | raises reach; also raises what households must sell |
+| `LogisticsCapacity` | what a unit of collection or relief costs | divides the cost of both |
+
+### The tax ledger
+
+Taxation is decomposed the way M3 requires, and every part is separately logged and reported:
+
+```text
+tax base        the land the county can see; elite land escapes in proportion to weak information
+nominal quota   assessment_rate x base x assessed value per mu
+collection      effort from the extraction policy, then reach from the five capacities
+collection cost effort x quota / logistics, paid from the treasury
+actual receipts what reached the treasury, through mediation, silver or liquidation
+arrears         everything pursued and not taken, owed by households to the county
+```
+
+Collection walks a fixed order, reusing the machinery households already have for food: elite tax
+mediation → silver on hand → forced grain sale down to a subsistence reserve → movable goods →
+land, bought by the local elite → a loan against remaining collateral → arrears. The county's
+arrears stock *is* the sum of its households' arrears, and a test reconciles the two.
+
+### Official relief
+
+Official relief is funded from the treasury: the county buys grain into its granary at the posted
+market price, then releases it to households whose measured distress crosses a threshold, in
+proportion to that distress, capped by `ReliefCapacity` and the granary, with the logistics cost
+recorded. It is a different fiscal fact from private elite relief and the log says which is which.
+
+### Elite tax mediation
+
+P04 shipped a mediation interface with no demand behind it. P05 supplies the demand: the assessed
+obligation is what an elite may advance, the advance becomes a claim on the household, and both
+sides log it. The P04 placeholder knob is deleted rather than left beside the real path.
+
+### What the pressure experiment shows, and what it refuses to claim
+
+`experiments/extraction.py` sweeps the nominal pressure from 0.005 to 0.16 (a 32-fold range)
+under both a fixed and an arrears-escalating policy, and reports measurements only — the curve has
+no verdict column, and a test asserts its columns are exactly the declared measures.
+
+| pressure | quota | receipts | receipts/quota | arrears | arrears per household | visible land | migration-eligible |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.005 | 74,191 | 20,396 | 0.275 | 9,280 | 0.44 | 180,750 → 175,655 | 0.52 |
+| 0.02 | 296,102 | 64,489 | 0.218 | 53,952 | 2.97 | 180,750 → 175,228 | 0.48 |
+| 0.08 | 1,184,327 | 194,081 | 0.164 | 279,649 | 17.13 | 180,750 → 175,489 | 0.44 |
+| 0.16 | 2,360,336 | 273,923 | 0.116 | 670,212 | 42.58 | 180,750 → 174,803 | 0.36 |
+
+Receipts rise with pressure, but far less than the quota does, and the unpaid remainder piles up
+as arrears. That is the *data* an extraction-inversion hypothesis would need. **P05 does not claim
+the mechanism exists**, and the report says what would be required before anyone may: receipts do
+not actually fall in this range, the base erodes only through the food channel (no land was sold
+for tax at any pressure, because the only land buyer — the local elite — had lent its silver
+away), and arrears in P05 carry no consequence at all: nothing is seized, no interest accrues and
+no distress follows from owing the county. Until arrears bite, an "extraction does not cause
+flight" reading of this curve is an artefact of the model, not a finding — migration eligibility
+falls across the sweep because higher receipts fund more relief.
+
 ## Deterministic kernel (P01)
 
 The kernel is history-free by design: it owns time, randomness, event recording, provenance
@@ -355,9 +425,9 @@ Python 3.12 · `uv`. Dependencies are added when a phase needs them, not in adva
 src/late_ming_lab/
 ├── core/        config.py, clock.py, rng.py, events.py, tick.py, kernel.py, manifest.py,
 │                hashing.py                       (implemented in P01)
-├── actors/      households.py, merchants.py, elites.py, exchange.py, ledger.py,
-│                fixtures.py                       (implemented in P03-P04)
-│                government, military, armed_groups
+├── actors/      households.py, merchants.py, elites.py, government.py, exchange.py,
+│                ledger.py, fixtures.py            (implemented in P03-P05)
+│                military, armed_groups
 ├── systems/     calendar.py, climate.py          (implemented in P02)
 │                agriculture, households, markets, credit, taxation, relief,
 │                migration, military_finance, insurgency, violence
@@ -366,8 +436,10 @@ src/late_ming_lab/
 ├── policies/    base, rules, utility, random_policy, ustc_v41
 ├── evidence/    provenance.py (P01), grades.py (P02); registry, parameters (P08)
 ├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
-├── analysis/    distress.py, concentration.py    (implemented in P03-P04)
-├── experiments/ assembly.py, household_shock.py, market_credit.py  (P03-P04)
+├── analysis/    distress.py, concentration.py, fiscal.py  (P03-P05)
+├── policies/    fiscal.py                          (implemented in P05)
+├── experiments/ assembly.py, household_shock.py, market_credit.py,
+│                extraction.py                      (P03-P05)
 ├── calibration/ cli/ ui/
 ```
 
