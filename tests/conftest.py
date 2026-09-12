@@ -20,7 +20,7 @@ from late_ming_lab.core.clock import Clock, Month, Period
 from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.core.events import EventLogger
 from late_ming_lab.core.rng import RngStreams
-from late_ming_lab.core.tick import TickContext
+from late_ming_lab.core.tick import TickContext, TickPhase
 from late_ming_lab.networks.dataset import SpatialDataset
 from late_ming_lab.networks.fixtures import toy_spatial_dataset
 from late_ming_lab.networks.graphs import SpatialGraphs
@@ -72,8 +72,15 @@ class StubMarket:
     name: str = "stub-market"
 
     def buy_grain(
-        self, ctx: TickContext, buyer: NodeBound, shi_wanted: float, max_silver: float
+        self,
+        ctx: TickContext,
+        buyer: NodeBound,
+        shi_wanted: float,
+        max_silver: float,
+        *,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> TradeOutcome:
+        del phase  # the stub has no phase-dependent behaviour; the protocol does
         cost = min(shi_wanted * self.price_tael_per_shi, max_silver, self.grain_shi)
         if cost <= 0.0:
             return TradeOutcome(quantity=0.0, value_tael=0.0, counterparty_id=self.name)
@@ -83,8 +90,15 @@ class StubMarket:
         return TradeOutcome(quantity=shi, value_tael=cost, counterparty_id=self.name)
 
     def buy_movables(
-        self, ctx: TickContext, seller: NodeBound, wanted_tael: float, max_tael: float
+        self,
+        ctx: TickContext,
+        seller: NodeBound,
+        wanted_tael: float,
+        max_tael: float,
+        *,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> TradeOutcome:
+        del phase
         proceeds = min(wanted_tael, max_tael, self.silver_tael)
         self.silver_tael -= proceeds
         return TradeOutcome(quantity=proceeds, value_tael=proceeds, counterparty_id=self.name)

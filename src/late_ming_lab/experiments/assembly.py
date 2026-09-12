@@ -13,6 +13,9 @@ so a reader can see the complete tick order in one screen:
 06 credit and debt    DebtServiceSystem      (interest, cash and grain repayment)
 07 taxation           TaxCollectionSystem
 08 relief             OfficialReliefSystem, then EliteActionSystem
+09 migration          MigrationSystem        (seasonal absence, permanent moves, exits)
+07 taxation           TaxCollectionSystem
+08 relief             OfficialReliefSystem, then EliteActionSystem
 10 military finance   MilitaryFinanceSystem  (pay, rations, morale, cohesion)
 11 desertion          DesertionSystem        (who leaves, and where they go)
 12 recruitment        BandRecruitmentSystem  (the shared pool, levies, band formation)
@@ -53,6 +56,7 @@ from late_ming_lab.evidence.parameters import (
     FiscalParameters,
     HouseholdParameters,
     MarketParameters,
+    MigrationParameters,
     MilitaryParameters,
     core_default_band_parameters,
     core_default_crop_parameters,
@@ -60,8 +64,10 @@ from late_ming_lab.evidence.parameters import (
     core_default_fiscal_parameters,
     core_default_household_parameters,
     core_default_market_parameters,
+    core_default_migration_parameters,
     core_default_military_parameters,
 )
+from late_ming_lab.networks.dataset import SpatialDataset
 from late_ming_lab.networks.disruption import CalmTrade, TradeDisruption
 from late_ming_lab.networks.fixtures import toy_spatial_dataset
 from late_ming_lab.networks.graphs import SpatialGraphs
@@ -81,6 +87,7 @@ from late_ming_lab.systems.household_survival import (
     DebtServiceSystem,
 )
 from late_ming_lab.systems.markets import MarketClearingSystem
+from late_ming_lab.systems.migration import MigrationSystem
 from late_ming_lab.systems.military import (
     BandActionSystem,
     BandRecruitmentSystem,
@@ -115,6 +122,8 @@ class Economy:
     elite_parameters: EliteParameters
     military_parameters: MilitaryParameters
     band_parameters: BandParameters
+    migration_parameters: MigrationParameters
+    migration: MigrationSystem | None
 
 
 def build_toy_economy(
@@ -137,6 +146,9 @@ def build_toy_economy(
     band_parameters: BandParameters | None = None,
     with_military: bool = False,
     garrison_troops: float | None = None,
+    dataset: SpatialDataset | None = None,
+    migration_parameters: MigrationParameters | None = None,
+    with_migration: bool = False,
 ) -> Economy:
     """Build the toy economy; every argument is a scenario knob, every default is grade ``S``."""
     zone_calendar = calendar or core_default_calendar()
@@ -151,7 +163,7 @@ def build_toy_economy(
     # legitimate configuration, and the one that deserts for purely fiscal reasons.
     military_enabled = with_military
 
-    graphs = toy_spatial_dataset().build()
+    graphs = (dataset or toy_spatial_dataset()).build()
     population = toy_cohort_population(graphs.nodes)
     merchants = toy_merchant_layer(graphs, stock_scale=merchant_stock_scale)
     elites = toy_elite_layer(graphs.nodes)
@@ -168,6 +180,7 @@ def build_toy_economy(
     )
     credit = LocalCredit(elites=elites, population=population, parameters=elite_settings)
     governments = toy_government_layer(graphs, capacity=capacity) if with_fiscal else None
+    migration_settings = migration_parameters or core_default_migration_parameters()
     military = toy_military_layer(
         graphs,
         troops_per_node=(GARRISON_TROOPS_PER_NODE if garrison_troops is None else garrison_troops),
@@ -221,6 +234,20 @@ def build_toy_economy(
             book=market.book,
         )
     )
+    # Migration follows relief: it reads the distress window and the posted prices that phases 04-08
+    # have just updated, and it moves households (every class) or a season's adults. It ships off
+    # unless asked for, like the military, so the P03-P05 measurements stay what they were.
+    migration: MigrationSystem | None = None
+    if with_migration:
+        migration = MigrationSystem(
+            graphs=graphs,
+            population=population,
+            merchants=merchants,
+            book=market.book,
+            parameters=migration_settings,
+            household_parameters=households,
+        )
+        systems.append(migration)
     if military_enabled:
         systems.extend(
             (
@@ -286,4 +313,6 @@ def build_toy_economy(
         elite_parameters=elite_settings,
         military_parameters=garrisons,
         band_parameters=bands,
+        migration_parameters=migration_settings,
+        migration=migration,
     )

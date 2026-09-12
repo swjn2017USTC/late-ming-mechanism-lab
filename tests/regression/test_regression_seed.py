@@ -41,9 +41,12 @@ CLIMATE_EVENT_COUNT = 240 * 6
 #: Re-pinned in P06 for instrumentation only: the county's monthly state record now carries the
 #: military decomposition (``military_pay_tael``, ``military_grain_shi``), both zero when no
 #: garrison is wired. Verified by row-level diff against the P05 log: 480 of 28764 events changed,
-#: each gaining those two keys and nothing else, and event count is unchanged. The P06 report
-#: records the re-pin.
-FISCAL_DIGEST = "5889e3304509d8fab993f1d02c55555990b94f9ebf2ea333aa6de93796aac420"
+#: each gaining those two keys and nothing else, and event count is unchanged.
+#:
+#: Re-pinned in P07 for instrumentation only, with the market-phase correction described above and
+#: verified the same way (the fiscal run's event count is unchanged at 28764). Both re-pins are
+#: recorded in their phase reports.
+FISCAL_DIGEST = "c9a1d9d56f84617e2a78c9428207f5cd513d3e4662e07284d945c9ff6efe977d"
 FISCAL_EVENT_COUNT = 28764
 
 #: Same, with the whole P04 economy (market, merchants, elites, credit): two short windows.
@@ -51,15 +54,23 @@ FISCAL_EVENT_COUNT = 28764
 #: Re-pinned in P05 for instrumentation only: the log now tags why a sale happened
 #: (``reason_is_*``) and names the rent counterparty, so digests move while balances, flows and
 #: every published P03/P04 answer stay identical. The P05 report records the change.
+#:
+#: Re-pinned again in P07 for instrumentation only: a market trade now records the phase of the
+#: system that asked for it rather than the market's own phase, so a ration purchase is logged
+#: under ``military_finance`` and a household's dinner under ``household_consumption``. The calm
+#: market baseline is untouched (no cross-phase trade happens in it); the severe one moves, and an
+#: A/B run of the same scenario showed identical sequence numbers, identical event count and every
+#: column byte-identical except the ``phase`` token on 600 merchant rows. The P07 report records
+#: it, and both earlier re-pins stand on the same row-level evidence.
 MARKET_BASELINE_DIGEST = "4b98410a02a5400c20f148ab0ee26a971cb6379807285337ed00a3274587c545"
 MARKET_BASELINE_EVENT_COUNT = 10618
-MARKET_SEVERE_DIGEST = "d0f24df364a9085ae07c2b605d173415e2ee6c2c4819741f559d4d2a3a21e99b"
+MARKET_SEVERE_DIGEST = "dd7d6e7d4df8c26e64e33349f4547ef1c6f0d214192cd5089d47924f7bcd0fed"
 MARKET_SEVERE_EVENT_COUNT = 14108
 
 #: Same, with the toy cohort population: a normal year and a severe synthetic shock.
 HOUSEHOLD_BASELINE_DIGEST = "39d980735462639c2ea0cc837751eac97b6fec488b828747d6ada3fc1ae50a2d"
 HOUSEHOLD_BASELINE_EVENT_COUNT = 25606
-HOUSEHOLD_SEVERE_DIGEST = "d064a799b2a811aa9df5485b05139f429abe92256bd27270b607ac4746ca22c0"
+HOUSEHOLD_SEVERE_DIGEST = "f61073359378ac876913689259e08d925f42be1d4e38be1ea089b9e334197060"
 HOUSEHOLD_SEVERE_EVENT_COUNT = 33606
 
 
