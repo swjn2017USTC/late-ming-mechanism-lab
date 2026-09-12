@@ -15,7 +15,6 @@ from pydantic import ValidationError
 from late_ming_lab.actors.households import (
     BALANCE_TOLERANCE,
     CohortClass,
-    CopingStage,
     HouseholdCohortAgent,
     HouseholdPopulation,
 )
@@ -96,40 +95,43 @@ def test_consumption_never_exceeds_what_the_ladder_could_assemble(
         consumption = next(event for event in events if event.event_type.value == "CONSUMPTION")
         need = consumption.trigger["need_shi"]
         floor = consumption.trigger["floor_shi"]
-        consumed = consumption.trigger["consumed_shi"]
+        eaten = consumption.trigger["eaten_shi"]
 
-        assert 0.0 <= consumed <= need
+        assert 0.0 <= eaten <= need
         assert 0.0 <= consumption.trigger["unmet_shi"] <= floor
-        assert consumption.trigger["purchased_shi"] <= consumed
+        assert consumption.trigger["purchased_shi"] <= eaten
         assert consumption.trigger["reduced_shi"] >= consumption.trigger["unmet_shi"]
+        # Whatever was eaten was debited from the granary in the same event.
+        assert consumption.trigger["grain_delta_shi"] == -eaten
 
 
 @settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.too_slow])
 @given(endowment=ENDOWMENTS, impacts=IMPACT_SEQUENCES)
-def test_cohort_weight_and_stage_monotonicity(
+def test_grain_is_conserved_across_a_sequence_of_months(
     endowment: dict[str, float], impacts: list[float]
 ) -> None:
+    """Flow conservation: everything eaten was earned, harvested, bought or taken from stock."""
     cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
     households = cohort.households
-    previous_stage = cohort.coping_stage
-    previous_grain = cohort.grain_shi
+    initial_grain = cohort.grain_shi
+    eaten = credited = 0.0
 
     for impact in impacts:
         cohort.accumulate_climate_impact(impact)
-        cohort.monthly_budget(
+        for event in cohort.monthly_budget(
             parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="property"
-        )
+        ):
+            trigger = event.trigger
+            if event.event_type.value == "CONSUMPTION":
+                eaten += trigger["eaten_shi"]
+            elif event.event_type.value == "GRAIN_PURCHASE":
+                credited += trigger["purchased_shi"]
 
         assert cohort.households == households
-        assert cohort.coping_stage >= previous_stage or cohort.coping_stage is (
-            CopingStage.SELF_SUFFICIENT
-        )
-        # Without a harvest between months, grain can only be earned or bought, never minted.
-        assert cohort.grain_shi >= -BALANCE_TOLERANCE
-        previous_stage = cohort.coping_stage
-        previous_grain = cohort.grain_shi
+        cohort.check_balances()
 
-    assert previous_grain >= -BALANCE_TOLERANCE
+    assert eaten == pytest.approx(credited + initial_grain - cohort.grain_shi)
+    assert eaten >= -BALANCE_TOLERANCE
 
 
 @settings(max_examples=25, deadline=None, suppress_health_check=[HealthCheck.too_slow])

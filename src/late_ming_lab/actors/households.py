@@ -209,12 +209,31 @@ class HouseholdCohortAgent(BaseModel):
         assets: float = 0.0,
         impacts: tuple[tuple[str, float], ...] = (),
     ) -> None:
-        """Apply a balance change; the only place balances ever move."""
-        self.grain_shi = self.grain_shi + grain
-        self.silver_tael = self.silver_tael + silver
-        self.land_mu = self.land_mu + land
-        self.debt_tael = self.debt_tael + debt
-        self.movable_assets_tael = self.movable_assets_tael + assets
+        """Apply a balance change; the only place balances ever move.
+
+        The new balances are checked before anything is written, so a rejected change leaves the
+        cohort exactly as it was instead of half-moved.
+        """
+        candidates = (
+            ("grain_shi", self.grain_shi + grain),
+            ("silver_tael", self.silver_tael + silver),
+            ("land_mu", self.land_mu + land),
+            ("debt_tael", self.debt_tael + debt),
+            ("movable_assets_tael", self.movable_assets_tael + assets),
+        )
+        for name, value in candidates:
+            if not math.isfinite(value) or value < 0.0:
+                raise HouseholdLedgerError(
+                    f"{self.cohort_id}: refusing an impossible balance change; {name} would "
+                    f"become {value}"
+                )
+        self.grain_shi, self.silver_tael, self.land_mu, self.debt_tael, self.movable_assets_tael = (
+            candidates[0][1],
+            candidates[1][1],
+            candidates[2][1],
+            candidates[3][1],
+            candidates[4][1],
+        )
         for key, value in impacts:
             self._ledger[key] = self._ledger[key] + value
 
@@ -293,31 +312,34 @@ class HouseholdCohortAgent(BaseModel):
         *,
         need_shi: float,
         floor_shi: float,
-        from_storage_shi: float,
-        consumed_shi: float,
+        eaten_shi: float,
+        from_purchases_shi: float,
         purchased_shi: float,
         rule_version: str,
     ) -> CohortEvent:
         """Record the month's food intake against the subsistence floor.
 
-        The storage draw is reported here as a ledger delta because eating from the granary is
-        a balance change like any other; without it the event log would not account for the
-        grain a household consumed.
+        ``eaten_shi`` is everything the household actually ate, whatever its origin, and the
+        ledger delta is exactly that amount: grain bought on the ladder is credited to the
+        granary when it is bought and debited here when it is eaten, so no purchase can feed
+        two months.
         """
+        from_storage = max(0.0, eaten_shi - from_purchases_shi)
         return CohortEvent(
             event_type=CohortEventType.CONSUMPTION,
             rule_version=rule_version,
             trigger={
                 "need_shi": need_shi,
                 "floor_shi": floor_shi,
-                "from_storage_shi": from_storage_shi,
-                "consumed_shi": consumed_shi,
+                "eaten_shi": eaten_shi,
+                "from_storage_shi": from_storage,
+                "from_purchases_shi": from_purchases_shi,
                 "purchased_shi": purchased_shi,
-                "reduced_shi": max(0.0, need_shi - consumed_shi),
-                "unmet_shi": max(0.0, floor_shi - consumed_shi),
-                GRAIN_DELTA: -from_storage_shi,
+                "reduced_shi": max(0.0, need_shi - eaten_shi),
+                "unmet_shi": max(0.0, floor_shi - eaten_shi),
+                GRAIN_DELTA: -eaten_shi,
             },
-            outcome="met-floor" if consumed_shi >= floor_shi else "below-floor",
+            outcome="met-floor" if eaten_shi >= floor_shi else "below-floor",
         )
 
     def record_borrowing_request(
@@ -637,11 +659,22 @@ class HouseholdCohortAgent(BaseModel):
     ) -> tuple[CohortEvent, ...]:
         """Run the declared coping ladder for one month and return the recorded transitions.
 
-        Fixed, versioned order: stored grain and in-kind wages → discretionary consumption
-        down to the floor → silver on hand (a stored resource, spent before borrowing) →
-        borrow → sell movable assets → sell land. Whatever part of the floor is still unmet
-        after the whole ladder is recorded as unmet need, which raises the cohort's distress
-        ratio and nothing else.
+        Fixed, versioned order, matching the phase specification:
+
+        ```text
+        1 stored grain and in-kind wages (and silver on hand, both stored resources)
+        2 discretionary consumption cut down to the floor
+        3 borrowing request
+        4 movable asset sale
+        5 land sale
+        6 eligibility flags (computed by the bookkeeping system, not here)
+        ```
+
+        Silver on hand is spent after the consumption cut and before borrowing, because a
+        household that cannot reach the floor first accepts eating less and then pays for the
+        rest; borrowing starts only when its own silver is gone. Whatever part of the floor is
+        still unmet after the whole ladder is recorded as unmet need, which raises the cohort's
+        distress ratio and nothing else.
 
         ``labour_demand_factor`` is the local harvest's yield fraction: a failed harvest means
         little work and little wage. It is a declared placeholder for the labour market that
@@ -661,9 +694,9 @@ class HouseholdCohortAgent(BaseModel):
             )
         ]
 
-        eaten = self.eat_from_storage(need)
+        eaten_from_storage = self.eat_from_storage(need)
         purchased = 0.0
-        gap = max(0.0, floor - eaten)
+        gap = max(0.0, floor - eaten_from_storage)
 
         if gap > 0:
             purchase_events, bought = self._buy_with_silver(
@@ -702,22 +735,28 @@ class HouseholdCohortAgent(BaseModel):
             purchased += bought
             gap = max(0.0, gap - bought)
 
-        consumed = eaten + purchased
+        # Food bought this month is eaten this month; the draw is debited here so that a
+        # purchase is credited once and debited once. Only purchased grain can remain to eat:
+        # the first draw already took everything up to `need` from the granary.
+        shortfall = max(0.0, floor - eaten_from_storage)
+        eaten_from_purchases = self.eat_from_storage(shortfall)
+        eaten = eaten_from_storage + eaten_from_purchases
+        unmet = max(0.0, floor - eaten)
         events.append(
             self.record_consumption(
                 need_shi=need,
                 floor_shi=floor,
-                from_storage_shi=eaten,
-                consumed_shi=consumed,
+                eaten_shi=eaten,
+                from_purchases_shi=eaten_from_purchases,
                 purchased_shi=purchased,
                 rule_version=rule_version,
             )
         )
 
         stage = self._stage_reached(
-            consumed=consumed,
+            consumed=eaten,
             need=need,
-            unmet=gap,
+            unmet=unmet,
             used_credit=used_credit,
             used_assets=used_assets,
             used_land=used_land,

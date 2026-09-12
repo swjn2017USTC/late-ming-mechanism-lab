@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from late_ming_lab.actors.households import (
     ASSETS_DELTA,
-    BALANCE_TOLERANCE,
     DEBT_DELTA,
     GRAIN_DELTA,
     LAND_DELTA,
@@ -124,7 +123,7 @@ def test_distress_is_unmet_need_and_is_never_negative() -> None:
 
     assert consumption.trigger["unmet_shi"] > 0.0
     assert consumption.trigger["unmet_shi"] <= consumption.trigger["floor_shi"]
-    assert consumption.trigger["consumed_shi"] == 0.0
+    assert consumption.trigger["eaten_shi"] == 0.0
     assert consumption.trigger["reduced_shi"] >= consumption.trigger["unmet_shi"]
 
 
@@ -321,5 +320,36 @@ def test_population_invariants_reconcile_every_cohort() -> None:
         population.check_invariants()
 
 
-def test_ledger_tolerance_is_tight() -> None:
-    assert BALANCE_TOLERANCE < 1e-6
+def test_food_bought_on_the_ladder_is_eaten_exactly_once() -> None:
+    """Regression: a purchase must be credited once and debited once, never eaten twice."""
+    no_wage = PARAMETERS.model_validate(
+        {**PARAMETERS.model_dump(), "wage_grain_shi_per_adult_month": 0.0}
+    )
+    cohort = _cohort(grain_shi=0.0, silver_tael=1_000.0, movable_assets_tael=0.0, land_mu=0.0)
+    initial_grain = cohort.grain_shi
+    eaten = purchased = 0.0
+
+    for _ in range(6):
+        for event in cohort.monthly_budget(
+            parameters=no_wage, labour_demand_factor=0.0, rule_version="test"
+        ):
+            if event.event_type is CohortEventType.CONSUMPTION:
+                eaten += event.trigger["eaten_shi"]
+                assert event.trigger["grain_delta_shi"] == -event.trigger["eaten_shi"]
+            elif event.event_type is CohortEventType.GRAIN_PURCHASE:
+                purchased += event.trigger["purchased_shi"]
+
+    assert purchased > 0.0
+    assert eaten == pytest.approx(purchased + initial_grain - cohort.grain_shi)
+    assert eaten == pytest.approx(purchased)
+    cohort.check_balances()
+
+
+def test_an_impossible_change_leaves_the_balance_sheet_untouched() -> None:
+    cohort = _cohort(grain_shi=0.0, silver_tael=1.0)
+    before = (cohort.grain_shi, cohort.silver_tael, dict(cohort.ledger_deltas))
+
+    with pytest.raises(HouseholdLedgerError, match="impossible balance change"):
+        cohort._apply(grain=5.0, silver=-2.0)
+
+    assert (cohort.grain_shi, cohort.silver_tael, dict(cohort.ledger_deltas)) == before

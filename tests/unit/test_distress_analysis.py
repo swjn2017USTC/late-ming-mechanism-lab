@@ -34,7 +34,7 @@ def _frame() -> pl.DataFrame:
         trigger={
             "need_shi": 100.0,
             "floor_shi": 75.0,
-            "consumed_shi": 90.0,
+            "eaten_shi": 90.0,
             "purchased_shi": 10.0,
             "unmet_shi": 0.0,
             "grain_delta_shi": -80.0,
@@ -48,7 +48,7 @@ def _frame() -> pl.DataFrame:
         trigger={
             "need_shi": 100.0,
             "floor_shi": 75.0,
-            "consumed_shi": 40.0,
+            "eaten_shi": 40.0,
             "purchased_shi": 0.0,
             "unmet_shi": 35.0,
             "grain_delta_shi": -40.0,
@@ -129,8 +129,8 @@ def test_final_state_comes_from_the_last_snapshot() -> None:
     assert row["final_grain_shi"] == 420.0
     assert row["final_debt_tael"] == 3.0
     assert row["final_stage"] == CopingStage.SELLING_LAND.token
-    assert row["destitute"] is False
-    assert row["sold_land_stage"] is True
+    assert row["ended_destitute"] is False
+    assert row["ended_selling_land"] is True
     assert row["final_permanent_migration_eligible"] == 1.0
     assert row["final_recruitment_eligible"] == 0.0
 
@@ -144,7 +144,7 @@ def test_distribution_reports_shares_and_per_household_means() -> None:
     assert row["cohort_class"] == "poor-smallholder"
     assert row["cohorts"] == 1
     assert row["share_below_floor"] == 1.0
-    assert row["share_destitute"] == 0.0
+    assert row["share_ended_destitute"] == 0.0
     assert row["mean_land_sold_mu_per_household"] == pytest.approx(4.0 / 1450.0)
     assert row["mean_borrowed_tael_per_household"] == pytest.approx(3.0 / 1450.0)
 

@@ -183,19 +183,28 @@ Units, fixed once and used everywhere: grain in ``shi`` (石), silver in ``tael`
 ### The coping ladder
 
 ```text
-1 stored grain and in-kind wages
+1 stored grain and in-kind wages — silver on hand belongs here too: it is stored wealth
 2 discretionary consumption cut down to the floor
-3 silver on hand (a stored resource, spent before borrowing)
-4 borrow: request recorded even when no capacity exists
-5 sell movable assets
-6 sell land
-7 eligibility flags: temporary migration, permanent migration, recruitment
+3 borrow: the request is recorded even when no capacity exists
+4 sell movable assets
+5 sell land
+6 eligibility flags: temporary migration, permanent migration, recruitment
 ```
 
-Whatever remains of the floor after step 6 is **unmet need** — a physical ledger quantity, not a
-sentiment. The stage reached in a month is the furthest step used; it is sticky within a crop
-year and resets after a harvest that covers the year's need. There is no anger, grievance or
-rebellion scalar in any of this, and P03 moves nobody: it records who *could* move.
+Silver is spent on food after the consumption cut and before borrowing, because a household that
+cannot reach the floor first accepts eating less and only then pays for the rest. Grain bought on
+the ladder is credited to the granary when it is bought and debited when it is eaten, so a
+purchase feeds one month.
+
+Whatever remains of the floor after the whole ladder is **unmet need** — a physical ledger
+quantity, not a sentiment. The coping stage records the furthest *distress* step reached
+(reduction, borrowing, assets, land, destitute); spending silver on hand is provisioning, not
+distress, so it has no stage of its own. The stage is sticky within a crop year and resets after
+a harvest reaching ``harvest_recovery_grain_ratio`` × the household's annual need (0.5 in the
+default parameter set, not a full year), so an analysis column named ``ended_*`` means "ended the
+window at or beyond this step", while ``unmet_ratio`` is the continuous measure of the month.
+There is no anger, grievance or rebellion scalar in any of this, and P03 moves nobody: it records
+who *could* move.
 
 ### Enforcement, not documentation
 
@@ -229,14 +238,19 @@ share of the subsistence floor, by archetype:
 | severity floor | landless | tenant | poor smallholder | middle smallholder | wealthy farmer |
 | --- | --- | --- | --- | --- | --- |
 | 0.0 (baseline) | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 |
-| 0.2 (mild) | 0.001 | 0.000 | 0.000 | 0.000 | 0.000 |
-| 0.4 (moderate) | 0.118 | 0.046 | 0.000 | 0.000 | 0.000 |
-| 0.6 (severe) | 0.388 | 0.269 | 0.007 | 0.000 | 0.000 |
-| 0.8 (extreme) | 0.610 | 0.506 | 0.140 | 0.000 | 0.000 |
+| 0.2 (mild) | 0.004 | 0.000 | 0.000 | 0.000 | 0.000 |
+| 0.4 (moderate) | 0.126 | 0.076 | 0.000 | 0.000 | 0.000 |
+| 0.6 (severe) | 0.396 | 0.330 | 0.145 | 0.000 | 0.000 |
+| 0.8 (extreme) | 0.618 | 0.564 | 0.319 | 0.136 | 0.000 |
 
 The ordering is emergent, not encoded: no rule mentions a cohort class, and the gradient comes
 from endowment, collateral and the ladder's order. The severity axis is a scenario parameter,
 not an estimate of any historical drought — no calibration exists yet, and none is claimed.
+
+Flow conservation is asserted separately from balance reconciliation, because a flow missing on
+both sides of the ledger cancels out: `tests/invariants/test_household_mass_balance.py` checks
+that everything reported as eaten was debited from a granary in the same event. That test fails
+against the pre-fix code, where grain bought on the ladder was eaten but never debited.
 
 ## Deterministic kernel (P01)
 

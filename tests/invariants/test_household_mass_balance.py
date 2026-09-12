@@ -102,6 +102,35 @@ def test_no_balance_ever_goes_negative(
             )
 
 
+def test_reported_consumption_leaves_a_ledger_trace(
+    run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
+) -> None:
+    """Flow conservation: every shi reported as eaten was debited from a granary.
+
+    The balance reconciliation above cannot catch a flow that is missing on both sides; this can.
+    """
+    events, _, _ = run
+    consumption = with_trigger_fields(
+        events.filter(pl.col("event_type") == CohortEventType.CONSUMPTION.value),
+        ("eaten_shi", "from_storage_shi", "from_purchases_shi", GRAIN_DELTA),
+    )
+
+    assert consumption.height > 0
+    totals = consumption.select(
+        pl.col(GRAIN_DELTA).sum().alias("ledger"),
+        pl.col("eaten_shi").sum().alias("reported"),
+        (pl.col("from_storage_shi") + pl.col("from_purchases_shi") - pl.col("eaten_shi"))
+        .abs()
+        .max()
+        .alias("split_error"),
+        pl.col(GRAIN_DELTA).max().alias("worst_delta"),
+    ).row(0, named=True)
+
+    assert abs(totals["ledger"] + totals["reported"]) < 1e-6
+    assert totals["split_error"] < 1e-9
+    assert totals["worst_delta"] <= 0.0
+
+
 def test_silver_never_appears_without_a_recorded_source(
     run: tuple[pl.DataFrame, HouseholdPopulation, dict[str, dict[str, float]]],
 ) -> None:

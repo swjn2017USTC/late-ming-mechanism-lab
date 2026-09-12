@@ -120,8 +120,6 @@ def cohort_distress(
     interest = _flow_sums(events, CohortEventType.DEBT_INTEREST, ("interest_tael",))
     land_sales = _flow_sums(events, CohortEventType.LAND_SALE, ("land_sold_mu", "proceeds_tael"))
     asset_sales = _flow_sums(events, CohortEventType.MOVABLE_ASSET_SALE, ("assets_sold_tael",))
-    labour_income = _flow_sums(events, CohortEventType.LABOUR_INCOME, ("silver_delta_tael",))
-
     ledger = _final_state(events)
     for flows in (
         consumption,
@@ -130,7 +128,6 @@ def cohort_distress(
         borrowing,
         interest,
         asset_sales,
-        labour_income,
     ):
         ledger = ledger.join(flows, on="cohort_id", how="left")
     ledger = ledger.join(
@@ -154,7 +151,6 @@ def cohort_distress(
             pl.col("land_sold_mu").fill_null(0.0),
             pl.col("land_sale_proceeds_tael").fill_null(0.0),
             pl.col("assets_sold_tael").fill_null(0.0),
-            pl.col("silver_delta_tael").fill_null(0.0),
         ]
     )
     return ledger.with_columns(
@@ -165,9 +161,14 @@ def cohort_distress(
                 .otherwise(0.0)
             ).alias("unmet_ratio"),
             (pl.col("unmet_shi") > 0).cast(pl.Boolean).alias("ever_below_floor"),
-            (pl.col("final_coping_stage_index") >= float(CopingStage.DESTITUTE)).alias("destitute"),
+            # The coping stage is sticky within a crop year, so these flags describe where the
+            # cohort ended up since its last recovery, not how it is doing this month. The
+            # continuous measure of the month is `unmet_ratio`.
+            (pl.col("final_coping_stage_index") >= float(CopingStage.DESTITUTE)).alias(
+                "ended_destitute"
+            ),
             (pl.col("final_coping_stage_index") >= float(CopingStage.SELLING_LAND)).alias(
-                "sold_land_stage"
+                "ended_selling_land"
             ),
         ]
     )
@@ -189,8 +190,8 @@ def distress_distribution(
                 pl.col("unmet_ratio").mean().alias("mean_unmet_ratio"),
                 pl.col("unmet_ratio").max().alias("max_unmet_ratio"),
                 pl.col("ever_below_floor").mean().alias("share_below_floor"),
-                pl.col("destitute").mean().alias("share_destitute"),
-                pl.col("sold_land_stage").mean().alias("share_sold_land"),
+                pl.col("ended_destitute").mean().alias("share_ended_destitute"),
+                pl.col("ended_selling_land").mean().alias("share_ended_selling_land"),
                 (pl.col("land_sold_mu") / pl.col("households"))
                 .mean()
                 .alias("mean_land_sold_mu_per_household"),
