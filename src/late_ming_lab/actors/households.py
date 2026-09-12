@@ -36,6 +36,7 @@ from late_ming_lab.actors.ledger import (
     GRAIN_DELTA,
     LAND_DELTA,
     SILVER_DELTA,
+    TAX_ARREARS_DELTA,
     LedgerAgent,
     LedgerError,
 )
@@ -54,6 +55,7 @@ __all__ = [
     "GRAIN_DELTA",
     "LAND_DELTA",
     "SILVER_DELTA",
+    "TAX_ARREARS_DELTA",
     "CohortClass",
     "CohortEvent",
     "CohortEventType",
@@ -109,6 +111,8 @@ class CohortEventType(StrEnum):
     MOVABLE_ASSET_SALE = "MOVABLE_ASSET_SALE"
     LAND_SALE = "LAND_SALE"
     COPING_TRANSITION = "COPING_TRANSITION"
+    TAX_PAYMENT = "TAX_PAYMENT"
+    TAX_ARREARS = "TAX_ARREARS_ASSESSED"
     MARKET_SALE = "MARKET_SALE"
     RELIEF_RECEIVED = "RELIEF_RECEIVED"
     TAX_MEDIATION = "TAX_MEDIATION"
@@ -159,6 +163,9 @@ class HouseholdCohortAgent(LedgerAgent):
     grain_shi: float = Field(ge=0)
     silver_tael: float = Field(ge=0)
     debt_tael: float = Field(ge=0)
+    tax_arrears_tael: float = Field(
+        default=0.0, ge=0, description="obligation owed to the county, not to a lender"
+    )
     movable_assets_tael: float = Field(ge=0)
 
     season_impact: float = Field(default=0.0, ge=0)
@@ -295,6 +302,7 @@ class HouseholdCohortAgent(LedgerAgent):
         capacity_tael: float,
         lender_id: str,
         rule_version: str,
+        reason: str = "consumption",
     ) -> CohortEvent:
         self._apply(
             silver=granted_tael,
@@ -311,6 +319,7 @@ class HouseholdCohortAgent(LedgerAgent):
                 "debt_tael": self.debt_tael,
                 SILVER_DELTA: granted_tael,
                 DEBT_DELTA: granted_tael,
+                f"reason_is_{reason}": 1.0,
             },
             outcome=(f"granted-by:{lender_id}" if granted_tael > 0 else f"no-capacity:{lender_id}"),
         )
@@ -345,7 +354,9 @@ class HouseholdCohortAgent(LedgerAgent):
             outcome=occasion,
         )
 
-    def record_movable_asset_sale(self, *, proceeds_tael: float, rule_version: str) -> CohortEvent:
+    def record_movable_asset_sale(
+        self, *, proceeds_tael: float, rule_version: str, reason: str = "food"
+    ) -> CohortEvent:
         self._apply(
             assets=-proceeds_tael,
             silver=proceeds_tael,
@@ -360,12 +371,18 @@ class HouseholdCohortAgent(LedgerAgent):
                 "assets_left_tael": self.movable_assets_tael,
                 ASSETS_DELTA: -proceeds_tael,
                 SILVER_DELTA: proceeds_tael,
+                f"reason_is_{reason}": 1.0,
             },
-            outcome="sold-for-food",
+            outcome=f"sold-for-{reason}",
         )
 
     def record_land_sale(
-        self, *, mu: float, price_tael_per_mu: float, rule_version: str
+        self,
+        *,
+        mu: float,
+        price_tael_per_mu: float,
+        rule_version: str,
+        reason: str = "food",
     ) -> CohortEvent:
         proceeds = mu * price_tael_per_mu
         self._apply(
@@ -383,8 +400,9 @@ class HouseholdCohortAgent(LedgerAgent):
                 "land_left_mu": self.land_mu,
                 LAND_DELTA: -mu,
                 SILVER_DELTA: proceeds,
+                f"reason_is_{reason}": 1.0,
             },
-            outcome="distress-sale",
+            outcome=f"distress-sale-for-{reason}",
         )
 
     def surplus_for_sale(self, *, parameters: HouseholdParameters) -> float:
@@ -395,7 +413,13 @@ class HouseholdCohortAgent(LedgerAgent):
         return max(0.0, self.grain_shi - keep)
 
     def record_market_sale(
-        self, *, shi: float, price_tael_per_shi: float, buyer_id: str, rule_version: str
+        self,
+        *,
+        shi: float,
+        price_tael_per_shi: float,
+        buyer_id: str,
+        rule_version: str,
+        reason: str = "surplus",
     ) -> CohortEvent:
         """Sell harvest surplus to the local market for silver."""
         proceeds = shi * price_tael_per_shi
@@ -413,12 +437,63 @@ class HouseholdCohortAgent(LedgerAgent):
                 "proceeds_tael": proceeds,
                 GRAIN_DELTA: -shi,
                 SILVER_DELTA: proceeds,
+                f"reason_is_{reason}": 1.0,
             },
             outcome=f"sold-to:{buyer_id}",
         )
 
-    def record_relief(self, *, grain_shi: float, donor_id: str, rule_version: str) -> CohortEvent:
-        """Grain received as private relief; a transfer, not production."""
+    def record_tax_payment(
+        self,
+        *,
+        silver_tael: float,
+        assessed_tael: float,
+        county_id: str,
+        channel: str,
+        rule_version: str,
+    ) -> CohortEvent:
+        """Pay an assessed obligation in silver.
+
+        The channel naming who the county received it from is part of the record: an advance by
+        an elite is a different fiscal fact from a household paying out of its own purse.
+        """
+        paid = min(silver_tael, self.silver_tael)
+        self._apply(silver=-paid, impacts=((SILVER_DELTA, -paid),))
+        return CohortEvent(
+            event_type=CohortEventType.TAX_PAYMENT,
+            rule_version=rule_version,
+            trigger={
+                "assessed_tael": assessed_tael,
+                "paid_tael": paid,
+                SILVER_DELTA: -paid,
+                "silver_tael": self.silver_tael,
+            },
+            outcome=f"paid-to:{county_id}:{channel}",
+        )
+
+    def record_tax_arrears(
+        self, *, delta_tael: float, county_id: str, rule_version: str
+    ) -> CohortEvent:
+        """Carry an unpaid obligation; arrears are owed to the county, not to a lender."""
+        self._apply(tax_arrears=delta_tael, impacts=((TAX_ARREARS_DELTA, delta_tael),))
+        return CohortEvent(
+            event_type=CohortEventType.TAX_ARREARS,
+            rule_version=rule_version,
+            trigger={
+                "arrears_delta_tael": delta_tael,
+                TAX_ARREARS_DELTA: delta_tael,
+                "tax_arrears_tael": self.tax_arrears_tael,
+            },
+            outcome=f"owed-to:{county_id}",
+        )
+
+    def record_relief(
+        self, *, grain_shi: float, donor_id: str, rule_version: str, source: str = "private"
+    ) -> CohortEvent:
+        """Grain received as relief; a transfer, not production.
+
+        ``source`` distinguishes official relief from a private release, because the two are
+        different fiscal facts even though the household experiences the same grain.
+        """
         self._apply(grain=grain_shi, impacts=((GRAIN_DELTA, grain_shi),))
         return CohortEvent(
             event_type=CohortEventType.RELIEF_RECEIVED,
@@ -427,8 +502,9 @@ class HouseholdCohortAgent(LedgerAgent):
                 "relief_shi": grain_shi,
                 GRAIN_DELTA: grain_shi,
                 "grain_shi": self.grain_shi,
+                f"source_is_{source}": 1.0,
             },
-            outcome=f"relieved-by:{donor_id}",
+            outcome=f"relieved-by:{donor_id}:{source}",
         )
 
     def record_tax_mediation(

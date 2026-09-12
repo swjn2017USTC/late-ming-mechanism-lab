@@ -22,6 +22,7 @@ from late_ming_lab.networks.nodes import AgrarianZone
 CROP_PARAMETERS_VERSION: Final[str] = "crop-parameters-v1"
 HOUSEHOLD_PARAMETERS_VERSION: Final[str] = "household-parameters-v1"
 MARKET_PARAMETERS_VERSION: Final[str] = "market-parameters-v1"
+FISCAL_PARAMETERS_VERSION: Final[str] = "fiscal-parameters-v1"
 ELITE_PARAMETERS_VERSION: Final[str] = "elite-parameters-v1"
 
 
@@ -71,6 +72,13 @@ class HouseholdParameters(BaseModel):
 
     land_reference_value_tael_per_mu: float = Field(
         gt=0, description="collateral value of land as the borrower values it"
+    )
+    tax_grain_sale_floor_ratio_of_annual_need: float = Field(
+        ge=0,
+        description=(
+            "grain a household will not sell to pay tax: below this share of a year's need it "
+            "would rather fall into arrears"
+        ),
     )
     surplus_keep_ratio_of_annual_need: float = Field(
         ge=0,
@@ -133,6 +141,7 @@ def core_default_household_parameters() -> HouseholdParameters:
         minimum_consumption_fraction=0.75,
         wage_grain_shi_per_adult_month=0.3,
         land_reference_value_tael_per_mu=5.0,
+        tax_grain_sale_floor_ratio_of_annual_need=0.5,
         surplus_keep_ratio_of_annual_need=1.0,
         debt_repayment_silver_reserve_tael_per_household=0.5,
         debt_repayment_grain_ratio_of_annual_need=1.0,
@@ -263,5 +272,76 @@ def core_default_elite_parameters() -> EliteParameters:
         provenance=DataProvenance.assumption(
             "development-scale lending, land price, relief and mediation rules; grade S, to be "
             "replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+class FiscalParameters(BaseModel):
+    """Assessment, collection, treasury and official-relief rules for county governments.
+
+    The tax ledger is decomposed the way M3 requires — quota, effort, cost, receipts, arrears —
+    and every rate here is a grade ``S`` assumption. ``assessed_value_tael_per_mu`` is the value
+    the county assesses a mu of taxable land at, not a market price.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = FISCAL_PARAMETERS_VERSION
+
+    assessed_value_tael_per_mu: float = Field(gt=0)
+    collection_cost_per_effort_tael: float = Field(gt=0)
+    collection_cost_logistics_floor: float = Field(gt=0, le=1)
+
+    elite_hidden_land_share: float = Field(
+        ge=0, le=1, description="share of elite land the county cannot see at full information"
+    )
+
+    relief_eligibility_unmet_ratio: float = Field(ge=0, le=1)
+    relief_share_of_need: float = Field(ge=0, le=1)
+    relief_logistics_cost_per_shi_tael: float = Field(ge=0)
+    granary_target_cover_months: float = Field(ge=0)
+    granary_purchase_share_of_silver: float = Field(ge=0, le=1)
+
+    provenance: DataProvenance
+
+    @model_validator(mode="after")
+    def _bounded_rules(self) -> FiscalParameters:
+        if self.collection_cost_logistics_floor <= 0.0:
+            raise ValueError("logistics capacity cannot divide by zero")
+        return self
+
+    def hidden_land_share(self, *, information_capacity: float) -> float:
+        """Land the county cannot see: elites hide more of it when information is weak."""
+        if not 0.0 <= information_capacity <= 1.0:
+            raise ValueError("information capacity must lie in [0, 1]")
+        return self.elite_hidden_land_share * (1.0 - information_capacity)
+
+    def collection_cost_tael(
+        self, *, effort: float, quota_tael: float, logistics_capacity: float
+    ) -> float:
+        """What the effort costs: effort against the quota, dearer with worse logistics."""
+        logistics = max(logistics_capacity, self.collection_cost_logistics_floor)
+        return effort * quota_tael * self.collection_cost_per_effort_tael / logistics
+
+    def relief_cost_tael(self, *, released_shi: float, logistics_capacity: float) -> float:
+        logistics = max(logistics_capacity, self.collection_cost_logistics_floor)
+        return released_shi * self.relief_logistics_cost_per_shi_tael / logistics
+
+
+def core_default_fiscal_parameters() -> FiscalParameters:
+    """Development-scale fiscal assumptions for the toy counties."""
+    return FiscalParameters(
+        assessed_value_tael_per_mu=0.35,
+        collection_cost_per_effort_tael=0.02,
+        collection_cost_logistics_floor=0.1,
+        elite_hidden_land_share=0.6,
+        relief_eligibility_unmet_ratio=0.05,
+        relief_share_of_need=0.5,
+        relief_logistics_cost_per_shi_tael=0.02,
+        granary_target_cover_months=1.0,
+        granary_purchase_share_of_silver=0.5,
+        provenance=DataProvenance.assumption(
+            "development-scale assessment value, collection and relief costs, elite hiding and "
+            "granary rules; grade S, to be replaced by sourced parameter cards in P08"
         ),
     )

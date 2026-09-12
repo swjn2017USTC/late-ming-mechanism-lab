@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Final
 
 from late_ming_lab.actors.elites import EliteLayer, LocalEliteAgent
+from late_ming_lab.actors.government import CountyGovernment, GovernmentLayer, StateCapacity
 from late_ming_lab.actors.households import (
     CohortClass,
     HouseholdCohortAgent,
@@ -178,5 +179,46 @@ def toy_elite_layer(nodes: SpatialNodes) -> EliteLayer:
                 silver_tael=ELITE_SILVER_TAEL_PER_NODE,
             )
             for node in nodes.counties
+        )
+    )
+
+
+#: County treasuries start empty: the fiscal layer is about extraction, not endowment.
+COUNTY_SILVER_TAEL: Final[float] = 0.0
+COUNTY_GRANARY_SHI: Final[float] = 0.0
+
+
+def toy_capacity(
+    *,
+    tax_collection: float = 0.6,
+    information: float = 0.5,
+    relief: float = 0.5,
+    coercion: float = 0.4,
+    logistics: float = 0.6,
+) -> StateCapacity:
+    """Declared development-scale capacities, each one adjustable on its own."""
+    return StateCapacity(
+        tax_collection=tax_collection,
+        information=information,
+        relief=relief,
+        coercion=coercion,
+        logistics=logistics,
+    )
+
+
+def toy_government_layer(
+    graphs: SpatialGraphs, *, capacity: StateCapacity | None = None
+) -> GovernmentLayer:
+    """One county government per county node, with an empty treasury and granary."""
+    settings = capacity or toy_capacity()
+    return GovernmentLayer(
+        tuple(
+            CountyGovernment(
+                node_id=node.node_id,
+                capacity=settings,
+                silver_tael=COUNTY_SILVER_TAEL,
+                grain_shi=COUNTY_GRANARY_SHI,
+            )
+            for node in graphs.nodes.counties
         )
     )

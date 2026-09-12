@@ -26,6 +26,7 @@ SILVER_DELTA = "silver_delta_tael"
 LAND_DELTA = "land_delta_mu"
 DEBT_DELTA = "debt_delta_tael"
 ASSETS_DELTA = "assets_delta_tael"
+TAX_ARREARS_DELTA = "tax_arrears_delta_tael"
 
 #: The trigger keys every balance movement is recorded under.
 LEDGER_KEYS: tuple[str, ...] = (
@@ -34,6 +35,7 @@ LEDGER_KEYS: tuple[str, ...] = (
     LAND_DELTA,
     DEBT_DELTA,
     ASSETS_DELTA,
+    TAX_ARREARS_DELTA,
 )
 
 #: Balance field name -> the trigger key that records its movements.
@@ -45,6 +47,7 @@ LEDGER_KEY_BY_FIELD: Mapping[str, str] = MappingProxyType(
         "debt_tael": DEBT_DELTA,
         "movable_assets_tael": ASSETS_DELTA,
         "goods_tael": ASSETS_DELTA,
+        "tax_arrears_tael": TAX_ARREARS_DELTA,
     }
 )
 
@@ -57,6 +60,7 @@ DELTA_FIELDS: Mapping[str, str] = MappingProxyType(
         "debt": "debt_tael",
         "assets": "movable_assets_tael",
         "goods": "goods_tael",
+        "tax_arrears": "tax_arrears_tael",
     }
 )
 
@@ -101,6 +105,7 @@ class LedgerAgent(BaseModel):
         debt: float = 0.0,
         assets: float = 0.0,
         goods: float = 0.0,
+        tax_arrears: float = 0.0,
         impacts: tuple[tuple[str, float], ...] = (),
     ) -> None:
         """Apply a balance change atomically; the only place balances ever move."""
@@ -111,6 +116,7 @@ class LedgerAgent(BaseModel):
             "debt": debt,
             "assets": assets,
             "goods": goods,
+            "tax_arrears": tax_arrears,
         }
         candidates: list[tuple[str, float]] = []
         for keyword, delta in changes.items():
