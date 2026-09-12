@@ -36,16 +36,24 @@ REGRESSION_EVENT_COUNT = 240
 CLIMATE_SIMULATION_DIGEST = "6a03cce6cfdc4e8c426f19ec839f7d8ea3e2a0d9628e8e03c80fb2f238ce0755"
 CLIMATE_EVENT_COUNT = 240 * 6
 
+#: The P05 fiscal economy: county governments, assessment, collection and official relief.
+FISCAL_DIGEST = "8155e41b15a8b6019962da68b5c1c4ab5cf9922d1849d8b5faf6c204496b7d16"
+FISCAL_EVENT_COUNT = 28764
+
 #: Same, with the whole P04 economy (market, merchants, elites, credit): two short windows.
-MARKET_BASELINE_DIGEST = "fcb3dfdc3863db49eb9a8a9dadf6b0221b22a9e55359d66790f8f9681ef1584c"
+#:
+#: Re-pinned in P05 for instrumentation only: the log now tags why a sale happened
+#: (``reason_is_*``) and names the rent counterparty, so digests move while balances, flows and
+#: every published P03/P04 answer stay identical. The P05 report records the change.
+MARKET_BASELINE_DIGEST = "4b98410a02a5400c20f148ab0ee26a971cb6379807285337ed00a3274587c545"
 MARKET_BASELINE_EVENT_COUNT = 10618
-MARKET_SEVERE_DIGEST = "dcfe82695ef95465d58fddd552b0dbb5dcf9bb26f9b49a39e9cd90f067dd7bb8"
+MARKET_SEVERE_DIGEST = "d0f24df364a9085ae07c2b605d173415e2ee6c2c4819741f559d4d2a3a21e99b"
 MARKET_SEVERE_EVENT_COUNT = 14108
 
 #: Same, with the toy cohort population: a normal year and a severe synthetic shock.
-HOUSEHOLD_BASELINE_DIGEST = "076ca261fbf514661fd471c06ef067cd9eb00a745834c6d9ad306a87acf2206e"
+HOUSEHOLD_BASELINE_DIGEST = "39d980735462639c2ea0cc837751eac97b6fec488b828747d6ada3fc1ae50a2d"
 HOUSEHOLD_BASELINE_EVENT_COUNT = 25606
-HOUSEHOLD_SEVERE_DIGEST = "55f0b4c6253668ffcaa6c457b6e17ceeb23b2e63737183d7e551be36b1349249"
+HOUSEHOLD_SEVERE_DIGEST = "d064a799b2a811aa9df5485b05139f429abe92256bd27270b607ac4746ca22c0"
 HOUSEHOLD_SEVERE_EVENT_COUNT = 33606
 
 
@@ -155,3 +163,21 @@ def test_household_forcing_replays_and_the_shock_changes_it() -> None:
 
     assert severe.result.events.equals(replay.result.events)
     assert not baseline.result.events.equals(severe.result.events)
+
+
+def test_fiscal_regression_run_matches_its_pinned_baseline() -> None:
+    from late_ming_lab.experiments.extraction import ExtractionScenario, run_extraction_scenario
+
+    compact = SimulationConfig.model_validate({"tick_count": 96, "warmup_ticks": 24})
+    run = run_extraction_scenario(
+        ExtractionScenario(
+            label="fiscal-baseline",
+            nominal_pressure=0.02,
+            monthly_event_probability=0.5,
+            severity_floor=0.6,
+        ),
+        config=compact,
+    )
+
+    assert run.result.summary.event_count == FISCAL_EVENT_COUNT
+    assert run.result.summary.simulation_digest == FISCAL_DIGEST

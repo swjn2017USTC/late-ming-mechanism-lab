@@ -15,7 +15,6 @@ The shock is a scenario parameter throughout. Nothing here says anything about 1
 from __future__ import annotations
 
 import polars as pl
-import pytest
 
 from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.experiments.market_credit import (
@@ -157,54 +156,13 @@ def test_elite_relief_reaches_distressed_cohorts() -> None:
     assert with_relief.economy.elites.total_grain_shi < without.economy.elites.total_grain_shi
 
 
-def test_tax_mediation_moves_silver_only_when_a_demand_exists() -> None:
-    """The P05 hook: with no demand nothing is advanced; with one, both sides record it.
+def test_tax_mediation_belongs_to_the_fiscal_layer_now() -> None:
+    """P04 shipped the interface; P05 drives it with an assessed demand, so the hook is gone."""
+    from late_ming_lab.experiments.assembly import build_toy_economy
 
-    The elite advances silver, the cohort receives it and owes it: the two events must balance,
-    and the cohort's new debt must equal what the elite paid out.
-    """
-    from late_ming_lab.actors.elites import AdvanceBasedTaxMediation
-    from late_ming_lab.actors.ledger import SILVER_DELTA
-    from late_ming_lab.analysis.distress import with_trigger_fields
-    from late_ming_lab.core.kernel import KernelResult, SimulationKernel
-    from late_ming_lab.experiments.assembly import Economy, build_toy_economy
-
-    compact = SimulationConfig.model_validate({"tick_count": 12, "warmup_ticks": 2})
-    policy = AdvanceBasedTaxMediation(minimum_client_land_mu=0.0)
-
-    def run(demand: float) -> tuple[Economy, KernelResult]:
-        economy = build_toy_economy(tax_mediation=policy, tax_demand_tael_per_household=demand)
-        result = SimulationKernel(compact, list(economy.systems)).run(run_label="mediation")
-        return economy, result
-
-    inert_economy, inert = run(0.0)
-    active_economy, active = run(5.0)
-
-    for event_type in ("TAX_MEDIATION", "ELITE_TAX_MEDIATION"):
-        assert inert.events.filter(inert.events["event_type"] == event_type).height == 0
-    for house in inert_economy.elites:
-        house.check_balances()
-
-    paid_out = with_trigger_fields(
-        active.events.filter(active.events["event_type"] == "ELITE_TAX_MEDIATION"),
-        (SILVER_DELTA, "advanced_tael"),
-    )
-    advanced_to = with_trigger_fields(
-        active.events.filter(active.events["event_type"] == "TAX_MEDIATION"),
-        (SILVER_DELTA, "debt_delta_tael"),
-    )
-
-    assert paid_out.height > 0
-    assert advanced_to.height == paid_out.height
-    paid = float(paid_out.select(pl.col(SILVER_DELTA).sum()).item() or 0.0)
-    received = float(advanced_to.select(pl.col(SILVER_DELTA).sum()).item() or 0.0)
-    owed = float(advanced_to.select(pl.col("debt_delta_tael").sum()).item() or 0.0)
-
-    assert paid < 0.0
-    assert received == pytest.approx(-paid, rel=1e-9), "silver advanced must arrive somewhere"
-    assert owed == pytest.approx(received, rel=1e-9), "what a client received, it owes"
-    for house in active_economy.elites:
-        house.check_balances()
+    economy = build_toy_economy(with_fiscal=False)
+    assert economy.governments is None
+    assert all(not hasattr(system, "tax_demand_tael_per_household") for system in economy.systems)
 
 
 def test_scenarios_replay_exactly() -> None:

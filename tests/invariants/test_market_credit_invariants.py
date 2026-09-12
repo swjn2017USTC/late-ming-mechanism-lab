@@ -34,7 +34,8 @@ SHORT_CONFIG = SimulationConfig.model_validate({"tick_count": 60, "warmup_ticks"
 @pytest.fixture(scope="module")
 def economy_run() -> tuple[Economy, KernelResult]:
     economy = build_toy_economy(
-        climate_model=SyntheticClimate(monthly_event_probability=0.5, severity_floor=0.6)
+        climate_model=SyntheticClimate(monthly_event_probability=0.5, severity_floor=0.6),
+        with_fiscal=False,
     )
     from late_ming_lab.core.kernel import SimulationKernel
 
