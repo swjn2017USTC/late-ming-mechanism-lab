@@ -25,6 +25,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Final
 
+from late_ming_lab.actors.elites import EliteLayer
 from late_ming_lab.actors.households import (
     HARVEST_RULE_VERSION,
     HouseholdCohortAgent,
@@ -35,6 +36,7 @@ from late_ming_lab.core.tick import TickContext, TickPhase
 from late_ming_lab.evidence.parameters import CropParameters, HouseholdParameters
 from late_ming_lab.systems.calendar import AgriculturalCalendar
 from late_ming_lab.systems.climate import CLIMATE_EVENT_TYPE
+from late_ming_lab.systems.markets import emit_elite_event
 
 AGRICULTURAL_STATE_RULE_VERSION: Final[str] = "agricultural-state-v1"
 
@@ -98,11 +100,14 @@ class HarvestSystem:
         calendar: AgriculturalCalendar,
         crop_parameters: CropParameters,
         household_parameters: HouseholdParameters,
+        *,
+        elites: EliteLayer | None = None,
     ) -> None:
         self._population = population
         self._calendar = calendar
         self._crop_parameters = crop_parameters
         self._household_parameters = household_parameters
+        self._elites = elites
 
     def step(self, ctx: TickContext) -> None:
         month = ctx.month.month
@@ -129,47 +134,37 @@ class HarvestSystem:
                 self.phase,
             )
             self._pay_rent(ctx, cohort, result.grain_shi)
-            self._repay_from_surplus(ctx, cohort)
             self._maybe_reset_coping(ctx, cohort, result.grain_shi)
 
     def _pay_rent(self, ctx: TickContext, cohort: HouseholdCohortAgent, harvest_shi: float) -> None:
+        """Pay rent to the local elite; the counterparty P03 left unmodelled."""
         share = self._household_parameters.rent_share_for(cohort.cohort_class.value)
         if share <= 0.0 or harvest_shi <= 0.0:
             return
         rent = min(harvest_shi * share, cohort.grain_shi)
         if rent <= 0.0:
             return
+        house = self._elites.require(cohort.node_id) if self._elites is not None else None
         emit_cohort_event(
             ctx,
             cohort,
             cohort.record_rent_payment(
-                grain_shi=rent, share=share, rule_version=HARVEST_RULE_VERSION
+                grain_shi=rent,
+                share=share,
+                landlord_id=house.elite_id if house is not None else "unmodelled-landlord",
+                rule_version=HARVEST_RULE_VERSION,
             ),
             self.phase,
         )
-
-    def _repay_from_surplus(self, ctx: TickContext, cohort: HouseholdCohortAgent) -> None:
-        """Repay debt out of grain above the household's own year of need.
-
-        Grain loans repaid from the harvest are the norm in this economy; without a cash
-        income stream a household would otherwise never be able to service a debt, and the
-        debt stock would only ever compound.
-        """
-        if cohort.debt_tael <= 0:
+        if house is None:
             return
-        annual_need = self._household_parameters.annual_need_shi(cohort.adults)
-        keep = self._household_parameters.debt_repayment_grain_ratio_of_annual_need * annual_need
-        surplus = max(0.0, cohort.grain_shi - keep)
-        price = self._household_parameters.grain_reference_price_tael_per_shi
-        if surplus <= 0:
-            return
-        value = surplus * price
-        emit_cohort_event(
+        emit_elite_event(
             ctx,
-            cohort,
-            cohort.record_repayment_from_harvest(
-                repaid_tael=min(cohort.debt_tael, value),
-                price_tael_per_shi=price,
+            house,
+            house.receive_grain(
+                grain_shi=rent,
+                payer_id=cohort.cohort_id,
+                reason="rent",
                 rule_version=HARVEST_RULE_VERSION,
             ),
             self.phase,
