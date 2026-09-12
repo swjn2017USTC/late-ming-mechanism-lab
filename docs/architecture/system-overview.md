@@ -1,11 +1,13 @@
 # System Overview
 
-Status: P06 (military finance and armed organization). Space, climate, households, a county grain
-market, merchant houses, elite lending, a county fiscal apparatus, garrisons and armed bands
-exist; rebels-as-organizations, migration itself, inter-county military movement and runtime-LLM
-decisions do not. There are no tactics, battles or named leaders, by decision — see
-`docs/adr/0002-military-abstractions.md`. The only spatial dataset is the toy fixture and every
-endowment and rate is an assumption: none of it is history.
+Status: P07 (integrated crisis engine). The whole chain is wired — climate, agriculture,
+households, market and credit, taxation and relief, migration, military finance, armed bands,
+violence — under an explicit, validated monthly scheduler, and runs for the full 1625–1644 window on
+a five-county and a twelve-county fixture. Inter-county military movement, trade disruption driven
+by band activity, births and deaths, and runtime-LLM decisions do not exist. There are no tactics,
+battles or named leaders, by decision — see `docs/adr/0002-military-abstractions.md`; the tick order
+and its dependency rule are enforced and drawn in `docs/architecture/system-dependency.md`. Every
+dataset and rate is an assumption: none of it is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -63,8 +65,10 @@ A single county-adjacency graph is prohibited.
 
 ## Tick order
 
-One tick = one month. Order is explicit, versioned, and tested — never Mesa's incidental
-default ordering.
+One tick = one month. Order is explicit, versioned, tested, and *drawable*: every system declares
+the shared resources it reads and writes, `core.scheduler` refuses a registration that reads a
+resource before the phase that writes it, and the diagram in `docs/architecture/system-dependency.md`
+is generated from those declarations rather than maintained by hand.
 
 ```text
 01 climate update                    10 military finance
@@ -266,6 +270,7 @@ against the pre-fix code, where grain bought on the ladder was eaten but never d
 | Violence hook | `networks/disruption.py` | `TradeDisruption` scales a link's risk and capacity and can block it outright. Not yet driven by armed-band activity: P06 raids do not touch the trade graph, and an experiment has to supply the disruption explicitly (open item in the P06 report) |
 | Merchant layer | `actors/merchants.py` | one house per node the trade graph reaches, with silver, grain and goods; every purchase and sale is logged from both sides |
 | Elite layer | `actors/elites.py` | rent, lending, land purchase, relief, tax mediation; **claims are derived** from household debt, so borrower and lender records cannot drift |
+| Migration | `systems/migration.py` | phase 09: eligible households leave for good (people, food, silver and movable property; their fields are abandoned), adults leave for a declared term and eat where they arrive, and movers to a boundary node leave the modelled population. Destination = the cheapest reachable county, the exit a last resort |
 | Credit | `systems/elites.py` | `LocalCredit` lends against collateral, bounded by both the borrower's limit and the lender's silver |
 | Relief and mediation | `systems/elites.py` | `EliteActionSystem` (phase 08) releases grain to cohorts whose measured distress exceeds a threshold, and asks a `TaxMediationPolicy` how much of a tax demand it would advance |
 | Analysis | `analysis/concentration.py` | price dispersion, land distribution, land concentration, debt distribution, trade summary, first-distress ticks |

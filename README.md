@@ -11,28 +11,33 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P06 (Military Finance / Armed Organization) complete. The repository holds a history-free
-deterministic kernel (P01), a spatial–temporal–environmental skeleton (P02), weighted household
-cohorts with an explicit coping ladder (P03), a county grain market with merchant houses and
-elite lending, land purchase and private relief (P04), a county fiscal apparatus (P05):
-assessment against a tax base, collection effort and cost, receipts, arrears, official relief and
-elite tax mediation, with state capacity kept as five separate capacities and never one number,
-and a garrison and armed bands (P06): pay and rations from the same treasury and granary, arrears,
-morale, cohesion and desertion, a shared recruit pool, band formation from unorganized deserters,
-raids, movement, suppression, dissolution, split and merge.
-Mass-balance, double-entry, fiscal-accounting and people/food/war-material invariants are enforced
-in code and rebuilt from the event log in tests. There are still no tactics, no named leaders, no
-actual migration and no LLM decisions.
+P07 (Integrated Crisis Engine) complete. The repository holds a history-free deterministic kernel
+(P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with an explicit
+coping ladder (P03), a county grain market with merchant houses and elite lending, land purchase and
+private relief (P04), a county fiscal apparatus (P05) with state capacity kept as five separate
+capacities and never one number, a garrison and armed bands (P06) — pay, rations, arrears, morale,
+desertion, a shared recruit pool, raids, movement, suppression, split and merge — and now the
+sandbox that connects them (P07): an explicit, validated monthly scheduler with a derived dependency
+diagram, real migration (permanent moves with land abandoned, seasonal absences, exits from the
+region), and a metric set covering distress, land concentration, migration, price dispersion,
+receipts, the tax base, military arrears, desertion, armed groups and governance warning indicators.
+Two spatial fixtures ship: the five-county toy and a twelve-county Shaanxi–Henan fixture; the
+integrated experiment runs both for the full 1625–1644 window.
+Mass-balance, double-entry, fiscal-accounting, people/food/war-material and migration invariants are
+enforced in code and rebuilt from the event log in tests, and the whole sandbox is pinned by a
+fixed-seed regression suite. There are still no tactics, no named leaders and no LLM decisions.
 
-Everything shipped so far is an assumption, not history: the five-county toy fixture and the
-toy cohort endowments are graded `S` throughout, and the shock experiment's severity axis is a
-scenario parameter, never an estimate of a historical drought. Real geography enters only
+Everything shipped so far is an assumption, not history: both spatial fixtures and every cohort
+endowment are graded `S` throughout, the shock experiment's severity axis is a scenario parameter,
+never an estimate of a historical drought, and the governance indicators are declared reading
+lines rather than evidence. Real geography enters only
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P06.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P07.md`.
 Why the military actors are declared abstractions rather than tactics:
-`docs/adr/0002-military-abstractions.md`.
+`docs/adr/0002-military-abstractions.md`; how the tick order and its dependencies are enforced and
+drawn: `docs/architecture/system-dependency.md`.
 
 ```bash
 uv run late-ming-lab smoke-run            # 240 ticks, 1625-01 → 1644-12, into outputs/runs/
