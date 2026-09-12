@@ -1,0 +1,38 @@
+# Project OMP settings — late-ming-mechanism-lab
+#
+# Every key below was verified against `omp config list` (omp v18.1.13, 2026-09-12).
+# No key is guessed or carried over from memory. Supported model roles are:
+# default, smol, slow, vision, plan, commit, tiny, task, advisor.
+#
+# Development-time model routing ONLY. The runtime institutional-policy model is
+# USTC DeepSeek V4.1 and is never routed through these roles; it is disabled by
+# default. See docs/architecture/runtime-llm-boundary.md and .omp/RULES.md.
+
+modelRoles:
+  # Coding / analysis main model (OpenCode Go — development only).
+  default: opencode-go/deepseek-v4.1-flash
+  task: opencode-go/deepseek-v4.1-flash
+  plan: opencode-go/deepseek-v4.1-flash
+  slow: opencode-go/deepseek-v4.1-flash
+  # Cheap mechanical work.
+  smol: opencode-go/mimo-v2.5
+  tiny: opencode-go/mimo-v2.5
+  commit: opencode-go/mimo-v2.5
+  # Adversarial/independent review uses other model families, to avoid
+  # same-family correlated review. Off by default; see `advisor.enabled`.
+  advisor: opencode-go/glm-5.3-flash
+
+# Advisor runtime is off by default (.omp/RULES.md rule 16).
+advisor:
+  enabled: false
+
+task:
+  # Subagent budget ceiling: ordinary work <= 1, complex work <= 2 (.omp/RULES.md rule 17).
+  maxConcurrency: 2
+  # Authoritative per-agent routing. These override agent frontmatter `model`.
+  agentModelOverrides:
+    repo-scout: opencode-go/mimo-v2.5
+    architect: opencode-go/deepseek-v4.1-flash
+    implementer: opencode-go/deepseek-v4.1-flash
+    plan-critic: opencode-go/qwen3.8-flash
+    reviewer: opencode-go/glm-5.3-flash
