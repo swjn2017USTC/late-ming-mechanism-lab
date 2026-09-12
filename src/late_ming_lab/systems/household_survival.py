@@ -32,7 +32,24 @@ from late_ming_lab.actors.households import (
     emit_cohort_event,
 )
 from late_ming_lab.actors.merchants import MerchantLayer
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_AGRICULTURE,
+    RESOURCE_COHORT_ADULTS,
+    RESOURCE_COHORT_ASSETS,
+    RESOURCE_COHORT_DEBT,
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_COHORT_HOUSEHOLDS,
+    RESOURCE_COHORT_LAND,
+    RESOURCE_COHORT_SILVER,
+    RESOURCE_DISTRESS_WINDOW,
+    RESOURCE_ELITE_GRAIN,
+    RESOURCE_ELITE_LAND,
+    RESOURCE_ELITE_SILVER,
+    RESOURCE_MARKET_PRICE,
+    RESOURCE_MERCHANT_STOCK,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import EliteParameters, HouseholdParameters
 from late_ming_lab.systems.markets import (
     LocalGrainMarket,
@@ -48,6 +65,33 @@ class ConsumptionSystem:
 
     name: str = "household-consumption"
     phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION
+    # The adult and household counts, the land endowment and the posted price are carried over
+    # from previous ticks rather than produced in this one, so they are not claimed here.
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_AGRICULTURE,
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_LAND,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_LAND,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_DISTRESS_WINDOW,
+            RESOURCE_ELITE_LAND,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
 
     def __init__(
         self,
@@ -63,7 +107,7 @@ class ConsumptionSystem:
         self._credit = credit
         self._markets: Mapping[str, LocalGrainMarket] = {
             node_id: LocalGrainMarket(node_id=node_id, book=book, merchants=merchants)
-            for node_id in {cohort.node_id for cohort in population}
+            for node_id in sorted({cohort.node_id for cohort in population})
         }
         for cohort in population:
             cohort.set_land_reference_value(parameters.land_reference_value_tael_per_mu)
@@ -101,6 +145,23 @@ class DebtServiceSystem:
 
     name: str = "debt-service"
     phase: TickPhase = TickPhase.CREDIT_AND_DEBT
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_MARKET_PRICE,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_ELITE_GRAIN,
+            RESOURCE_ELITE_SILVER,
+        }
+    )
 
     def __init__(
         self,
@@ -210,6 +271,20 @@ class CohortBookkeepingSystem:
 
     name: str = "cohort-bookkeeping"
     phase: TickPhase = TickPhase.BOOKKEEPING
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_AGRICULTURE,
+            RESOURCE_COHORT_ADULTS,
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_HOUSEHOLDS,
+            RESOURCE_COHORT_LAND,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_DISTRESS_WINDOW,
+        }
+    )
+    writes: frozenset[str] = frozenset()
 
     def __init__(self, population: HouseholdPopulation, parameters: HouseholdParameters) -> None:
         self._population = population

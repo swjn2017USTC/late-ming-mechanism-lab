@@ -22,6 +22,7 @@ from late_ming_lab.core.events import EventLogger
 from late_ming_lab.core.hashing import canonical_json, hash_records
 from late_ming_lab.core.manifest import RunManifest, RunSummary
 from late_ming_lab.core.rng import RngStreams
+from late_ming_lab.core.scheduler import systems_digest, validate
 from late_ming_lab.core.tick import System, TickContext, TickPhase
 from late_ming_lab.evidence.provenance import git_provenance
 
@@ -57,7 +58,7 @@ class SimulationKernel:
     def __init__(self, config: SimulationConfig, systems: Sequence[System] = ()) -> None:
         self._config = config
         self._clock = Clock.from_config(config)
-        self._systems = _validated_systems(systems)
+        self._systems = validate(systems)
 
     @property
     def config(self) -> SimulationConfig:
@@ -70,6 +71,11 @@ class SimulationKernel:
     @property
     def systems(self) -> tuple[System, ...]:
         return self._systems
+
+    @property
+    def systems_digest(self) -> str:
+        """SHA-256 of the registered systems' phases and dependency claims."""
+        return systems_digest(self._systems)
 
     def run(self, run_label: str | None = None) -> KernelResult:
         """Run the window to completion and return the run artifacts."""
@@ -107,6 +113,7 @@ class SimulationKernel:
             rng=rng,
             provenance=git_provenance(),
             created_at=created_at,
+            systems=self._systems,
             run_label=run_label,
         )
         summary = RunSummary(
@@ -145,22 +152,3 @@ def simulation_digest(events: pl.DataFrame, macro: pl.DataFrame) -> str:
     records = [canonical_json(row) for row in events.iter_rows(named=True)]
     records += [canonical_json(row) for row in macro.iter_rows(named=True)]
     return hash_records(records)
-
-
-def _validated_systems(systems: Sequence[System]) -> tuple[System, ...]:
-    validated = tuple(systems)
-    seen: set[str] = set()
-    previous: TickPhase | None = None
-    for system in validated:
-        if not system.name:
-            raise ValueError("system name must not be empty")
-        if system.name in seen:
-            raise ValueError(f"duplicate system name {system.name!r}")
-        seen.add(system.name)
-        if previous is not None and system.phase < previous:
-            raise ValueError(
-                f"system {system.name!r} registers in phase {system.phase.token!r} after "
-                f"{previous.token!r}; systems must follow the versioned tick order"
-            )
-        previous = system.phase
-    return validated

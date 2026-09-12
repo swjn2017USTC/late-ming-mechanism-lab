@@ -20,6 +20,8 @@ class _DrawSystem:
 
     name: str = "test-draw"
     phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION
+    reads: frozenset[str] = frozenset()
+    writes: frozenset[str] = frozenset()
     calls: list[tuple[int, float]] = field(default_factory=list)
 
     def step(self, ctx: TickContext) -> None:
@@ -40,6 +42,8 @@ class _DrawSystem:
 class _OtherSystem:
     name: str = "test-other"
     phase: TickPhase = TickPhase.BOOKKEEPING
+    reads: frozenset[str] = frozenset()
+    writes: frozenset[str] = frozenset()
 
     def step(self, ctx: TickContext) -> None:
         ctx.emit("TEST_OTHER", phase="bookkeeping")
@@ -123,6 +127,8 @@ def test_systems_see_a_consistent_tick_context() -> None:
     class _Inspector:
         name = "test-inspector"
         phase = TickPhase.DATA_COLLECTION
+        reads: frozenset[str] = frozenset()
+        writes: frozenset[str] = frozenset()
 
         def step(self, ctx: TickContext) -> None:
             seen.append((ctx.tick, str(ctx.month), ctx.period.value, str(ctx.config.root_seed)))

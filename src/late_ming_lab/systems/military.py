@@ -42,7 +42,26 @@ from late_ming_lab.actors.military import (
     MilitaryEventType,
     MilitaryLayer,
 )
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_BAND_STANDING,
+    RESOURCE_BAND_STORES,
+    RESOURCE_BAND_TROOPS,
+    RESOURCE_COHORT_ADULTS,
+    RESOURCE_COHORT_ASSETS,
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_COUNTY_GRANARY,
+    RESOURCE_COUNTY_TREASURY,
+    RESOURCE_DISTRESS_WINDOW,
+    RESOURCE_ELITE_GRAIN,
+    RESOURCE_MARKET_PRICE,
+    RESOURCE_MERCHANT_STOCK,
+    RESOURCE_UNIT_PAY,
+    RESOURCE_UNIT_STANDING,
+    RESOURCE_UNIT_STORES,
+    RESOURCE_UNIT_TROOPS,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import BandParameters, MilitaryParameters
 from late_ming_lab.networks.graphs import SpatialGraphs
 from late_ming_lab.systems.fiscal import emit_government_event
@@ -211,6 +230,28 @@ class MilitaryFinanceSystem:
 
     name: str = "military-finance"
     phase: TickPhase = TickPhase.MILITARY_FINANCE
+    # Unit troop counts are carried over from previous ticks, so the phase-level claim names the
+    # pay, stores and standing this phase produces and the county and market state it draws on.
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_MARKET_PRICE,
+            RESOURCE_MERCHANT_STOCK,
+            RESOURCE_UNIT_PAY,
+            RESOURCE_UNIT_STORES,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_MERCHANT_STOCK,
+            RESOURCE_UNIT_PAY,
+            RESOURCE_UNIT_STANDING,
+            RESOURCE_UNIT_STORES,
+        }
+    )
 
     def __init__(
         self,
@@ -331,7 +372,9 @@ class MilitaryFinanceSystem:
         market = self._markets.get(unit.node_id)
         if remaining > 0.0 and market is not None and county.silver_tael > 0.0:
             budget = county.silver_tael * self._parameters.ration_purchase_share_of_silver
-            outcome = market.buy_grain(ctx, county, shi_wanted=remaining, max_silver=budget)
+            outcome = market.buy_grain(
+                ctx, county, shi_wanted=remaining, max_silver=budget, phase=self.phase
+            )
             if outcome.quantity > 0.0:
                 emit_government_event(
                     ctx,
@@ -396,6 +439,16 @@ class DesertionSystem:
 
     name: str = "desertion"
     phase: TickPhase = TickPhase.DESERTION
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_ADULTS,
+            RESOURCE_UNIT_PAY,
+            RESOURCE_UNIT_STANDING,
+            RESOURCE_UNIT_STORES,
+            RESOURCE_UNIT_TROOPS,
+        }
+    )
+    writes: frozenset[str] = frozenset({RESOURCE_COHORT_ADULTS, RESOURCE_UNIT_TROOPS})
 
     def __init__(
         self,
@@ -512,6 +565,17 @@ class BandRecruitmentSystem:
 
     name: str = "band-recruitment"
     phase: TickPhase = TickPhase.ARMED_RECRUITMENT
+    reads: frozenset[str] = frozenset(
+        {RESOURCE_COHORT_ADULTS, RESOURCE_DISTRESS_WINDOW, RESOURCE_UNIT_TROOPS}
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_TROOPS,
+            RESOURCE_COHORT_ADULTS,
+            RESOURCE_UNIT_TROOPS,
+        }
+    )
 
     def __init__(
         self,
@@ -551,7 +615,7 @@ class BandRecruitmentSystem:
                 self.phase,
             )
 
-        for node_id in {unit.node_id for unit in self._military}:
+        for node_id in sorted({unit.node_id for unit in self._military}):
             self._reinforce_and_form(ctx, node_id)
             self._record_pool(ctx, node_id)
         self._military.check_invariants()
@@ -777,6 +841,28 @@ class BandActionSystem:
 
     name: str = "band-actions"
     phase: TickPhase = TickPhase.ARMED_MOVEMENT
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_STORES,
+            RESOURCE_BAND_TROOPS,
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_ELITE_GRAIN,
+            RESOURCE_UNIT_TROOPS,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_STORES,
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_ELITE_GRAIN,
+        }
+    )
 
     def __init__(
         self,
@@ -1007,6 +1093,27 @@ class ViolenceSystem:
 
     name: str = "violence"
     phase: TickPhase = TickPhase.VIOLENCE_CONSEQUENCES
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_STORES,
+            RESOURCE_BAND_TROOPS,
+            RESOURCE_COHORT_ADULTS,
+            RESOURCE_UNIT_STANDING,
+            RESOURCE_UNIT_STORES,
+            RESOURCE_UNIT_TROOPS,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_STORES,
+            RESOURCE_BAND_TROOPS,
+            RESOURCE_COHORT_ADULTS,
+            RESOURCE_UNIT_STANDING,
+            RESOURCE_UNIT_STORES,
+        }
+    )
 
     def __init__(
         self,
@@ -1310,6 +1417,18 @@ class MilitaryBookkeepingSystem:
 
     name: str = "military-bookkeeping"
     phase: TickPhase = TickPhase.BOOKKEEPING
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_BAND_STANDING,
+            RESOURCE_BAND_STORES,
+            RESOURCE_BAND_TROOPS,
+            RESOURCE_UNIT_PAY,
+            RESOURCE_UNIT_STANDING,
+            RESOURCE_UNIT_STORES,
+            RESOURCE_UNIT_TROOPS,
+        }
+    )
+    writes: frozenset[str] = frozenset()
 
     def __init__(self, *, military: MilitaryLayer, bands: BandLayer) -> None:
         self._military = military

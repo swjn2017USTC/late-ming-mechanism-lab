@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from late_ming_lab.core.tick import TickContext
+from late_ming_lab.core.tick import TickContext, TickPhase
 
 
 class CounterpartyError(RuntimeError):
@@ -62,13 +62,30 @@ class GrainMarket(Protocol):
     def price_tael_per_shi(self) -> float: ...
 
     def buy_grain(
-        self, ctx: TickContext, buyer: NodeBound, shi_wanted: float, max_silver: float
+        self,
+        ctx: TickContext,
+        buyer: NodeBound,
+        shi_wanted: float,
+        max_silver: float,
+        *,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> TradeOutcome:
-        """Sell grain to a household, limited by the market's stock and the household's silver."""
+        """Sell grain to a household, limited by the market's stock and the household's silver.
+
+        ``phase`` is the tick phase that asked for the trade. It is part of the audit trail, so the
+        caller supplies it: a household buying dinner and a county buying rations are the same
+        market transaction happening at different points in the tick.
+        """
         ...
 
     def buy_movables(
-        self, ctx: TickContext, seller: NodeBound, wanted_tael: float, max_tael: float
+        self,
+        ctx: TickContext,
+        seller: NodeBound,
+        wanted_tael: float,
+        max_tael: float,
+        *,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> TradeOutcome:
         """Buy movable goods, limited by the buyer's silver and what the household owns."""
         ...

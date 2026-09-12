@@ -9,6 +9,7 @@ still recording when each of them happened.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Literal
 
@@ -19,7 +20,8 @@ from late_ming_lab.core.clock import Clock
 from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.core.hashing import canonical_json, hash_text
 from late_ming_lab.core.rng import RngStreams
-from late_ming_lab.core.tick import TICK_ORDER_VERSION
+from late_ming_lab.core.scheduler import systems_digest
+from late_ming_lab.core.tick import TICK_ORDER_VERSION, System
 from late_ming_lab.evidence.provenance import Provenance
 
 RUN_ID_PATTERN = r"^[a-z0-9][a-z0-9._-]*$"
@@ -58,6 +60,13 @@ class RunManifest(BaseModel):
     policy_id: str
     tick_count: int = Field(ge=1)
     tick_order_version: str
+    systems: tuple[str, ...] = Field(
+        description="Registered system names, in the order the kernel runs them."
+    )
+    systems_digest: str = Field(
+        pattern=_HASH_PATTERN,
+        description="SHA-256 of the systems' phases and read/write claims; see core.scheduler.",
+    )
     llm_enabled: bool
     llm_model_id: str | None = None
     llm_prompt_version: str | None = None
@@ -72,8 +81,10 @@ class RunManifest(BaseModel):
         rng: RngStreams,
         provenance: Provenance,
         created_at: datetime,
+        systems: Iterable[System] = (),
         run_label: str | None = None,
     ) -> RunManifest:
+        registered = tuple(systems)
         return cls(
             run_id=make_run_id(config, run_label),
             engine_version=__version__,
@@ -86,6 +97,8 @@ class RunManifest(BaseModel):
             policy_id=config.policy_id,
             tick_count=clock.tick_count,
             tick_order_version=TICK_ORDER_VERSION,
+            systems=tuple(system.name for system in registered),
+            systems_digest=systems_digest(registered),
             llm_enabled=config.llm_enabled,
             llm_model_id=config.llm_model_id,
             llm_prompt_version=config.llm_prompt_version,

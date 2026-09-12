@@ -52,7 +52,24 @@ from late_ming_lab.actors.households import (
     emit_cohort_event,
 )
 from late_ming_lab.actors.merchants import MerchantLayer
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_COHORT_ASSETS,
+    RESOURCE_COHORT_DEBT,
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_COHORT_LAND,
+    RESOURCE_COHORT_SILVER,
+    RESOURCE_COHORT_TAX_ARREARS,
+    RESOURCE_COUNTY_ARREARS,
+    RESOURCE_COUNTY_GRANARY,
+    RESOURCE_COUNTY_TREASURY,
+    RESOURCE_DISTRESS_WINDOW,
+    RESOURCE_ELITE_LAND,
+    RESOURCE_ELITE_SILVER,
+    RESOURCE_MARKET_PRICE,
+    RESOURCE_MERCHANT_STOCK,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import (
     EliteParameters,
     FiscalParameters,
@@ -70,6 +87,35 @@ class TaxCollectionSystem:
 
     name: str = "tax-collection"
     phase: TickPhase = TickPhase.TAXATION
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_LAND,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_COHORT_TAX_ARREARS,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_ELITE_LAND,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MARKET_PRICE,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_ASSETS,
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_LAND,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_COHORT_TAX_ARREARS,
+            RESOURCE_COUNTY_ARREARS,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_ELITE_LAND,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
 
     def __init__(
         self,
@@ -101,7 +147,7 @@ class TaxCollectionSystem:
         self._nominal_pressure = nominal_pressure
         self._markets: Mapping[str, LocalGrainMarket] = {
             node_id: LocalGrainMarket(node_id=node_id, book=book, merchants=merchants)
-            for node_id in {county.node_id for county in governments}
+            for node_id in sorted({county.node_id for county in governments})
         }
 
     @property
@@ -337,7 +383,11 @@ class TaxCollectionSystem:
             return outstanding
         market = self._markets[cohort.node_id]
         outcome = market.buy_movables(
-            ctx, cohort, wanted_tael=outstanding, max_tael=cohort.movable_assets_tael
+            ctx,
+            cohort,
+            wanted_tael=outstanding,
+            max_tael=cohort.movable_assets_tael,
+            phase=self.phase,
         )
         if outcome.quantity <= 0.0:
             return outstanding
@@ -457,6 +507,23 @@ class OfficialReliefSystem:
 
     name: str = "official-relief"
     phase: TickPhase = TickPhase.RELIEF
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_DISTRESS_WINDOW,
+            RESOURCE_MARKET_PRICE,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_COUNTY_TREASURY,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
 
     def __init__(
         self,
@@ -476,7 +543,7 @@ class OfficialReliefSystem:
         self._household_parameters = household_parameters
         self._markets: Mapping[str, LocalGrainMarket] = {
             node_id: LocalGrainMarket(node_id=node_id, book=book, merchants=merchants)
-            for node_id in {county.node_id for county in governments}
+            for node_id in sorted({county.node_id for county in governments})
         }
 
     def step(self, ctx: TickContext) -> None:
@@ -507,7 +574,9 @@ class OfficialReliefSystem:
         shoppable = min(shortfall, budget / price)
         if shoppable <= 0.0:
             return
-        outcome = market.buy_grain(ctx, county, shi_wanted=shoppable, max_silver=budget)
+        outcome = market.buy_grain(
+            ctx, county, shi_wanted=shoppable, max_silver=budget, phase=self.phase
+        )
         if outcome.quantity <= 0.0:
             return
         emit_government_event(
@@ -624,6 +693,15 @@ class CountyBookkeepingSystem:
 
     name: str = "county-bookkeeping"
     phase: TickPhase = TickPhase.BOOKKEEPING
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_TAX_ARREARS,
+            RESOURCE_COUNTY_ARREARS,
+            RESOURCE_COUNTY_GRANARY,
+            RESOURCE_COUNTY_TREASURY,
+        }
+    )
+    writes: frozenset[str] = frozenset()
 
     def __init__(self, *, governments: GovernmentLayer, population: HouseholdPopulation) -> None:
         self._governments = governments

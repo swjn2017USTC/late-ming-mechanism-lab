@@ -33,7 +33,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from late_ming_lab.core.clock import Month
 from late_ming_lab.core.rng import RngStream
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import RESOURCE_CLIMATE, TickContext, TickPhase
 from late_ming_lab.evidence.grades import DataProvenance, EvidenceGrade
 from late_ming_lab.networks.nodes import CountyNode, SpatialNodes
 from late_ming_lab.systems.calendar import AgriculturalCalendar, ZoneCalendar
@@ -194,6 +194,8 @@ class ClimateSystem:
 
     name: str = "climate"
     phase: TickPhase = TickPhase.CLIMATE_UPDATE
+    reads: frozenset[str] = frozenset()
+    writes: frozenset[str] = frozenset({RESOURCE_CLIMATE})
 
     def __init__(
         self,

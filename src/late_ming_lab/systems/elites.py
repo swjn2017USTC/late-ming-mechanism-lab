@@ -25,7 +25,17 @@ from late_ming_lab.actors.households import (
     HouseholdPopulation,
     emit_cohort_event,
 )
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_COHORT_DEBT,
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_DISTRESS_WINDOW,
+    RESOURCE_ELITE_GRAIN,
+    RESOURCE_ELITE_LAND,
+    RESOURCE_ELITE_SILVER,
+    RESOURCE_MARKET_PRICE,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import EliteParameters, HouseholdParameters
 from late_ming_lab.systems.markets import MarketBook, emit_elite_event
 
@@ -126,6 +136,17 @@ class EliteActionSystem:
 
     name: str = "elite-actions"
     phase: TickPhase = TickPhase.RELIEF
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_DEBT,
+            RESOURCE_DISTRESS_WINDOW,
+            RESOURCE_ELITE_GRAIN,
+            RESOURCE_ELITE_LAND,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MARKET_PRICE,
+        }
+    )
+    writes: frozenset[str] = frozenset({RESOURCE_COHORT_GRAIN, RESOURCE_ELITE_GRAIN})
 
     def __init__(
         self,

@@ -32,7 +32,14 @@ from late_ming_lab.actors.households import (
     HouseholdPopulation,
     emit_cohort_event,
 )
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_AGRICULTURE,
+    RESOURCE_CLIMATE,
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_ELITE_GRAIN,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import CropParameters, HouseholdParameters
 from late_ming_lab.systems.calendar import AgriculturalCalendar
 from late_ming_lab.systems.climate import CLIMATE_EVENT_TYPE
@@ -74,6 +81,8 @@ class AgriculturalStateSystem:
 
     name: str = "agricultural-state"
     phase: TickPhase = TickPhase.AGRICULTURAL_STATE
+    reads: frozenset[str] = frozenset({RESOURCE_CLIMATE})
+    writes: frozenset[str] = frozenset({RESOURCE_AGRICULTURE})
 
     def __init__(self, population: HouseholdPopulation) -> None:
         self._population = population
@@ -93,6 +102,12 @@ class HarvestSystem:
 
     name: str = "harvest"
     phase: TickPhase = TickPhase.GRAIN_PRODUCTION
+    # The land and adult endowments are carried over from previous ticks, so the phase-level
+    # claim names the season's state and the grain this phase moves, not every field it reads.
+    reads: frozenset[str] = frozenset({RESOURCE_AGRICULTURE, RESOURCE_COHORT_GRAIN})
+    writes: frozenset[str] = frozenset(
+        {RESOURCE_AGRICULTURE, RESOURCE_COHORT_GRAIN, RESOURCE_ELITE_GRAIN}
+    )
 
     def __init__(
         self,

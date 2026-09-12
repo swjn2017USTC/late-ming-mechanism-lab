@@ -35,7 +35,16 @@ from late_ming_lab.actors.households import (
     emit_cohort_event,
 )
 from late_ming_lab.actors.merchants import MerchantEvent, MerchantHouse, MerchantLayer
-from late_ming_lab.core.tick import TickContext, TickPhase
+from late_ming_lab.core.tick import (
+    RESOURCE_COHORT_GRAIN,
+    RESOURCE_COHORT_SILVER,
+    RESOURCE_ELITE_GRAIN,
+    RESOURCE_ELITE_SILVER,
+    RESOURCE_MARKET_PRICE,
+    RESOURCE_MERCHANT_STOCK,
+    TickContext,
+    TickPhase,
+)
 from late_ming_lab.evidence.parameters import (
     EliteParameters,
     HouseholdParameters,
@@ -146,8 +155,20 @@ class LocalGrainMarket:
         return self._merchants.require(self._node_id)
 
     def buy_grain(
-        self, ctx: TickContext, buyer: NodeBound, shi_wanted: float, max_silver: float
+        self,
+        ctx: TickContext,
+        buyer: NodeBound,
+        shi_wanted: float,
+        max_silver: float,
+        *,
+        phase: TickPhase = TickPhase.MARKET_CLEARING,
     ) -> TradeOutcome:
+        """Sell grain to a local counterparty, recorded under the phase that asked for it.
+
+        A county buying rations in phase 10, migrants buying food in phase 09 and a household
+        buying its dinner in phase 04 all trade through this market. The phase token is part of the
+        audit trail the scheduler promises, so it belongs to the caller, not to the market.
+        """
         house = self._require_local(buyer)
         price = self.price_tael_per_shi
         cost = min(shi_wanted * price, max_silver, house.grain_shi * price)
@@ -161,12 +182,19 @@ class LocalGrainMarket:
             buyer_id=_identity(buyer),
             rule_version=self._rule_version,
         )
-        emit_merchant_event(ctx, house, event, TickPhase.MARKET_CLEARING)
+        emit_merchant_event(ctx, house, event, phase)
         return TradeOutcome(quantity=shi, value_tael=cost, counterparty_id=house.merchant_id)
 
     def buy_movables(
-        self, ctx: TickContext, seller: NodeBound, wanted_tael: float, max_tael: float
+        self,
+        ctx: TickContext,
+        seller: NodeBound,
+        wanted_tael: float,
+        max_tael: float,
+        *,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> TradeOutcome:
+        """Buy movable property from a local counterparty, under the asking phase."""
         house = self._require_local(seller)
         proceeds = min(wanted_tael, max_tael, house.silver_tael)
         if proceeds <= 0.0:
@@ -176,7 +204,7 @@ class LocalGrainMarket:
             seller_id=_identity(seller),
             rule_version=self._rule_version,
         )
-        emit_merchant_event(ctx, house, event, TickPhase.HOUSEHOLD_CONSUMPTION)
+        emit_merchant_event(ctx, house, event, phase)
         return TradeOutcome(
             quantity=proceeds, value_tael=proceeds, counterparty_id=house.merchant_id
         )
@@ -187,6 +215,24 @@ class MarketClearingSystem:
 
     name: str = "market-clearing"
     phase: TickPhase = TickPhase.MARKET_CLEARING
+    reads: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_ELITE_GRAIN,
+            RESOURCE_MARKET_PRICE,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
+    writes: frozenset[str] = frozenset(
+        {
+            RESOURCE_COHORT_GRAIN,
+            RESOURCE_COHORT_SILVER,
+            RESOURCE_ELITE_GRAIN,
+            RESOURCE_ELITE_SILVER,
+            RESOURCE_MARKET_PRICE,
+            RESOURCE_MERCHANT_STOCK,
+        }
+    )
 
     def __init__(
         self,
