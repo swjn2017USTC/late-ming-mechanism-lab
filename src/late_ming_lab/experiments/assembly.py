@@ -11,8 +11,14 @@ so a reader can see the complete tick order in one screen:
 04 consumption        ConsumptionSystem      (ladder against market and lender)
 05 market clearing    MarketClearingSystem   (surplus sales, intercounty trade, prices)
 06 credit and debt    DebtServiceSystem      (interest, cash and grain repayment)
-08 relief             EliteActionSystem      (private relief, tax mediation hook)
-16 bookkeeping        CohortBookkeepingSystem
+07 taxation           TaxCollectionSystem
+08 relief             OfficialReliefSystem, then EliteActionSystem
+10 military finance   MilitaryFinanceSystem  (pay, rations, morale, cohesion)
+11 desertion          DesertionSystem        (who leaves, and where they go)
+12 recruitment        BandRecruitmentSystem  (the shared pool, levies, band formation)
+13 band action        BandActionSystem       (raids, rations, movement toward food)
+14 violence           ViolenceSystem         (suppression, dissolution, split, merge)
+16 bookkeeping        CohortBookkeepingSystem, CountyBookkeepingSystem, military records
 ```
 
 Everything built here is a development-scale assumption graded ``S``: the toy county dataset,
@@ -27,26 +33,34 @@ from typing import Final
 
 from late_ming_lab.actors.elites import EliteLayer, TaxMediationPolicy
 from late_ming_lab.actors.fixtures import (
+    GARRISON_TROOPS_PER_NODE,
+    toy_band_layer,
     toy_cohort_population,
     toy_elite_layer,
     toy_government_layer,
     toy_merchant_layer,
+    toy_military_layer,
 )
 from late_ming_lab.actors.government import GovernmentLayer, StateCapacity
 from late_ming_lab.actors.households import HouseholdPopulation
 from late_ming_lab.actors.merchants import MerchantLayer
+from late_ming_lab.actors.military import BandLayer, MilitaryLayer
 from late_ming_lab.core.tick import System
 from late_ming_lab.evidence.parameters import (
+    BandParameters,
     CropParameters,
     EliteParameters,
     FiscalParameters,
     HouseholdParameters,
     MarketParameters,
+    MilitaryParameters,
+    core_default_band_parameters,
     core_default_crop_parameters,
     core_default_elite_parameters,
     core_default_fiscal_parameters,
     core_default_household_parameters,
     core_default_market_parameters,
+    core_default_military_parameters,
 )
 from late_ming_lab.networks.disruption import CalmTrade, TradeDisruption
 from late_ming_lab.networks.fixtures import toy_spatial_dataset
@@ -67,6 +81,15 @@ from late_ming_lab.systems.household_survival import (
     DebtServiceSystem,
 )
 from late_ming_lab.systems.markets import MarketClearingSystem
+from late_ming_lab.systems.military import (
+    BandActionSystem,
+    BandRecruitmentSystem,
+    DeserterPool,
+    DesertionSystem,
+    MilitaryBookkeepingSystem,
+    MilitaryFinanceSystem,
+    ViolenceSystem,
+)
 
 ASSEMBLY_VERSION: Final[str] = "toy-economy-v1"
 
@@ -82,12 +105,16 @@ class Economy:
     market: MarketClearingSystem
     credit: LocalCredit
     governments: GovernmentLayer | None
+    military: MilitaryLayer
+    bands: BandLayer
     systems: tuple[System, ...]
     calendar: AgriculturalCalendar
     crop_parameters: CropParameters
     household_parameters: HouseholdParameters
     market_parameters: MarketParameters
     elite_parameters: EliteParameters
+    military_parameters: MilitaryParameters
+    band_parameters: BandParameters
 
 
 def build_toy_economy(
@@ -106,6 +133,10 @@ def build_toy_economy(
     capacity: StateCapacity | None = None,
     extraction_policy: ExtractionPolicy | None = None,
     nominal_pressure: float = 0.02,
+    military_parameters: MilitaryParameters | None = None,
+    band_parameters: BandParameters | None = None,
+    with_military: bool = False,
+    garrison_troops: float | None = None,
 ) -> Economy:
     """Build the toy economy; every argument is a scenario knob, every default is grade ``S``."""
     zone_calendar = calendar or core_default_calendar()
@@ -113,6 +144,12 @@ def build_toy_economy(
     households = household_parameters or core_default_household_parameters()
     markets = market_parameters or core_default_market_parameters()
     elite_settings = elite_parameters or core_default_elite_parameters()
+    garrisons = military_parameters or core_default_military_parameters()
+    bands = band_parameters or core_default_band_parameters()
+    # The military ships off unless asked for, so the measurements P03-P05 recorded stay exactly
+    # what they were. Asking for it without fiscal is allowed: an unpaid, unfed garrison is a
+    # legitimate configuration, and the one that deserts for purely fiscal reasons.
+    military_enabled = with_military
 
     graphs = toy_spatial_dataset().build()
     population = toy_cohort_population(graphs.nodes)
@@ -131,6 +168,12 @@ def build_toy_economy(
     )
     credit = LocalCredit(elites=elites, population=population, parameters=elite_settings)
     governments = toy_government_layer(graphs, capacity=capacity) if with_fiscal else None
+    military = toy_military_layer(
+        graphs,
+        troops_per_node=(GARRISON_TROOPS_PER_NODE if garrison_troops is None else garrison_troops),
+    )
+    band_layer = toy_band_layer()
+    deserter_pool = DeserterPool()
     fiscal = fiscal_parameters or core_default_fiscal_parameters()
     systems: list[System] = [
         ClimateSystem(graphs.nodes, zone_calendar, climate_model or BaselineClimate()),
@@ -178,6 +221,50 @@ def build_toy_economy(
             book=market.book,
         )
     )
+    if military_enabled:
+        systems.extend(
+            (
+                MilitaryFinanceSystem(
+                    military=military,
+                    governments=governments,
+                    parameters=garrisons,
+                    merchants=merchants,
+                    book=market.book,
+                ),
+                DesertionSystem(
+                    military=military,
+                    population=population,
+                    parameters=garrisons,
+                    pool=deserter_pool,
+                ),
+                BandRecruitmentSystem(
+                    military=military,
+                    bands=band_layer,
+                    population=population,
+                    parameters=garrisons,
+                    band_parameters=bands,
+                    pool=deserter_pool,
+                ),
+                BandActionSystem(
+                    bands=band_layer,
+                    military=military,
+                    population=population,
+                    elites=elites,
+                    governments=governments,
+                    graphs=graphs,
+                    parameters=bands,
+                    military_parameters=garrisons,
+                ),
+                ViolenceSystem(
+                    bands=band_layer,
+                    military=military,
+                    population=population,
+                    military_parameters=garrisons,
+                    band_parameters=bands,
+                ),
+                MilitaryBookkeepingSystem(military=military, bands=band_layer),
+            )
+        )
     systems.append(CohortBookkeepingSystem(population, households))
     if governments is not None:
         systems.append(CountyBookkeepingSystem(governments=governments, population=population))
@@ -189,10 +276,14 @@ def build_toy_economy(
         market=market,
         credit=credit,
         governments=governments,
+        military=military,
+        bands=band_layer,
         systems=tuple(systems),
         calendar=zone_calendar,
         crop_parameters=crops,
         household_parameters=households,
         market_parameters=markets,
         elite_parameters=elite_settings,
+        military_parameters=garrisons,
+        band_parameters=bands,
     )
