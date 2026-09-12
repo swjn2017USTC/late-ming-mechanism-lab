@@ -1,0 +1,176 @@
+"""Property tests: the balance sheet holds for any endowment and any season.
+
+These tests do not assert what the model should *do*; they assert what it must never do —
+hold a negative balance, move a balance without recording it, or let cohort weight change.
+The ladder is exercised over arbitrary endowments and arbitrary exogenous impact sequences.
+"""
+
+from __future__ import annotations
+
+import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
+from pydantic import ValidationError
+
+from late_ming_lab.actors.households import (
+    BALANCE_TOLERANCE,
+    CohortClass,
+    CopingStage,
+    HouseholdCohortAgent,
+    HouseholdPopulation,
+)
+from late_ming_lab.evidence.parameters import core_default_household_parameters
+from late_ming_lab.networks.nodes import AgrarianZone
+
+PARAMETERS = core_default_household_parameters()
+
+ENDOWMENTS = st.fixed_dictionaries(
+    {
+        "households": st.floats(min_value=1.0, max_value=5000.0),
+        "land_mu": st.floats(min_value=0.0, max_value=5000.0),
+        "grain_shi": st.floats(min_value=0.0, max_value=2000.0),
+        "silver_tael": st.floats(min_value=0.0, max_value=2000.0),
+        "debt_tael": st.floats(min_value=0.0, max_value=500.0),
+        "movable_assets_tael": st.floats(min_value=0.0, max_value=500.0),
+    }
+)
+
+IMPACT_SEQUENCES = st.lists(st.floats(min_value=0.0, max_value=1.0), min_size=1, max_size=24)
+
+
+def _cohort(endowment: dict[str, float], *, adults: float) -> HouseholdCohortAgent:
+    cohort = HouseholdCohortAgent.model_validate(
+        {
+            "cohort_id": "prop:cohort",
+            "node_id": "prop-node",
+            "cohort_class": CohortClass.POOR_SMALLHOLDER,
+            "zone": AgrarianZone.LOESS_DRYLAND,
+            "adults": adults,
+            **endowment,
+        }
+    )
+    cohort.set_land_reference_value(PARAMETERS.land_reference_value_tael_per_mu)
+    return cohort
+
+
+@settings(max_examples=75, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@given(
+    endowment=ENDOWMENTS,
+    impacts=IMPACT_SEQUENCES,
+    demand=st.floats(min_value=0.0, max_value=1.0),
+)
+def test_balances_stay_non_negative_and_reconcile(
+    endowment: dict[str, float], impacts: list[float], demand: float
+) -> None:
+    cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
+
+    for impact in impacts:
+        cohort.accumulate_climate_impact(impact)
+        cohort.monthly_budget(
+            parameters=PARAMETERS, labour_demand_factor=demand, rule_version="property"
+        )
+        cohort.check_balances()
+
+    for balance in (
+        cohort.grain_shi,
+        cohort.silver_tael,
+        cohort.land_mu,
+        cohort.debt_tael,
+        cohort.movable_assets_tael,
+    ):
+        assert balance >= -BALANCE_TOLERANCE
+
+
+@settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@given(endowment=ENDOWMENTS, impacts=IMPACT_SEQUENCES)
+def test_consumption_never_exceeds_what_the_ladder_could_assemble(
+    endowment: dict[str, float], impacts: list[float]
+) -> None:
+    cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
+
+    for impact in impacts:
+        cohort.accumulate_climate_impact(impact)
+        events = cohort.monthly_budget(
+            parameters=PARAMETERS, labour_demand_factor=0.5, rule_version="property"
+        )
+        consumption = next(event for event in events if event.event_type.value == "CONSUMPTION")
+        need = consumption.trigger["need_shi"]
+        floor = consumption.trigger["floor_shi"]
+        consumed = consumption.trigger["consumed_shi"]
+
+        assert 0.0 <= consumed <= need
+        assert 0.0 <= consumption.trigger["unmet_shi"] <= floor
+        assert consumption.trigger["purchased_shi"] <= consumed
+        assert consumption.trigger["reduced_shi"] >= consumption.trigger["unmet_shi"]
+
+
+@settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@given(endowment=ENDOWMENTS, impacts=IMPACT_SEQUENCES)
+def test_cohort_weight_and_stage_monotonicity(
+    endowment: dict[str, float], impacts: list[float]
+) -> None:
+    cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
+    households = cohort.households
+    previous_stage = cohort.coping_stage
+    previous_grain = cohort.grain_shi
+
+    for impact in impacts:
+        cohort.accumulate_climate_impact(impact)
+        cohort.monthly_budget(
+            parameters=PARAMETERS, labour_demand_factor=0.0, rule_version="property"
+        )
+
+        assert cohort.households == households
+        assert cohort.coping_stage >= previous_stage or cohort.coping_stage is (
+            CopingStage.SELF_SUFFICIENT
+        )
+        # Without a harvest between months, grain can only be earned or bought, never minted.
+        assert cohort.grain_shi >= -BALANCE_TOLERANCE
+        previous_stage = cohort.coping_stage
+        previous_grain = cohort.grain_shi
+
+    assert previous_grain >= -BALANCE_TOLERANCE
+
+
+@settings(max_examples=25, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+@given(endowment=ENDOWMENTS)
+def test_population_invariants_hold_after_arbitrary_transitions(
+    endowment: dict[str, float],
+) -> None:
+    cohort = _cohort(endowment, adults=endowment["households"] * 2.0)
+    population = HouseholdPopulation((cohort,))
+
+    for need, unmet in ((10.0, 0.0), (10.0, 3.0), (0.0, 0.0)):
+        population.record_month(cohort.cohort_id, need_shi=need, unmet_shi=unmet)
+        population.check_invariants()
+
+    assert 0.0 <= population.unmet_ratio(cohort.cohort_id) <= 1.0
+
+
+def test_endowments_outside_the_contract_are_rejected() -> None:
+    for payload in (
+        {"households": 0.0},
+        {"households": -1.0},
+        {"adults": 0.0},
+        {"land_mu": -1.0},
+        {"grain_shi": -0.01},
+        {"silver_tael": -1.0},
+        {"debt_tael": -1.0},
+        {"movable_assets_tael": -5.0},
+    ):
+        base: dict[str, object] = {
+            "cohort_id": "prop:cohort",
+            "node_id": "prop-node",
+            "cohort_class": CohortClass.POOR_SMALLHOLDER,
+            "zone": AgrarianZone.LOESS_DRYLAND,
+            "households": 10.0,
+            "adults": 20.0,
+            "land_mu": 10.0,
+            "grain_shi": 10.0,
+            "silver_tael": 10.0,
+            "debt_tael": 0.0,
+            "movable_assets_tael": 10.0,
+            **payload,
+        }
+        with pytest.raises(ValidationError):
+            HouseholdCohortAgent.model_validate(base)

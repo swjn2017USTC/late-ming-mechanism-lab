@@ -143,3 +143,19 @@ def test_event_json_is_canonical() -> None:
     assert payload["rng_stream"] == "migration"
     assert payload["trigger"] == {"subsistence_gap": 0.31, "debt_ratio": 1.8}
     assert event.to_json() == json.dumps(payload, sort_keys=True, separators=(",", ":"))
+
+
+def test_events_for_tick_exposes_only_that_tick_in_order() -> None:
+    logger = EventLogger(tick_count=3)
+    logger.emit(tick=0, event_type="TICK")
+    logger.emit(tick=1, event_type="HOUSEHOLD_MIGRATION", region="R1")
+    logger.emit(tick=1, event_type="LAND_SALE", region="R2")
+    logger.emit(tick=2, event_type="TICK")
+
+    assert [event.event_type for event in logger.events_for_tick(1)] == [
+        "HOUSEHOLD_MIGRATION",
+        "LAND_SALE",
+    ]
+    assert logger.events_for_tick(0) == (logger.events[0],)
+    with pytest.raises(TickOutOfRange):
+        logger.events_for_tick(3)

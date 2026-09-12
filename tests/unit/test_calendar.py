@@ -117,3 +117,19 @@ def test_calendar_phase_and_sensitivity_agree_with_the_entries() -> None:
     assert len(phases) == 12
     assert calendar.phase(AgrarianZone.NORTH_CHINA_PLAIN, 4) is CropPhase.GROWING
     assert calendar.shock_sensitivity(AgrarianZone.NORTH_CHINA_PLAIN, 4) == 0.9
+
+
+def test_harvest_ticks_collapse_a_harvest_window_and_keep_two_crops_apart() -> None:
+    calendar = core_default_calendar()
+
+    # The loess zone's September-October harvest is one crop, taken in October.
+    assert calendar.calendar_for(AgrarianZone.LOESS_DRYLAND).harvest_months == (9, 10)
+    assert calendar.calendar_for(AgrarianZone.LOESS_DRYLAND).harvest_ticks == (10,)
+
+    # The plain harvests winter wheat in May and the summer crop in September.
+    assert calendar.calendar_for(AgrarianZone.NORTH_CHINA_PLAIN).harvest_months == (5, 9)
+    assert calendar.calendar_for(AgrarianZone.NORTH_CHINA_PLAIN).harvest_ticks == (5, 9)
+
+    for entry in calendar.zones:
+        assert set(entry.harvest_ticks) <= set(entry.harvest_months)
+        assert all(entry.phases[month] is CropPhase.HARVEST for month in entry.harvest_ticks)
