@@ -76,6 +76,9 @@ class GovernmentEventType(StrEnum):
     GRAIN_PURCHASE = "GOVERNMENT_GRAIN_PURCHASE"
     RELIEF_RELEASE = "OFFICIAL_RELIEF"
     RELIEF_COST = "OFFICIAL_RELIEF_COST"
+    MILITARY_PAY = "MILITARY_PAY_OUTLAY"
+    GRAIN_ISSUE = "GOVERNMENT_GRAIN_ISSUE"
+    GRAIN_SEIZURE = "GRANARY_GRAIN_SEIZED"
     STATE = "COUNTY_STATE"
 
 
@@ -118,6 +121,8 @@ class CountyGovernment(LedgerAgent):
             "collection_effort": 0.0,
             "reachable_tael": 0.0,
             "pressure": 0.0,
+            "military_pay_tael": 0.0,
+            "military_grain_shi": 0.0,
         }
 
     @property
@@ -317,6 +322,68 @@ class CountyGovernment(LedgerAgent):
             outcome=f"relieved:{recipient_id}",
         )
 
+    def pay_military(
+        self, *, silver_tael: float, payee_id: str, rule_version: str
+    ) -> GovernmentEvent:
+        """Pay the garrison: silver out of the treasury, against pay already owed."""
+        paid = min(silver_tael, self.silver_tael)
+        self._apply(silver=-paid, impacts=((SILVER_DELTA, -paid),))
+        self.accumulate(military_pay_tael=paid)
+        return GovernmentEvent(
+            event_type=GovernmentEventType.MILITARY_PAY,
+            rule_version=rule_version,
+            trigger={
+                "military_pay_tael": paid,
+                "military_pay_requested_tael": silver_tael,
+                SILVER_DELTA: -paid,
+                "silver_tael": self.silver_tael,
+            },
+            outcome=f"paid-to:{payee_id}" if paid > 0.0 else "nothing-to-pay",
+        )
+
+    def issue_grain(
+        self, *, grain_shi: float, recipient_id: str, rule_version: str
+    ) -> GovernmentEvent:
+        """Issue grain from the granary as military rations.
+
+        Separate from :meth:`release_relief`: the same granary feeds both the garrison and the
+        starving, and the two claims must stay distinguishable in the log.
+        """
+        issued = min(grain_shi, self.grain_shi)
+        self._apply(grain=-issued, impacts=((GRAIN_DELTA, -issued),))
+        self.accumulate(military_grain_shi=issued)
+        return GovernmentEvent(
+            event_type=GovernmentEventType.GRAIN_ISSUE,
+            rule_version=rule_version,
+            trigger={
+                "grain_issued_shi": issued,
+                "grain_requested_shi": grain_shi,
+                GRAIN_DELTA: -issued,
+                "granary_shi": self.grain_shi,
+            },
+            outcome=f"issued-to:{recipient_id}",
+        )
+
+    def record_grain_seizure(
+        self, *, grain_shi: float, taker_id: str, rule_version: str, reason: str = "band"
+    ) -> GovernmentEvent:
+        """Lose granary grain to a raider."""
+        taken = min(grain_shi, self.grain_shi)
+        if taken <= 0.0:
+            raise ValueError("a grain seizure must take at least one shi")
+        self._apply(grain=-taken, impacts=((GRAIN_DELTA, -taken),))
+        return GovernmentEvent(
+            event_type=GovernmentEventType.GRAIN_SEIZURE,
+            rule_version=rule_version,
+            trigger={
+                "grain_seized_shi": taken,
+                GRAIN_DELTA: -taken,
+                "granary_shi": self.grain_shi,
+                f"reason_is_{reason}": 1.0,
+            },
+            outcome=f"seized-by:{taker_id}",
+        )
+
     def pay_relief_cost(
         self, *, silver_tael: float, rule_version: str = RELIEF_RULE_VERSION
     ) -> GovernmentEvent:
@@ -363,6 +430,8 @@ class CountyGovernment(LedgerAgent):
                 "hidden_land_mu": flows["hidden_land_mu"],
                 "relief_released_shi": flows["relief_released_shi"],
                 "relief_cost_tael": flows["relief_cost_tael"],
+                "military_pay_tael": flows["military_pay_tael"],
+                "military_grain_shi": flows["military_grain_shi"],
                 "silver_tael": self.silver_tael,
                 "granary_shi": self.grain_shi,
                 "tax_collection_capacity": self.capacity.tax_collection,

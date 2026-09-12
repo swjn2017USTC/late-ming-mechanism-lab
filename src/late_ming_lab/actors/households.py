@@ -31,6 +31,7 @@ from pydantic import Field, PrivateAttr
 
 from late_ming_lab.actors.exchange import CreditSource, GrainMarket
 from late_ming_lab.actors.ledger import (
+    ADULTS_DELTA,
     ASSETS_DELTA,
     DEBT_DELTA,
     GRAIN_DELTA,
@@ -50,6 +51,7 @@ HouseholdLedgerError = LedgerError
 
 #: Names re-exported for the ledger contract this actor satisfies.
 __all__ = [
+    "ADULTS_DELTA",
     "ASSETS_DELTA",
     "DEBT_DELTA",
     "GRAIN_DELTA",
@@ -109,10 +111,14 @@ class CohortEventType(StrEnum):
     BORROWING_REQUEST = "BORROWING_REQUEST"
     GRAIN_PURCHASE = "GRAIN_PURCHASE"
     MOVABLE_ASSET_SALE = "MOVABLE_ASSET_SALE"
+    GRAIN_SEIZURE = "GRAIN_SEIZED"
+    ASSET_SEIZURE = "MOVABLE_ASSET_SEIZED"
     LAND_SALE = "LAND_SALE"
     COPING_TRANSITION = "COPING_TRANSITION"
     TAX_PAYMENT = "TAX_PAYMENT"
     TAX_ARREARS = "TAX_ARREARS_ASSESSED"
+    RECRUITMENT_LEVY = "RECRUITMENT_LEVY"
+    DESERTER_RETURN = "DESERTER_RETURN"
     MARKET_SALE = "MARKET_SALE"
     RELIEF_RECEIVED = "RELIEF_RECEIVED"
     TAX_MEDIATION = "TAX_MEDIATION"
@@ -158,7 +164,9 @@ class HouseholdCohortAgent(LedgerAgent):
     zone: AgrarianZone
 
     households: float = Field(gt=0)
-    adults: float = Field(gt=0)
+    adults: float = Field(
+        gt=0, description="adult labour units; recruits leave this balance and returners rejoin it"
+    )
     land_mu: float = Field(ge=0)
     grain_shi: float = Field(ge=0)
     silver_tael: float = Field(ge=0)
@@ -209,7 +217,8 @@ class HouseholdCohortAgent(LedgerAgent):
         if self.households != self._initial_households:
             raise HouseholdLedgerError(
                 f"{self.cohort_id}: cohort weight changed from {self._initial_households} to "
-                f"{self.households}; P03-P04 record eligibility but move no household"
+                f"{self.households}; cohorts move people, not households, and only through the "
+                "levy and return transitions"
             )
 
     def set_land_reference_value(self, value: float) -> None:
@@ -354,6 +363,60 @@ class HouseholdCohortAgent(LedgerAgent):
             outcome=occasion,
         )
 
+    def record_grain_seizure(
+        self,
+        *,
+        grain_shi: float,
+        taker_id: str,
+        rule_version: str,
+        reason: str = "band",
+    ) -> CohortEvent:
+        """Lose grain to a raider: taken, not sold, so no silver comes back.
+
+        The counterpart of a band's raid. A seizure is a transfer out of the household with no
+        market transaction behind it, which is why it carries its own event type.
+        """
+        taken = min(grain_shi, self.grain_shi)
+        if taken <= 0.0:
+            raise ValueError("a grain seizure must take at least one shi")
+        self._apply(grain=-taken, impacts=((GRAIN_DELTA, -taken),))
+        return CohortEvent(
+            event_type=CohortEventType.GRAIN_SEIZURE,
+            rule_version=rule_version,
+            trigger={
+                "grain_seized_shi": taken,
+                GRAIN_DELTA: -taken,
+                "grain_shi": self.grain_shi,
+                f"reason_is_{reason}": 1.0,
+            },
+            outcome=f"seized-by:{taker_id}",
+        )
+
+    def record_asset_seizure(
+        self,
+        *,
+        assets_tael: float,
+        taker_id: str,
+        rule_version: str,
+        reason: str = "band",
+    ) -> CohortEvent:
+        """Lose movable property to a raider; again, no matching inflow of silver."""
+        taken = min(assets_tael, self.movable_assets_tael)
+        if taken <= 0.0:
+            raise ValueError("an asset seizure must take at least one tael of value")
+        self._apply(assets=-taken, impacts=((ASSETS_DELTA, -taken),))
+        return CohortEvent(
+            event_type=CohortEventType.ASSET_SEIZURE,
+            rule_version=rule_version,
+            trigger={
+                "assets_seized_tael": taken,
+                ASSETS_DELTA: -taken,
+                "movable_assets_tael": self.movable_assets_tael,
+                f"reason_is_{reason}": 1.0,
+            },
+            outcome=f"seized-by:{taker_id}",
+        )
+
     def record_movable_asset_sale(
         self, *, proceeds_tael: float, rule_version: str, reason: str = "food"
     ) -> CohortEvent:
@@ -484,6 +547,40 @@ class HouseholdCohortAgent(LedgerAgent):
                 "tax_arrears_tael": self.tax_arrears_tael,
             },
             outcome=f"owed-to:{county_id}",
+        )
+
+    def lose_adults(
+        self, *, adults: float, destination: str, rule_version: str, reason: str
+    ) -> CohortEvent:
+        """Send adults away: to an army, to a band, or out of the modelled population."""
+        sent = min(adults, self.adults)
+        if sent <= 0.0:
+            raise ValueError("a recruitment levy must send at least one adult")
+        self._apply(adults=-sent, impacts=((ADULTS_DELTA, -sent),))
+        return CohortEvent(
+            event_type=CohortEventType.RECRUITMENT_LEVY,
+            rule_version=rule_version,
+            trigger={
+                "adults_levied": sent,
+                ADULTS_DELTA: -sent,
+                "adults_left": self.adults,
+                f"reason_is_{reason}": 1.0,
+            },
+            outcome=f"levied-to:{destination}",
+        )
+
+    def gain_adults(self, *, adults: float, source: str, rule_version: str) -> CohortEvent:
+        """Take adults back in: a deserter coming home, or a band dissolving."""
+        self._apply(adults=adults, impacts=((ADULTS_DELTA, adults),))
+        return CohortEvent(
+            event_type=CohortEventType.DESERTER_RETURN,
+            rule_version=rule_version,
+            trigger={
+                "adults_returned": adults,
+                ADULTS_DELTA: adults,
+                "adults_left": self.adults,
+            },
+            outcome=f"returned-from:{source}",
         )
 
     def record_relief(

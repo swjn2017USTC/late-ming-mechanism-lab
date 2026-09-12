@@ -27,6 +27,10 @@ LAND_DELTA = "land_delta_mu"
 DEBT_DELTA = "debt_delta_tael"
 ASSETS_DELTA = "assets_delta_tael"
 TAX_ARREARS_DELTA = "tax_arrears_delta_tael"
+TROOPS_DELTA = "troops_delta_people"
+ARMS_DELTA = "arms_delta_units"
+PAY_ARREARS_DELTA = "pay_arrears_delta_tael"
+ADULTS_DELTA = "adults_delta_people"
 
 #: The trigger keys every balance movement is recorded under.
 LEDGER_KEYS: tuple[str, ...] = (
@@ -36,6 +40,10 @@ LEDGER_KEYS: tuple[str, ...] = (
     DEBT_DELTA,
     ASSETS_DELTA,
     TAX_ARREARS_DELTA,
+    TROOPS_DELTA,
+    ARMS_DELTA,
+    PAY_ARREARS_DELTA,
+    ADULTS_DELTA,
 )
 
 #: Balance field name -> the trigger key that records its movements.
@@ -48,6 +56,10 @@ LEDGER_KEY_BY_FIELD: Mapping[str, str] = MappingProxyType(
         "movable_assets_tael": ASSETS_DELTA,
         "goods_tael": ASSETS_DELTA,
         "tax_arrears_tael": TAX_ARREARS_DELTA,
+        "troops": TROOPS_DELTA,
+        "arms_units": ARMS_DELTA,
+        "pay_arrears_tael": PAY_ARREARS_DELTA,
+        "adults": ADULTS_DELTA,
     }
 )
 
@@ -61,6 +73,10 @@ DELTA_FIELDS: Mapping[str, str] = MappingProxyType(
         "assets": "movable_assets_tael",
         "goods": "goods_tael",
         "tax_arrears": "tax_arrears_tael",
+        "troops": "troops",
+        "arms": "arms_units",
+        "pay_arrears": "pay_arrears_tael",
+        "adults": "adults",
     }
 )
 
@@ -106,6 +122,10 @@ class LedgerAgent(BaseModel):
         assets: float = 0.0,
         goods: float = 0.0,
         tax_arrears: float = 0.0,
+        troops: float = 0.0,
+        arms: float = 0.0,
+        pay_arrears: float = 0.0,
+        adults: float = 0.0,
         impacts: tuple[tuple[str, float], ...] = (),
     ) -> None:
         """Apply a balance change atomically; the only place balances ever move."""
@@ -117,6 +137,10 @@ class LedgerAgent(BaseModel):
             "assets": assets,
             "goods": goods,
             "tax_arrears": tax_arrears,
+            "troops": troops,
+            "arms": arms,
+            "pay_arrears": pay_arrears,
+            "adults": adults,
         }
         candidates: list[tuple[str, float]] = []
         for keyword, delta in changes.items():

@@ -31,6 +31,8 @@ from late_ming_lab.actors.ledger import (
     SILVER_DELTA,
     LedgerAgent,
 )
+from late_ming_lab.core.events import Event
+from late_ming_lab.core.tick import TickContext, TickPhase
 from late_ming_lab.evidence.parameters import EliteParameters
 
 
@@ -44,6 +46,7 @@ class EliteEventType:
     LAND_PURCHASE = "ELITE_LAND_PURCHASE"
     RELIEF = "ELITE_RELIEF"
     GRAIN_SALE = "ELITE_GRAIN_SALE"
+    GRAIN_SEIZURE = "ELITE_GRAIN_SEIZED"
     TAX_MEDIATION = "ELITE_TAX_MEDIATION"
     STATE = "ELITE_STATE"
 
@@ -175,6 +178,31 @@ class LocalEliteAgent(LedgerAgent):
             outcome=f"relieved:{recipient_id}",
         )
 
+    def record_grain_seizure(
+        self,
+        *,
+        grain_shi: float,
+        taker_id: str,
+        rule_version: str,
+        reason: str = "band",
+    ) -> EliteEvent:
+        """Lose stored grain to a raider; taken, not sold."""
+        taken = min(grain_shi, self.grain_shi)
+        if taken <= 0.0:
+            raise ValueError("a grain seizure must take at least one shi")
+        self._apply(grain=-taken, impacts=((GRAIN_DELTA, -taken),))
+        return EliteEvent(
+            event_type=EliteEventType.GRAIN_SEIZURE,
+            rule_version=rule_version,
+            trigger={
+                "grain_seized_shi": taken,
+                GRAIN_DELTA: -taken,
+                "grain_shi": self.grain_shi,
+                f"reason_is_{reason}": 1.0,
+            },
+            outcome=f"seized-by:{taker_id}",
+        )
+
     def sell_grain(
         self, *, shi: float, price_tael_per_shi: float, buyer_id: str, rule_version: str
     ) -> EliteEvent:
@@ -235,6 +263,21 @@ class LocalEliteAgent(LedgerAgent):
             },
             outcome="elite-state",
         )
+
+
+def emit_elite_event(
+    ctx: TickContext, elite: LocalEliteAgent, event: EliteEvent, phase: TickPhase
+) -> Event:
+    """Write one elite transition into the run's event log."""
+    return ctx.emit(
+        event.event_type,
+        phase=phase.token,
+        agent_id=elite.elite_id,
+        region=elite.node_id,
+        rule_version=event.rule_version,
+        trigger=event.trigger,
+        outcome=event.outcome,
+    )
 
 
 @runtime_checkable

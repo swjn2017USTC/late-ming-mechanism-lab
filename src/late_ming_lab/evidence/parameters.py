@@ -23,6 +23,8 @@ CROP_PARAMETERS_VERSION: Final[str] = "crop-parameters-v1"
 HOUSEHOLD_PARAMETERS_VERSION: Final[str] = "household-parameters-v1"
 MARKET_PARAMETERS_VERSION: Final[str] = "market-parameters-v1"
 FISCAL_PARAMETERS_VERSION: Final[str] = "fiscal-parameters-v1"
+MILITARY_PARAMETERS_VERSION: Final[str] = "military-parameters-v1"
+BAND_PARAMETERS_VERSION: Final[str] = "band-parameters-v1"
 ELITE_PARAMETERS_VERSION: Final[str] = "elite-parameters-v1"
 
 
@@ -343,5 +345,169 @@ def core_default_fiscal_parameters() -> FiscalParameters:
         provenance=DataProvenance.assumption(
             "development-scale assessment value, collection and relief costs, elite hiding and "
             "granary rules; grade S, to be replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+class MilitaryParameters(BaseModel):
+    """Garrison finance and desertion rules.
+
+    All of it is grade ``S``: what a soldier is paid, what he eats, and how likely he is to leave
+    when he is neither paid nor fed. There is no tactical content here, on purpose.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = MILITARY_PARAMETERS_VERSION
+
+    pay_tael_per_soldier_month: float = Field(gt=0)
+    pay_share_of_treasury: float = Field(gt=0, le=1)
+    food_shi_per_soldier_month: float = Field(gt=0)
+    ration_purchase_share_of_silver: float = Field(
+        gt=0,
+        le=1,
+        description="share of the treasury a county will spend buying rations for its garrison",
+    )
+
+    desertion_base_rate: float = Field(ge=0, le=1)
+    desertion_pay_weight: float = Field(ge=0)
+    desertion_food_weight: float = Field(ge=0)
+    desertion_morale_weight: float = Field(ge=0)
+    desertion_max_rate: float = Field(gt=0, le=1)
+
+    deserter_home_share: float = Field(ge=0, le=1)
+    deserter_band_share: float = Field(ge=0, le=1)
+
+    morale_pay_weight: float = Field(ge=0)
+    morale_food_weight: float = Field(ge=0)
+    morale_recovery: float = Field(ge=0)
+    cohesion_food_weight: float = Field(ge=0)
+
+    suppression_effectiveness: float = Field(ge=0, le=1)
+    suppression_arms_mitigation: float = Field(
+        ge=0,
+        le=1,
+        description="share of suppression losses a fully armed band can avoid",
+    )
+    suppression_food_cost_per_troop_shi: float = Field(ge=0)
+    suppression_cohesion_cost: float = Field(ge=0, le=1)
+
+    garrison_target_troops: float = Field(ge=0)
+    levy_rate_of_eligible_adults: float = Field(ge=0, le=1)
+
+    provenance: DataProvenance
+
+    @model_validator(mode="after")
+    def _shares_fit(self) -> MilitaryParameters:
+        if self.deserter_home_share + self.deserter_band_share > 1.0 + 1e-9:
+            raise ValueError(
+                "home and band shares cannot together exceed every deserter; the rest disperse"
+            )
+        return self
+
+
+class BandParameters(BaseModel):
+    """Armed-band rules: formation, recruitment, food, movement, raids, split and merge."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = BAND_PARAMETERS_VERSION
+
+    minimum_formation_troops: float = Field(gt=0)
+    formation_unmet_ratio: float = Field(ge=0, le=1)
+    formation_recruitment_months: float = Field(
+        gt=0,
+        description="months of distressed recruitment a forming band is assumed to concentrate",
+    )
+    recruitment_rate_of_eligible_adults: float = Field(ge=0, le=1)
+
+    food_shi_per_member_month: float = Field(gt=0)
+    raid_extraction_multiple: float = Field(
+        gt=0,
+        description="grain a band takes each month, in multiples of its own monthly food need",
+    )
+    raid_asset_share_per_month: float = Field(ge=0, le=1)
+    arms_per_asset_valuation: float = Field(ge=0)
+    arms_per_member_for_full_capability: float = Field(gt=0)
+
+    movement_mobility_floor: float = Field(gt=0, le=1)
+    movement_avoidance_ratio: float = Field(
+        ge=0,
+        le=1,
+        description="monthly losses as a share of its own size at which a band prefers to move",
+    )
+    mobility_gain_from_move: float = Field(ge=0, le=1)
+    mobility_decay_per_month: float = Field(ge=0, le=1)
+    cohesion_gain_per_month: float = Field(ge=0, le=1)
+    cohesion_decay_per_month: float = Field(ge=0, le=1)
+    network_gain_per_month: float = Field(ge=0, le=1)
+    network_loss_from_raid_per_month: float = Field(ge=0, le=1)
+
+    split_troops_threshold: float = Field(gt=0)
+    split_cohesion_below: float = Field(ge=0, le=1)
+    merge_cohesion_above: float = Field(ge=0, le=1)
+    dissolve_troops_below: float = Field(gt=0)
+
+    provenance: DataProvenance
+
+
+def core_default_military_parameters() -> MilitaryParameters:
+    """Development-scale garrison rules: pay, rations and the desertion that follows."""
+    return MilitaryParameters(
+        pay_tael_per_soldier_month=0.25,
+        pay_share_of_treasury=0.5,
+        food_shi_per_soldier_month=0.3,
+        ration_purchase_share_of_silver=0.3,
+        desertion_base_rate=0.002,
+        desertion_pay_weight=0.05,
+        desertion_food_weight=0.04,
+        desertion_morale_weight=0.02,
+        desertion_max_rate=0.08,
+        deserter_home_share=0.4,
+        deserter_band_share=0.3,
+        morale_pay_weight=0.08,
+        morale_food_weight=0.1,
+        morale_recovery=0.1,
+        cohesion_food_weight=0.1,
+        suppression_effectiveness=0.02,
+        suppression_arms_mitigation=0.5,
+        suppression_food_cost_per_troop_shi=0.02,
+        suppression_cohesion_cost=0.02,
+        garrison_target_troops=300.0,
+        levy_rate_of_eligible_adults=0.002,
+        provenance=DataProvenance.assumption(
+            "development-scale pay, rations, desertion and suppression rules; grade S, to be "
+            "replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+def core_default_band_parameters() -> BandParameters:
+    """Development-scale band rules: how bands form, eat, move and consolidate."""
+    return BandParameters(
+        minimum_formation_troops=40.0,
+        formation_unmet_ratio=0.15,
+        formation_recruitment_months=6.0,
+        recruitment_rate_of_eligible_adults=0.01,
+        food_shi_per_member_month=0.3,
+        raid_extraction_multiple=1.5,
+        raid_asset_share_per_month=0.05,
+        arms_per_asset_valuation=0.02,
+        arms_per_member_for_full_capability=0.05,
+        movement_mobility_floor=0.3,
+        movement_avoidance_ratio=0.05,
+        mobility_gain_from_move=0.05,
+        mobility_decay_per_month=0.02,
+        cohesion_gain_per_month=0.04,
+        cohesion_decay_per_month=0.02,
+        network_gain_per_month=0.03,
+        network_loss_from_raid_per_month=0.1,
+        split_troops_threshold=400.0,
+        split_cohesion_below=0.45,
+        merge_cohesion_above=0.6,
+        dissolve_troops_below=40.0,
+        provenance=DataProvenance.assumption(
+            "development-scale band formation, food, movement, raid and consolidation rules; "
+            "grade S, to be replaced by sourced parameter cards in P08"
         ),
     )

@@ -20,6 +20,11 @@ from late_ming_lab.actors.households import (
     HouseholdPopulation,
 )
 from late_ming_lab.actors.merchants import MerchantHouse, MerchantLayer
+from late_ming_lab.actors.military import (
+    BandLayer,
+    GovernmentMilitaryUnit,
+    MilitaryLayer,
+)
 from late_ming_lab.evidence.grades import DataProvenance
 from late_ming_lab.networks.graphs import SpatialGraphs
 from late_ming_lab.networks.nodes import SpatialNodes
@@ -186,6 +191,8 @@ def toy_elite_layer(nodes: SpatialNodes) -> EliteLayer:
 #: County treasuries start empty: the fiscal layer is about extraction, not endowment.
 COUNTY_SILVER_TAEL: Final[float] = 0.0
 COUNTY_GRANARY_SHI: Final[float] = 0.0
+GARRISON_TROOPS_PER_NODE: Final[float] = 300.0
+GARRISON_RATION_MONTHS: Final[float] = 4.0
 
 
 def toy_capacity(
@@ -222,3 +229,30 @@ def toy_government_layer(
             for node in graphs.nodes.counties
         )
     )
+
+
+def toy_military_layer(
+    graphs: SpatialGraphs, *, troops_per_node: float = GARRISON_TROOPS_PER_NODE
+) -> MilitaryLayer:
+    """One garrison per county node, with a declared strength and a ration stock.
+
+    The strength is a development-scale assumption graded ``S``, scaled to what the toy county can
+    plausibly pay and feed: about one soldier per thirty adults, and a ration stock of roughly four
+    months, so a run has to keep feeding them or watch morale, cohesion and eventually the soldiers
+    themselves go.
+    """
+    return MilitaryLayer(
+        tuple(
+            GovernmentMilitaryUnit(
+                node_id=node.node_id,
+                troops=troops_per_node,
+                grain_shi=troops_per_node * GARRISON_RATION_MONTHS,
+            )
+            for node in graphs.nodes.counties
+        )
+    )
+
+
+def toy_band_layer() -> BandLayer:
+    """No bands at the start: in P06 they are formed by desertion or by distress, not placed."""
+    return BandLayer()
