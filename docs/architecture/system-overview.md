@@ -1,6 +1,7 @@
 # System Overview
 
-Status: P00 (constitution only — no simulation code exists yet).
+Status: P01 (deterministic simulation kernel). No historical content exists yet: no
+counties, households, markets, armies, rebels or runtime-LLM decisions.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -106,6 +107,51 @@ version, RNG draw, and outcome. Any state change that matters must be explainabl
 - same code + config + seed + policy → same output, except live LLM decisions, whose traces
   must be recordable and replayable.
 
+## Deterministic kernel (P01)
+
+The kernel is history-free by design: it owns time, randomness, event recording, provenance
+and output, and nothing else. Domain mechanisms attach to it as systems in later phases.
+
+| Concern | Module | Enforced contract |
+| --- | --- | --- |
+| Configuration | `core/config.py` | Frozen Pydantic model, `extra="forbid"`, cross-field validation; runtime LLM off by default and, when enabled, restricted to `ustc-deepseek-v4.1`; `content_hash()` over canonical JSON |
+| Time | `core/clock.py` | Zero-based monthly ticks, pure integer month arithmetic, `warmup`/`shock` split, out-of-window access raises |
+| Randomness | `core/rng.py` | One root `SeedSequence` spawned into seven independent streams; 128-bit per-stream seed recorded in the manifest; a global `random.seed(...)` is prohibited |
+| Events | `core/events.py` | Frozen events ordered by `(tick, seq)`; trigger values stored as a read-only mapping and canonical JSON; Parquet round-trip is lossless |
+| Tick order | `core/tick.py` | `TickPhase` (17 phases) and `TICK_ORDER_VERSION = "tick-order-v1"`; the kernel refuses systems registered out of phase order |
+| Driver | `core/kernel.py` | Registration order within the versioned phase order, per-tick clock marker event, macro index frame, simulation digest |
+| Provenance | `core/manifest.py`, `evidence/provenance.py` | `RunManifest` (git SHA, dirty flag, engine version, config hash, root seed, subsystem seeds, scenario, policy, tick order version, LLM switch) and `RunSummary` (event count, simulation digest, wall-clock diagnostics) |
+| Storage | `storage/tables.py`, `storage/run_store.py`, `storage/warehouse.py` | Atomically written Parquet/JSON/YAML artifacts; run directories keyed by run id; read access plus DuckDB SQL over the written files |
+
+### What "reproducible" means here
+
+- Same code + same config + same seed → byte-identical Parquet and YAML artifacts, and an
+  identical `simulation_digest` (SHA-256 over the canonical form of every produced row).
+- `RunManifest.created_at` and `RunSummary.duration_seconds` are wall-clock diagnostics and
+  are excluded from `RunManifest.deterministic_digest()`; everything else in the manifest is
+  provenance and is included.
+- `run_id = <scenario>-<root_seed>-<config_hash[:12]>`, so repeating a configuration and
+  seed targets the same directory and reproduces it instead of accumulating duplicates.
+  Writing over a directory whose manifest has a different deterministic digest is refused
+  (`RunConflictError`); pass a run label for a deliberate second run of the same config.
+- With no systems registered, the kernel draws nothing: the seed changes run identity, not
+  event content. Seeded determinism of *drawn* values is exercised by kernel tests that
+  register a system bound to a stream.
+
+### Run directory
+
+```text
+outputs/runs/<run_id>/
+├── manifest.json             replay key
+├── config.snapshot.yaml      the exact configuration that was hashed
+├── macro_timeseries.parquet  per-tick index frame (clock columns in P01)
+├── agent_events.parquet      the event log, ordered by (tick, seq)
+└── summary.json              event count, simulation digest, wall-clock diagnostics
+```
+
+`parameters.snapshot.parquet`, `county_timeseries.parquet` and `decision_trace.jsonl` are
+absent because no phase produces them yet; each arrives with the phase that produces it.
+
 ## Stack
 
 Mesa 3 stable (not Mesa 4 alpha) · NetworkX · Polars + Arrow · DuckDB · Parquet · SALib
@@ -116,17 +162,21 @@ Python 3.12 · `uv`. Dependencies are added when a phase needs them, not in adva
 
 ```text
 src/late_ming_lab/
-├── core/        model.py, clock.py, rng.py, events.py, config.py
+├── core/        config.py, clock.py, rng.py, events.py, tick.py, kernel.py, manifest.py,
+│                hashing.py                       (implemented in P01)
 ├── actors/      households, elites, merchants, government, military, armed_groups
 ├── systems/     agriculture, households, markets, credit, taxation, relief,
 │                migration, military_finance, insurgency, violence
 ├── networks/    trade, migration, military
 ├── policies/    base, rules, utility, random_policy, ustc_v41
-├── evidence/    registry, parameters, provenance
-├── calibration/ experiments/ analysis/ storage/ cli/ ui/
+├── evidence/    provenance.py (P01); registry, parameters (P08)
+├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
+├── calibration/ experiments/ analysis/ cli/ ui/
 ```
 
-P00 implements only `late_ming_lab/__init__.py` and `late_ming_lab/cli.py`.
+Implemented so far: `late_ming_lab/__init__.py`, `cli.py` (`--version`, `smoke-run`),
+`core/`, `evidence/provenance.py`, `storage/`. Everything else is created by the phase that
+needs it.
 
 ## Phase roadmap
 

@@ -11,8 +11,21 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P00 (Bootstrap / Constitution) complete. No simulation code exists yet. Phase plan:
-`docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P00.md`.
+P01 (Simulation Kernel / Reproducibility) complete. The repository now holds a
+history-free deterministic kernel — configuration, monthly clock, subsystem RNG streams,
+immutable event log, run manifest, Parquet output, DuckDB query helper — and no historical
+content: no counties, households, markets, armies or LLM decisions. Phase plan:
+`docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P01.md`.
+
+```bash
+uv run late-ming-lab smoke-run            # 240 ticks, 1625-01 → 1644-12, into outputs/runs/
+uv run late-ming-lab smoke-run --ticks 24 --warmup 6 --seed 7
+```
+
+A run writes an immutable directory under `outputs/runs/<run_id>/` (manifest, config
+snapshot, event log, macro index, summary). Same configuration + same seed reproduces the
+artifacts byte for byte; repeating a run reuses its directory, and a directory holding a
+different run is refused rather than overwritten.
 
 ## Setup
 
@@ -26,6 +39,7 @@ chmod 600 .env          # never committed; add the USTC key only when P11 requir
 
 ```bash
 uv run late-ming-lab --version
+uv run late-ming-lab smoke-run --output-root /tmp/lml-check
 uv run pytest                   # offline; no live LLM access
 uv run ruff check . && uv run ruff format --check .
 uv run mypy
