@@ -35,6 +35,7 @@ from late_ming_lab.actors.ledger import (
     ASSETS_DELTA,
     DEBT_DELTA,
     GRAIN_DELTA,
+    HOUSEHOLDS_DELTA,
     LAND_DELTA,
     SILVER_DELTA,
     TAX_ARREARS_DELTA,
@@ -55,6 +56,7 @@ __all__ = [
     "ASSETS_DELTA",
     "DEBT_DELTA",
     "GRAIN_DELTA",
+    "HOUSEHOLDS_DELTA",
     "LAND_DELTA",
     "SILVER_DELTA",
     "TAX_ARREARS_DELTA",
@@ -113,6 +115,9 @@ class CohortEventType(StrEnum):
     MOVABLE_ASSET_SALE = "MOVABLE_ASSET_SALE"
     GRAIN_SEIZURE = "GRAIN_SEIZED"
     ASSET_SEIZURE = "MOVABLE_ASSET_SEIZED"
+    MIGRATION_DEPARTURE = "MIGRATION_DEPARTURE"
+    MIGRATION_ARRIVAL = "MIGRATION_ARRIVAL"
+    MIGRANT_SUBSISTENCE = "MIGRANT_SUBSISTENCE"
     LAND_SALE = "LAND_SALE"
     COPING_TRANSITION = "COPING_TRANSITION"
     TAX_PAYMENT = "TAX_PAYMENT"
@@ -183,11 +188,9 @@ class HouseholdCohortAgent(LedgerAgent):
     recruitment_eligible: bool = False
 
     _land_reference_value: float = PrivateAttr(default=0.0)
-    _initial_households: float = PrivateAttr(default=0.0)
 
     def model_post_init(self, _context: object) -> None:
         super().model_post_init(_context)
-        self._initial_households = self.households
 
     @property
     def ledger_name(self) -> str:
@@ -213,13 +216,13 @@ class HouseholdCohortAgent(LedgerAgent):
         return self.movable_assets_tael + self.land_mu * self._land_reference_value
 
     def check_balances(self) -> None:
+        """Reconcile every balance, weight included.
+
+        Until P07 a cohort's weight could not change at all, and the check was an equality against
+        the opening value. Households migrate now, so weight is a tracked balance like the rest:
+        it is reconciled against the movements recorded for it, and nothing else can move it.
+        """
         super().check_balances()
-        if self.households != self._initial_households:
-            raise HouseholdLedgerError(
-                f"{self.cohort_id}: cohort weight changed from {self._initial_households} to "
-                f"{self.households}; cohorts move people, not households, and only through the "
-                "levy and return transitions"
-            )
 
     def set_land_reference_value(self, value: float) -> None:
         """Collateral valuation used for credit capacity; declared by the run's parameters."""
@@ -583,6 +586,177 @@ class HouseholdCohortAgent(LedgerAgent):
             outcome=f"returned-from:{source}",
         )
 
+    def migrate_households_out(
+        self,
+        *,
+        households: float,
+        adults: float,
+        grain_shi: float,
+        silver_tael: float,
+        movable_assets_tael: float,
+        land_abandoned_mu: float,
+        destination: str,
+        rule_version: str,
+    ) -> CohortEvent:
+        """Send households away for good, with what they can carry.
+
+        Movers take their people, food, silver and movable property with them. They cannot carry
+        land, and the fields they were working are abandoned at the origin: the mu leave this
+        cohort's books to nobody, which is a declared outflow, not a transfer.
+        """
+        self._apply(
+            households=-households,
+            adults=-adults,
+            grain=-grain_shi,
+            silver=-silver_tael,
+            assets=-movable_assets_tael,
+            land=-land_abandoned_mu,
+            impacts=(
+                (HOUSEHOLDS_DELTA, -households),
+                (ADULTS_DELTA, -adults),
+                (GRAIN_DELTA, -grain_shi),
+                (SILVER_DELTA, -silver_tael),
+                (ASSETS_DELTA, -movable_assets_tael),
+                (LAND_DELTA, -land_abandoned_mu),
+            ),
+        )
+        return CohortEvent(
+            event_type=CohortEventType.MIGRATION_DEPARTURE,
+            rule_version=rule_version,
+            trigger={
+                "households_migrated": households,
+                "adults_migrated": adults,
+                "grain_carried_shi": grain_shi,
+                "silver_carried_tael": silver_tael,
+                "assets_carried_tael": movable_assets_tael,
+                "land_abandoned_mu": land_abandoned_mu,
+                HOUSEHOLDS_DELTA: -households,
+                ADULTS_DELTA: -adults,
+                GRAIN_DELTA: -grain_shi,
+                SILVER_DELTA: -silver_tael,
+                ASSETS_DELTA: -movable_assets_tael,
+                LAND_DELTA: -land_abandoned_mu,
+                "households_left": self.households,
+                "land_per_household_mu": self.land_per_household_mu,
+            },
+            outcome=f"migrated-to:{destination}",
+        )
+
+    def receive_migrant_households(
+        self,
+        *,
+        households: float,
+        adults: float,
+        grain_shi: float,
+        silver_tael: float,
+        movable_assets_tael: float,
+        source: str,
+        rule_version: str,
+    ) -> CohortEvent:
+        """Take in households that arrived from another node, with what they carried.
+
+        Arrivals bring no land: they are strangers in this catchment, which is what makes them
+        cheap labour for whoever already holds fields here.
+        """
+        self._apply(
+            households=households,
+            adults=adults,
+            grain=grain_shi,
+            silver=silver_tael,
+            assets=movable_assets_tael,
+            impacts=(
+                (HOUSEHOLDS_DELTA, households),
+                (ADULTS_DELTA, adults),
+                (GRAIN_DELTA, grain_shi),
+                (SILVER_DELTA, silver_tael),
+                (ASSETS_DELTA, movable_assets_tael),
+            ),
+        )
+        return CohortEvent(
+            event_type=CohortEventType.MIGRATION_ARRIVAL,
+            rule_version=rule_version,
+            trigger={
+                "households_arrived": households,
+                "adults_arrived": adults,
+                "grain_carried_shi": grain_shi,
+                "silver_carried_tael": silver_tael,
+                "assets_carried_tael": movable_assets_tael,
+                HOUSEHOLDS_DELTA: households,
+                ADULTS_DELTA: adults,
+                GRAIN_DELTA: grain_shi,
+                SILVER_DELTA: silver_tael,
+                ASSETS_DELTA: movable_assets_tael,
+                "households_left": self.households,
+                "land_per_household_mu": self.land_per_household_mu,
+            },
+            outcome=f"arrived-from:{source}",
+        )
+
+    def send_migrant_adults(
+        self, *, adults: float, destination: str, rule_version: str
+    ) -> CohortEvent:
+        """Send adults away for a bounded term; they are still this cohort's people.
+
+        The adults leave the cohort's balance for the migration system's holding account and come
+        back when the term ends, so sending them away lowers this cohort's subsistence need
+        without lowering its weight.
+        """
+        sent = min(adults, self.adults)
+        if sent <= 0.0:
+            raise ValueError("sending temporary migrants must send at least one adult")
+        self._apply(adults=-sent, impacts=((ADULTS_DELTA, -sent),))
+        return CohortEvent(
+            event_type=CohortEventType.MIGRATION_DEPARTURE,
+            rule_version=rule_version,
+            trigger={
+                "adults_migrated": sent,
+                "temporary": 1.0,
+                ADULTS_DELTA: -sent,
+                "adults_left": self.adults,
+            },
+            outcome=f"temporary-to:{destination}",
+        )
+
+    def receive_migrant_adults(
+        self, *, adults: float, source: str, rule_version: str
+    ) -> CohortEvent:
+        """Take seasonal migrants back, or bring them home early when their money runs out."""
+        self._apply(adults=adults, impacts=((ADULTS_DELTA, adults),))
+        return CohortEvent(
+            event_type=CohortEventType.MIGRATION_ARRIVAL,
+            rule_version=rule_version,
+            trigger={
+                "adults_returned": adults,
+                "temporary": 1.0,
+                ADULTS_DELTA: adults,
+                "adults_left": self.adults,
+            },
+            outcome=f"returned-from:{source}",
+        )
+
+    def record_migrant_subsistence(
+        self, *, silver_tael: float, destination: str, rule_version: str
+    ) -> CohortEvent:
+        """Pay for the food seasonal migrants eat while they are away.
+
+        The silver leaves the cohort here; the grain is bought at the destination and eaten there,
+        so this is the cohort's side of the trade and the destination market's sale is the other.
+        """
+        paid = min(silver_tael, self.silver_tael)
+        if paid <= 0.0:
+            raise ValueError("migrant subsistence must cost at least one tael")
+        self._apply(silver=-paid, impacts=((SILVER_DELTA, -paid),))
+        return CohortEvent(
+            event_type=CohortEventType.MIGRANT_SUBSISTENCE,
+            rule_version=rule_version,
+            trigger={
+                "migrant_subsistence_tael": paid,
+                SILVER_DELTA: -paid,
+                "silver_tael": self.silver_tael,
+            },
+            outcome=f"fed-migrants-at:{destination}",
+        )
+
     def record_relief(
         self, *, grain_shi: float, donor_id: str, rule_version: str, source: str = "private"
     ) -> CohortEvent:
@@ -843,6 +1017,7 @@ class HouseholdCohortAgent(LedgerAgent):
         market: GrainMarket,
         credit: CreditSource,
         rule_version: str,
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
     ) -> tuple[CohortEvent, ...]:
         """Run the declared coping ladder for one month and return the recorded transitions.
 
@@ -892,6 +1067,7 @@ class HouseholdCohortAgent(LedgerAgent):
             bought = self._buy_food(
                 ctx,
                 market,
+                phase=phase,
                 gap=gap,
                 price=price,
                 occasion="silver-on-hand",
@@ -935,7 +1111,11 @@ class HouseholdCohortAgent(LedgerAgent):
 
         if gap > 0:
             outcome = market.buy_movables(
-                ctx, self, wanted_tael=gap * price, max_tael=self.movable_assets_tael
+                ctx,
+                self,
+                wanted_tael=gap * price,
+                max_tael=self.movable_assets_tael,
+                phase=phase,
             )
             if outcome.quantity > 0:
                 events.append(
@@ -1022,12 +1202,15 @@ class HouseholdCohortAgent(LedgerAgent):
         price: float,
         occasion: str,
         events: list[CohortEvent],
+        phase: TickPhase = TickPhase.HOUSEHOLD_CONSUMPTION,
         rule_version: str,
     ) -> float:
         """Buy what the market can deliver with the silver on hand; returns the shi delivered."""
         if self.silver_tael <= 0.0 or gap <= 0.0:
             return 0.0
-        outcome = market.buy_grain(ctx, self, shi_wanted=gap, max_silver=self.silver_tael)
+        outcome = market.buy_grain(
+            ctx, self, shi_wanted=gap, max_silver=self.silver_tael, phase=phase
+        )
         if outcome.quantity <= 0.0:
             return 0.0
         events.append(
@@ -1090,7 +1273,7 @@ class HouseholdPopulation:
             cohort.cohort_id: deque(maxlen=window_months) for cohort in ordered
         }
         self._labour_demand: dict[str, float] = {
-            node_id: 1.0 for node_id in {cohort.node_id for cohort in ordered}
+            node_id: 1.0 for node_id in sorted({cohort.node_id for cohort in ordered})
         }
 
     def __iter__(self) -> Iterator[HouseholdCohortAgent]:

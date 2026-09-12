@@ -31,6 +31,7 @@ TROOPS_DELTA = "troops_delta_people"
 ARMS_DELTA = "arms_delta_units"
 PAY_ARREARS_DELTA = "pay_arrears_delta_tael"
 ADULTS_DELTA = "adults_delta_people"
+HOUSEHOLDS_DELTA = "households_delta_households"
 
 #: The trigger keys every balance movement is recorded under.
 LEDGER_KEYS: tuple[str, ...] = (
@@ -44,6 +45,7 @@ LEDGER_KEYS: tuple[str, ...] = (
     ARMS_DELTA,
     PAY_ARREARS_DELTA,
     ADULTS_DELTA,
+    HOUSEHOLDS_DELTA,
 )
 
 #: Balance field name -> the trigger key that records its movements.
@@ -60,6 +62,7 @@ LEDGER_KEY_BY_FIELD: Mapping[str, str] = MappingProxyType(
         "arms_units": ARMS_DELTA,
         "pay_arrears_tael": PAY_ARREARS_DELTA,
         "adults": ADULTS_DELTA,
+        "households": HOUSEHOLDS_DELTA,
     }
 )
 
@@ -77,6 +80,7 @@ DELTA_FIELDS: Mapping[str, str] = MappingProxyType(
         "arms": "arms_units",
         "pay_arrears": "pay_arrears_tael",
         "adults": "adults",
+        "households": "households",
     }
 )
 
@@ -126,6 +130,7 @@ class LedgerAgent(BaseModel):
         arms: float = 0.0,
         pay_arrears: float = 0.0,
         adults: float = 0.0,
+        households: float = 0.0,
         impacts: tuple[tuple[str, float], ...] = (),
     ) -> None:
         """Apply a balance change atomically; the only place balances ever move."""
@@ -141,6 +146,7 @@ class LedgerAgent(BaseModel):
             "arms": arms,
             "pay_arrears": pay_arrears,
             "adults": adults,
+            "households": households,
         }
         candidates: list[tuple[str, float]] = []
         for keyword, delta in changes.items():

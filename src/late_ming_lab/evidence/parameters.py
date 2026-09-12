@@ -24,6 +24,8 @@ HOUSEHOLD_PARAMETERS_VERSION: Final[str] = "household-parameters-v1"
 MARKET_PARAMETERS_VERSION: Final[str] = "market-parameters-v1"
 FISCAL_PARAMETERS_VERSION: Final[str] = "fiscal-parameters-v1"
 MILITARY_PARAMETERS_VERSION: Final[str] = "military-parameters-v1"
+MIGRATION_PARAMETERS_VERSION: Final[str] = "migration-parameters-v1"
+GOVERNANCE_INDICATOR_VERSION: Final[str] = "governance-indicators-v1"
 BAND_PARAMETERS_VERSION: Final[str] = "band-parameters-v1"
 ELITE_PARAMETERS_VERSION: Final[str] = "elite-parameters-v1"
 
@@ -509,5 +511,95 @@ def core_default_band_parameters() -> BandParameters:
         provenance=DataProvenance.assumption(
             "development-scale band formation, food, movement, raid and consolidation rules; "
             "grade S, to be replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+class MigrationParameters(BaseModel):
+    """Who leaves, how many, what they carry, and what it costs.
+
+    P03 decided who *could* migrate and moved nobody. These are the rules that move them, all grade
+    ``S``: the shares, the term of a seasonal absence, the price of a move, and what a move costs in
+    transit. Nothing here is drawn from the historical record.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = MIGRATION_PARAMETERS_VERSION
+
+    permanent_share_of_households_per_month: float = Field(gt=0, le=1)
+    temporary_share_of_adults_per_month: float = Field(gt=0, le=1)
+    temporary_term_months: int = Field(gt=0)
+    cost_tael_per_household: float = Field(ge=0)
+    cost_tael_per_adult: float = Field(ge=0)
+    transit_loss_share: float = Field(
+        ge=0,
+        le=1,
+        description=(
+            "share of what movers carry that is lost on the road; the edge's declared risk is "
+            "multiplied by this to give the realised loss"
+        ),
+    )
+    minimum_households_to_move: float = Field(gt=0)
+
+    provenance: DataProvenance
+
+
+def core_default_migration_parameters() -> MigrationParameters:
+    """Development-scale migration rules: a slow trickle, a seasonal absence, and a price."""
+    return MigrationParameters(
+        permanent_share_of_households_per_month=0.02,
+        temporary_share_of_adults_per_month=0.15,
+        temporary_term_months=6,
+        cost_tael_per_household=0.5,
+        cost_tael_per_adult=0.2,
+        transit_loss_share=0.5,
+        minimum_households_to_move=5.0,
+        provenance=DataProvenance.assumption(
+            "development-scale migration shares, term, cost and transit loss; grade S, to be "
+            "replaced by sourced parameter cards in P08"
+        ),
+    )
+
+
+class GovernanceIndicatorParameters(BaseModel):
+    """Thresholds that turn measured quantities into governance-failure indicators.
+
+    These are **reading rules, not evidence**: each one says "count this as a warning sign when the
+    measurement passes this line", and the phase reports the measurements and the count side by
+    side so a reader can move the line without touching the model. No aggregate index is computed
+    from them, on purpose.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = GOVERNANCE_INDICATOR_VERSION
+
+    receipts_below_quota_share: float = Field(gt=0, le=1)
+    tax_base_contraction_share: float = Field(gt=0, le=1)
+    arrears_growth_tael_per_month: float = Field(ge=0)
+    pay_shortfall_share: float = Field(gt=0, le=1)
+    band_troops_share_of_adults: float = Field(gt=0, le=1)
+    largest_band_share: float = Field(gt=0, le=1)
+    out_migration_share_of_households: float = Field(gt=0, le=1)
+    unmet_share_of_need: float = Field(gt=0, le=1)
+
+    provenance: DataProvenance
+
+
+def core_default_governance_indicators() -> GovernanceIndicatorParameters:
+    """Declared reading thresholds, recorded so a reader can see exactly what was counted."""
+    return GovernanceIndicatorParameters(
+        receipts_below_quota_share=0.5,
+        tax_base_contraction_share=0.02,
+        arrears_growth_tael_per_month=1.0,
+        pay_shortfall_share=0.5,
+        band_troops_share_of_adults=0.01,
+        largest_band_share=0.5,
+        out_migration_share_of_households=0.01,
+        unmet_share_of_need=0.25,
+        provenance=DataProvenance.assumption(
+            "reading thresholds for the governance warning indicators; grade S, chosen to be "
+            "visible at the toy scale and to be moved by a reader, not to be evidence"
         ),
     )
