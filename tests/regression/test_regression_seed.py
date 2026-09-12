@@ -1,10 +1,11 @@
 """Regression baseline for the fixed regression seed.
 
-The pinned digest is the kernel's deterministic output for the default configuration and
-:data:`late_ming_lab.core.config.DEFAULT_ROOT_SEED`. It changes only when the clock, the
-event representation or the configuration defaults change on purpose — which is exactly
-what a regression seed is for. Update it deliberately, in the commit that changes the
-kernel contract, never to make a red test go green.
+The pinned digests are the kernel's deterministic output for the default configuration and
+:data:`late_ming_lab.core.config.DEFAULT_ROOT_SEED`: once with no system registered, once
+with the toy spatial dataset and synthetic climate forcing. They change only when the clock,
+the event representation, the configuration defaults or the climate draw order change on
+purpose — which is exactly what a regression seed is for. Update them deliberately, in the
+commit that changes the contract, never to make a red test go green.
 """
 
 from __future__ import annotations
@@ -12,14 +13,29 @@ from __future__ import annotations
 from late_ming_lab.core.config import DEFAULT_ROOT_SEED, SimulationConfig
 from late_ming_lab.core.kernel import SimulationKernel
 from late_ming_lab.core.manifest import make_run_id
+from late_ming_lab.networks.fixtures import toy_spatial_dataset
+from late_ming_lab.systems.calendar import core_default_calendar
+from late_ming_lab.systems.climate import ClimateSystem, SyntheticClimate
 
 #: Expected simulation digest and event count for the default config and regression seed.
 REGRESSION_SIMULATION_DIGEST = "c34bd4998586d1e72217ef64b834386cef0b30b805ac3291a8b721f8301cf379"
 REGRESSION_EVENT_COUNT = 240
 
+#: Same, with the toy dataset and synthetic climate forcing over five county nodes.
+CLIMATE_SIMULATION_DIGEST = "6a03cce6cfdc4e8c426f19ec839f7d8ea3e2a0d9628e8e03c80fb2f238ce0755"
+CLIMATE_EVENT_COUNT = 240 * 6
+
 
 def _regression_run() -> SimulationKernel:
     return SimulationKernel(SimulationConfig())
+
+
+def _climate_run() -> SimulationKernel:
+    nodes = toy_spatial_dataset().build().nodes
+    model = SyntheticClimate(monthly_event_probability=0.25, severity_floor=0.3)
+    return SimulationKernel(
+        SimulationConfig(), [ClimateSystem(nodes, core_default_calendar(), model)]
+    )
 
 
 def test_regression_seed_is_the_documented_default() -> None:
@@ -50,3 +66,18 @@ def test_repeating_the_regression_run_is_bit_identical() -> None:
     assert first.summary.simulation_digest == second.summary.simulation_digest
     assert first.events.equals(second.events)
     assert first.macro.equals(second.macro)
+
+
+def test_climate_regression_run_matches_the_pinned_baseline() -> None:
+    result = _climate_run().run()
+
+    assert result.summary.event_count == CLIMATE_EVENT_COUNT
+    assert result.summary.simulation_digest == CLIMATE_SIMULATION_DIGEST
+
+
+def test_climate_forcing_replays_draw_for_draw() -> None:
+    first = _climate_run().run()
+    second = _climate_run().run()
+
+    assert first.events.equals(second.events)
+    assert first.summary.simulation_digest == second.summary.simulation_digest
