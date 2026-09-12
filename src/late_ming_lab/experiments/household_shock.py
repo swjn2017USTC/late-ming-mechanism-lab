@@ -111,7 +111,9 @@ def run_scenario(
     """Run one scenario through the kernel with the whole toy economy wired in.
 
     P03 wired only the household systems; P04's economy adds the market, merchants, elites and
-    credit, so this experiment now rides on the same assembly as the market experiments.
+    credit, so this experiment now rides on the same assembly as the market experiments. The
+    county fiscal layer added in P05 is switched off, so the P03 answers stay the answers to the
+    P03 configuration.
     """
     run_config = config or SimulationConfig()
     economy = build_toy_economy(
@@ -119,6 +121,7 @@ def run_scenario(
         calendar=calendar,
         crop_parameters=crop_parameters,
         household_parameters=household_parameters,
+        with_fiscal=False,
     )
     result = SimulationKernel(run_config, list(economy.systems)).run(run_label=scenario.label)
     return ScenarioRun(scenario=scenario, result=result, population=economy.population)

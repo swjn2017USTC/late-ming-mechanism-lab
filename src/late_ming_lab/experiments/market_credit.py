@@ -61,7 +61,12 @@ REFERENCE_SCENARIO: Final[str] = "credit-low-rate"
 
 @dataclass(frozen=True, slots=True)
 class MarketScenario:
-    """One point in the scenario space: forcing, trade regime, credit and relief rules."""
+    """One point in the scenario space: forcing, trade regime, credit and relief rules.
+
+    ``with_fiscal`` defaults to false, which is the P04 configuration these answers were measured
+    on. P05 adds the county fiscal layer, which changes what credit and markets do; re-measuring
+    these questions under it is a later phase's job, and keeping the flag here says so.
+    """
 
     label: str
     monthly_event_probability: float = 0.0
@@ -74,6 +79,7 @@ class MarketScenario:
     relief_enabled: bool = True
     interest_rate_monthly: float | None = None
     merchant_stock_scale: float = 1.0
+    with_fiscal: bool = False
 
     @property
     def severity_index(self) -> float:
@@ -182,6 +188,7 @@ def run_market_scenario(
         market_parameters=market_parameters,
         elite_parameters=elite_parameters,
         merchant_stock_scale=scenario.merchant_stock_scale,
+        with_fiscal=scenario.with_fiscal,
     )
     result = SimulationKernel(run_config, list(economy.systems)).run(run_label=scenario.label)
     return MarketRun(scenario=scenario, result=result, economy=economy)
