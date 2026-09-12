@@ -1,0 +1,149 @@
+# System Overview
+
+Status: P00 (constitution only — no simulation code exists yet).
+Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
+`docs/OMP_ENGINEERING_PLAN.md`.
+
+## Purpose
+
+A historical mechanism laboratory for the 1625–1644 Shaanxi–Henan crisis. It asks how
+household survival, land and debt, grain markets, local elites, fiscal extraction, relief,
+military pay, migration, desertion, and armed organization interact across scales, and under
+what conditions local governance crosses from "difficult but sustainable" into
+self-reinforcing systemic instability.
+
+It is not a game, not LLM role-play of historical figures, and not a machine for producing
+"probability the Ming collapsed = 83.7%".
+
+## Simulation domain
+
+| Dimension | Decision |
+| --- | --- |
+| Time | `1625-01 → 1644-12`, 240 monthly ticks; 1625–1626 warm-up, 1627+ shock period |
+| Space | Shaanxi + Henan core; Shanxi, Huguang, Sichuan, Beizhili only as exits/links/external conditions |
+| Population unit | Weighted household cohort, not individual households |
+| Development scale | 3–5 counties, 200–500 cohorts, 5–20 elites, 5–10 merchants, 1–3 armies, 0–10 armed bands |
+| Regional baseline | 50–100 county nodes, 2,000–5,000 cohorts, 100–300 elites, 100–300 merchants |
+
+A cohort carries weight, land, labour, grain, silver, debt, rent, tax burden, social ties,
+coping state, and migration state. It never represents a named household.
+
+## Four layers
+
+```text
+MACRO           climate / central fiscal-military pressure
+MESO            county government, army, market, elite, armed bands
+LOCAL SOCIAL    county / market / credit / grain stock
+MICRO           household cohorts, merchants, soldiers
+```
+
+Feedback crosses layers in both directions; a mechanism claim that only crosses one layer
+direction is incomplete.
+
+## Mechanism modules
+
+| Module | Scope | Key requirement |
+| --- | --- | --- |
+| M1 Household survival | land, labour, grain, silver, debt, credit, ties | Explicit coping ladder (stored grain → discretionary cuts → borrowing → asset sale → land sale → temporary migration → household migration → army/band recruitment). No anger threshold. |
+| M2 Market / credit / elite | county grain inventory, price, market access, transport cost, violence risk, credit supply; elite land, grain, silver, credit network, tax mediation, relief capacity, protection | Elite actions: lend, buy land, relieve, hide taxable resources, mediate tax, organize defense. |
+| M3 Fiscal / governance | `TaxCollectionCapacity`, `InformationCapacity`, `ReliefCapacity`, `CoercionCapacity`, `LogisticsCapacity` | Tax decomposed into quota, collection effort, collection cost, actual receipts, arrears. Never one scalar `state_capacity`. |
+| M4 Fiscal-military | army strength, food, pay due/received, arrears, morale, cohesion, desertion | Both loops: unrest → military demand → fiscal demand → extraction → household stress; and fiscal shortage → arrears → desertion → recruitment pool → armed groups. |
+| M5 Armed organization | size, food, arms, mobility, cohesion, local support, ties, territorial access, actions | Starts as generic `ArmedBand`; consolidation into organizations is observed, never pre-named. |
+
+## Networks
+
+Three separate NetworkX graphs, because the same pair of places has different costs:
+`G_trade` (trade cost), `G_migration` (migration cost), `G_military` (military movement cost).
+A single county-adjacency graph is prohibited.
+
+## Tick order
+
+One tick = one month. Order is explicit, versioned, and tested — never Mesa's incidental
+default ordering.
+
+```text
+01 climate update                    10 military finance
+02 agricultural state                11 desertion
+03 grain production / harvest        12 armed-group recruitment
+04 household consumption             13 armed-group movement / actions
+05 market clearing                   14 violence consequences
+06 credit / debt                     15 institutional decisions
+07 taxation                          16 bookkeeping
+08 relief                            17 data collection
+09 migration
+```
+
+## Randomness
+
+One root `SeedSequence` splits into independent subsystem streams: `climate_rng`,
+`household_rng`, `market_rng`, `migration_rng`, `military_rng`, `rebel_rng`, `decision_rng`.
+This supports common random numbers for counterfactual comparison. A single global
+`random.seed(...)` is prohibited.
+
+## Provenance and outputs
+
+Every run records `run_id`, `git_sha`, `engine_version`, `config_hash`, `parameter_hash`,
+`root_seed`, `subsystem_seeds`, `scenario_id`, `policy_id`, `llm_enabled`, `llm_model_id`,
+`llm_prompt_version`, `start_timestamp`.
+
+```text
+outputs/runs/<run_id>/
+├── manifest.json              ├── county_timeseries.parquet
+├── config.snapshot.yaml       ├── macro_timeseries.parquet
+├── parameters.snapshot.parquet├── agent_events.parquet
+├── decision_trace.jsonl       └── summary.json
+```
+
+The event log is a first-class artifact: tick, event, agent, region, trigger values, rule
+version, RNG draw, and outcome. Any state change that matters must be explainable from it.
+
+## Invariants
+
+- grain cannot become negative; silver cannot appear without an explicit source;
+- population_previous = population_current + deaths + net_outmigration ± explicit external flows;
+- deserters leave the army population; recruits come from an eligible population pool;
+- actual receipts ≤ collectible base under the defined rule;
+- same code + config + seed + policy → same output, except live LLM decisions, whose traces
+  must be recordable and replayable.
+
+## Stack
+
+Mesa 3 stable (not Mesa 4 alpha) · NetworkX · Polars + Arrow · DuckDB · Parquet · SALib
+(Morris screening → Sobol) · PyMC (`Simulator` ABC/SMC) · scikit-learn · Mesa Solara ·
+Python 3.12 · `uv`. Dependencies are added when a phase needs them, not in advance.
+
+## Package layout
+
+```text
+src/late_ming_lab/
+├── core/        model.py, clock.py, rng.py, events.py, config.py
+├── actors/      households, elites, merchants, government, military, armed_groups
+├── systems/     agriculture, households, markets, credit, taxation, relief,
+│                migration, military_finance, insurgency, violence
+├── networks/    trade, migration, military
+├── policies/    base, rules, utility, random_policy, ustc_v41
+├── evidence/    registry, parameters, provenance
+├── calibration/ experiments/ analysis/ storage/ cli/ ui/
+```
+
+P00 implements only `late_ming_lab/__init__.py` and `late_ming_lab/cli.py`.
+
+## Phase roadmap
+
+```text
+P00 constitution   P05 fiscal/governance/relief   P10 ablation/sensitivity/counterfactual
+P01 kernel         P06 military finance/bands     P11 USTC V4.1 decision layer
+P02 space/time     P07 integrated crisis engine   P12 decision-policy robustness
+P03 households     P08 historical evidence        P13 mechanism cards
+P04 market/elite   P09 calibration/hold-out       P14 visualization/HPC/release
+```
+
+Each phase ends with a phase report, logical commits, a clean tree, and a stop.
+
+## Boundaries
+
+- The development LLM (OpenCode Go) and the runtime institutional-policy LLM (USTC DeepSeek
+  V4.1) are strictly separate; see `docs/architecture/runtime-llm-boundary.md`.
+- Evidence grading and the parameter ledger: `docs/epistemics/evidence-grades.md`.
+- What simulation may and may not claim: `docs/epistemics/model-epistemics.md`.
+- No geographic, UI, calibration, or framework expansion ahead of its phase.
