@@ -18,7 +18,6 @@ from typing import Final
 
 import polars as pl
 
-from late_ming_lab.actors.fixtures import toy_cohort_population
 from late_ming_lab.actors.households import HouseholdPopulation
 from late_ming_lab.analysis.distress import (
     cohort_attributes,
@@ -27,27 +26,17 @@ from late_ming_lab.analysis.distress import (
 )
 from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.core.kernel import KernelResult, SimulationKernel
-from late_ming_lab.core.tick import System
 from late_ming_lab.evidence.parameters import (
     CropParameters,
     HouseholdParameters,
-    core_default_crop_parameters,
-    core_default_household_parameters,
 )
-from late_ming_lab.networks.fixtures import toy_spatial_dataset
+from late_ming_lab.experiments.assembly import build_toy_economy
 from late_ming_lab.storage.tables import write_table
-from late_ming_lab.systems.agriculture import AgriculturalStateSystem, HarvestSystem
-from late_ming_lab.systems.calendar import AgriculturalCalendar, core_default_calendar
+from late_ming_lab.systems.calendar import AgriculturalCalendar
 from late_ming_lab.systems.climate import (
     BaselineClimate,
     ClimateModel,
-    ClimateSystem,
     SyntheticClimate,
-)
-from late_ming_lab.systems.household_survival import (
-    CohortBookkeepingSystem,
-    ConsumptionSystem,
-    DebtServiceSystem,
 )
 
 DISTRESS_ARTIFACT: Final[str] = "p03_cohort_distress.parquet"
@@ -119,24 +108,20 @@ def run_scenario(
     crop_parameters: CropParameters | None = None,
     household_parameters: HouseholdParameters | None = None,
 ) -> ScenarioRun:
-    """Run one scenario through the kernel with the household systems registered."""
-    run_config = config or SimulationConfig()
-    zone_calendar = calendar or core_default_calendar()
-    crops = crop_parameters or core_default_crop_parameters()
-    households = household_parameters or core_default_household_parameters()
+    """Run one scenario through the kernel with the whole toy economy wired in.
 
-    nodes = toy_spatial_dataset().build().nodes
-    population = toy_cohort_population(nodes)
-    systems: list[System] = [
-        ClimateSystem(nodes, zone_calendar, climate_model_for(scenario)),
-        AgriculturalStateSystem(population),
-        HarvestSystem(population, zone_calendar, crops, households),
-        ConsumptionSystem(population, households),
-        DebtServiceSystem(population, households),
-        CohortBookkeepingSystem(population, households),
-    ]
-    result = SimulationKernel(run_config, systems).run(run_label=scenario.label)
-    return ScenarioRun(scenario=scenario, result=result, population=population)
+    P03 wired only the household systems; P04's economy adds the market, merchants, elites and
+    credit, so this experiment now rides on the same assembly as the market experiments.
+    """
+    run_config = config or SimulationConfig()
+    economy = build_toy_economy(
+        climate_model=climate_model_for(scenario),
+        calendar=calendar,
+        crop_parameters=crop_parameters,
+        household_parameters=household_parameters,
+    )
+    result = SimulationKernel(run_config, list(economy.systems)).run(run_label=scenario.label)
+    return ScenarioRun(scenario=scenario, result=result, population=economy.population)
 
 
 def run_shock_experiment(
