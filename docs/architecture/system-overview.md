@@ -1,9 +1,11 @@
 # System Overview
 
-Status: P05 (fiscal extraction, governance and relief). Space, climate, households, a county
-grain market, merchant houses, elite lending and now a county fiscal apparatus exist; armies,
-rebels, migration itself and runtime-LLM decisions do not. The only spatial dataset is the toy
-fixture and every endowment and rate is an assumption: none of it is history.
+Status: P06 (military finance and armed organization). Space, climate, households, a county grain
+market, merchant houses, elite lending, a county fiscal apparatus, garrisons and armed bands
+exist; rebels-as-organizations, migration itself, inter-county military movement and runtime-LLM
+decisions do not. There are no tactics, battles or named leaders, by decision — see
+`docs/adr/0002-military-abstractions.md`. The only spatial dataset is the toy fixture and every
+endowment and rate is an assumption: none of it is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
 
@@ -50,8 +52,8 @@ direction is incomplete.
 | M1 Household survival | land, labour, grain, silver, debt, credit, ties | Explicit coping ladder (stored grain → discretionary cuts → borrowing → asset sale → land sale → temporary migration → household migration → army/band recruitment). No anger threshold. |
 | M2 Market / credit / elite | county grain inventory, price, market access, transport cost, violence risk, credit supply; elite land, grain, silver, credit network, tax mediation, relief capacity, protection | Elite actions: lend, buy land, relieve, hide taxable resources, mediate tax, organize defense. |
 | M3 Fiscal / governance | `TaxCollectionCapacity`, `InformationCapacity`, `ReliefCapacity`, `CoercionCapacity`, `LogisticsCapacity` | Tax decomposed into quota, collection effort, collection cost, actual receipts, arrears. Never one scalar `state_capacity`. |
-| M4 Fiscal-military | army strength, food, pay due/received, arrears, morale, cohesion, desertion | Both loops: unrest → military demand → fiscal demand → extraction → household stress; and fiscal shortage → arrears → desertion → recruitment pool → armed groups. |
-| M5 Armed organization | size, food, arms, mobility, cohesion, local support, ties, territorial access, actions | Starts as generic `ArmedBand`; consolidation into organizations is observed, never pre-named. |
+| M4 Fiscal-military | army strength, food, pay due/received, arrears, morale, cohesion, desertion | Both loops: unrest → military demand → fiscal demand → extraction → household stress; and fiscal shortage → arrears → desertion → recruitment pool → armed groups. Implemented in P06: `actors/military.py`, `systems/military.py` (phases 10–14, 16). |
+| M5 Armed organization | size, food, arms, mobility, cohesion, local support, ties, territorial access, actions | Starts as generic `ArmedBand`; consolidation into organizations is observed, never pre-named. Implemented in P06 as raids, movement, formation, recruitment, suppression, dissolution, split and merge — no tactics. |
 
 ## Networks
 
@@ -261,7 +263,7 @@ against the pre-fix code, where grain bought on the ladder was eaten but never d
 | County inventory and price | `systems/markets.py` | `MarketClearingSystem` posts one price per priced node each month; `price = reference × (target cover / inventory)^elasticity`, clamped to declared bounds; a node with no modelled demand posts the reference price |
 | Intercounty trade | `systems/markets.py` | merchants arbitrage along `G_trade`: margin = destination − origin − transport cost; capacity, risk loss and exporter stock all bind; the loss is a separate `TRADE_LOSS` event |
 | Unit mappings | `evidence/parameters.py` | P02 left `cost` and `capacity` dimensionless; P04 declares one cost unit = silver per shi moved and one capacity unit = shi per month, with zero capacity meaning autarky |
-| Violence hook | `networks/disruption.py` | `TradeDisruption` scales a link's risk and capacity and can block it outright; P06 drives it from armed-group activity |
+| Violence hook | `networks/disruption.py` | `TradeDisruption` scales a link's risk and capacity and can block it outright. Not yet driven by armed-band activity: P06 raids do not touch the trade graph, and an experiment has to supply the disruption explicitly (open item in the P06 report) |
 | Merchant layer | `actors/merchants.py` | one house per node the trade graph reaches, with silver, grain and goods; every purchase and sale is logged from both sides |
 | Elite layer | `actors/elites.py` | rent, lending, land purchase, relief, tax mediation; **claims are derived** from household debt, so borrower and lender records cannot drift |
 | Credit | `systems/elites.py` | `LocalCredit` lends against collateral, bounded by both the borrower's limit and the lender's silver |
