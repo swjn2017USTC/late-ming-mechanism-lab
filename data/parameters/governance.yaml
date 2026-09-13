@@ -1,0 +1,133 @@
+schema_version: parameter-cards-v1
+parameter_set: GovernanceIndicatorParameters
+cards:
+- id: receipts_below_quota_share
+  name: receipts below quota share
+  parameter_set: GovernanceIndicatorParameters
+  definition: receipts against the assessed quota below which the indicator reads as a warning
+  unit: receipts over quota (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: A reading line for a report, not a mechanism value; the plan forbids collapsing governance
+    into a score, so the line is stated and the count of crossed lines is reported.
+  uncertainty: The line is a reader's choice; the report prints it beside the measurement.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: tax_base_contraction_share
+  name: tax base contraction share
+  parameter_set: GovernanceIndicatorParameters
+  definition: contraction of the visible tax base at which the indicator reads as a warning
+  unit: share of the opening base (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: 'As above: a declared reading line.'
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: arrears_growth_tael_per_month
+  name: arrears growth tael per month
+  parameter_set: GovernanceIndicatorParameters
+  definition: arrears growth per month at which the indicator reads as a warning
+  unit: tael per month
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: As above.
+  uncertainty: The unit is the model's own silver scale.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: pay_shortfall_share
+  name: pay shortfall share
+  parameter_set: GovernanceIndicatorParameters
+  definition: share of the monthly pay obligation unpaid at which the indicator reads as a warning
+  unit: share of the pay obligation (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: As above.
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: band_troops_share_of_adults
+  name: band troops share of adults
+  parameter_set: GovernanceIndicatorParameters
+  definition: armed members as a share of adults at which the indicator reads as a warning
+  unit: share of adults (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.01
+  central_text: null
+  sources: []
+  reasoning: As above.
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: largest_band_share
+  name: largest band share
+  parameter_set: GovernanceIndicatorParameters
+  definition: largest band's share of all armed men at which the indicator reads as a warning
+  unit: share of armed men (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: As above; this is the plan's consolidation observable used as a reading line.
+  uncertainty: The observable is a measurement; the line is a reader's.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: out_migration_share_of_households
+  name: out migration share of households
+  parameter_set: GovernanceIndicatorParameters
+  definition: households leaving the region as a share of households at which the indicator reads as a
+    warning
+  unit: share of households (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.01
+  central_text: null
+  sources: []
+  reasoning: As above.
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))
+- id: unmet_share_of_need
+  name: unmet share of need
+  parameter_set: GovernanceIndicatorParameters
+  definition: share of the subsistence floor unmet at which the indicator reads as a warning
+  unit: share of need (0-1)
+  mechanism: governance warning indicators (reading rules)
+  level: macro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.25
+  central_text: null
+  sources: []
+  reasoning: As above.
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: governance-indicators-v1 (P07 (reporting only))

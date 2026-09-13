@@ -1,0 +1,48 @@
+schema_version: historical-patterns-v1
+cluster: agriculture
+patterns:
+  - id: northern-dryland-yield-band
+    cluster: agriculture
+    name: Northern dryland yields sit in a band, not at a point
+    statement: >-
+      Reconstructions of late-Ming northern dryland agriculture put good land near 1 shi per mu,
+      medium land at 0.5-0.8 and poor land at 0.2-0.4, with a weighted northern average around
+      0.77-0.8 shi per mu; wheat, millet, sorghum and beans dominated the crop mix.
+    window: "1368-1644 (reconstruction horizon)"
+    geography: "North China dryland"
+    evidence_grade: C
+    sources: [guo-2001-grain-yields, broadberry-gupta-wang-2024-ming]
+    locators:
+      - "Guo 2001, pp. 373-396 (yield tables)"
+      - "Cambridge Economic History of China vol. 1 (national accounting context)"
+    calibration_role: constraint
+    signatures:
+      - quantity: "harvested grain per mu in a normal year (HARVEST events, summed by node)"
+        expected: "within the reconstructed band, and higher in the plain zone than in the loess zone"
+        scoring: "check membership in the band and the zone ordering; do not fit the yield to it"
+    falsifiers:
+      - "a simulated normal-year yield an order of magnitude outside the band"
+      - "loess-zone yields exceeding plain-zone yields in a normal year"
+
+  - id: land-abandonment-in-famine
+    cluster: agriculture
+    name: Fields are abandoned in the worst years
+    statement: >-
+      The gazetteers and the transition literature describe fields going out of cultivation as
+      households fled, and the registered tax base diverging from the land actually farmed.
+    window: "1630-1644"
+    geography: "Shaanxi"
+    evidence_grade: C
+    sources: [shaanxi-famine-gazetteers, cao-2024-population, mingshi]
+    locators:
+      - "dfz.shaanxi.gov.cn, gazetteer entries on depopulation"
+      - "Cao 2024, ch. 6 (Ming-Qing decline)"
+      - "Mingshi, fiscal treatise (食貨志) chapters - not opened"
+    calibration_role: target
+    signatures:
+      - quantity: "land abandoned by migration (land_abandoned_mu) and the visible tax base"
+        expected: "abandonment appears in the crisis years, and the visible base contracts"
+        scoring: "direction and co-movement with distress; no magnitude"
+    falsifiers:
+      - "no land abandoned despite sustained out-migration"
+      - "a tax base that grows through the crisis years"

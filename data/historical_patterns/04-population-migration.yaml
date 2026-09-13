@@ -1,0 +1,47 @@
+schema_version: historical-patterns-v1
+cluster: population_migration
+patterns:
+  - id: shaanxi-net-outflow
+    cluster: population_migration
+    name: Shaanxi becomes a net outflow region
+    statement: >-
+      Famine, drought and military disruption pushed households out of Shaanxi in the crisis years,
+      with movement toward Henan and the southern exits; the transition literature places a sharp
+      population decline across the period.
+    window: "1628-1644"
+    geography: "Shaanxi, with movement toward Henan and Huguang"
+    evidence_grade: C
+    sources: [shaanxi-famine-gazetteers, cao-2024-population, ge-2024-concise-population]
+    locators:
+      - "dfz.shaanxi.gov.cn, gazetteer entries on displacement"
+      - "Cao 2024, ch. 6 (Ming-Qing population decline)"
+      - "Ge 2024, chapter on the Ming-Qing transition"
+    calibration_role: hold-out
+    signatures:
+      - quantity: "per-node net households and regional exits (MIGRATION_SETTLEMENT, MIGRATION_EXIT)"
+        expected: "Shaanxi nodes negative on net, exits used in the crisis years rather than in the warm-up"
+        scoring: "sign and timing per node, not volume"
+    falsifiers:
+      - "no out-migration at all in a run with sustained famine distress"
+      - "out-migration concentrated in the warm-up period"
+
+  - id: seasonal-absence-beyond-crisis
+    cluster: population_migration
+    name: Seasonal absence is routine, not only a famine response
+    statement: >-
+      Seasonal labour migration was ordinary practice in north China; the record describes movement
+      in normal years as well as crisis years, for wages and for by-employments.
+    window: "1625-1644"
+    geography: "North China"
+    evidence_grade: C
+    sources: [ge-2024-concise-population, shaanxi-famine-gazetteers]
+    locators:
+      - "Ge 2024, chapter on the Ming-Qing transition"
+      - "dfz.shaanxi.gov.cn, gazetteer entries on labour and trade"
+    calibration_role: not-calibrated
+    signatures:
+      - quantity: "temporary migration departures in a calm run (TEMPORARY_MIGRATION events)"
+        expected: "non-zero even without a climate shock"
+        scoring: "report whether it happens at all; the model's distress gate currently prevents it, and that gap is recorded rather than fitted"
+    falsifiers:
+      - "zero seasonal absence in a run with no distress — the model's present behaviour, recorded here as a known limitation"

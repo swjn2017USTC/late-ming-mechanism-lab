@@ -1,0 +1,135 @@
+schema_version: parameter-cards-v1
+parameter_set: MigrationParameters
+cards:
+- id: permanent_share_of_households_per_month
+  name: permanent share of households per month
+  parameter_set: MigrationParameters
+  definition: share of an eligible cohort's households that leave for good in a month
+  unit: per month
+  mechanism: migration
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Famine migration moved people in large numbers and in stages; the monthly share is a declared
+    prior of a magnitude the sources describe but do not quantify.
+  uncertainty: Migration in the record is documented as a direction and a crisis, never as a monthly rate.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (P07 (phase 09))
+  range:
+    low: 0.005
+    high: 0.1
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - pop-shaanxi-migration-push
+- id: temporary_share_of_adults_per_month
+  name: temporary share of adults per month
+  parameter_set: MigrationParameters
+  definition: share of an eligible cohort's adults that leaves for a season
+  unit: per month
+  mechanism: migration
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.15
+  central_text: null
+  sources: []
+  reasoning: Seasonal labour migration is well attested in form for north China; the share is ours.
+  uncertainty: Seasonal movement was normal in good years too, which an eligibility rule cannot capture.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (P07 (phase 09))
+  range:
+    low: 0.05
+    high: 0.4
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - pop-shaanxi-migration-push
+- id: temporary_term_months
+  name: temporary term months
+  parameter_set: MigrationParameters
+  definition: how long a season away lasts
+  unit: months
+  mechanism: migration
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 6.0
+  central_text: null
+  sources: []
+  reasoning: Seasonal absence maps onto the agricultural calendar; six months is a declared round number
+    that fits the calendar's slack season.
+  uncertainty: Real absences were task-specific and shorter or longer than a fixed term.
+  sensitivity_priority: medium
+  version: migration-parameters-v1 (P07 (phase 09))
+- id: cost_tael_per_household
+  name: cost tael per household
+  parameter_set: MigrationParameters
+  definition: silver a household needs to move
+  unit: tael per household
+  mechanism: migration
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Moving cost money and the poorest could not pay it, which is why the model gates on silver
+    per household; the amount is declared.
+  uncertainty: No source prices a move; the gate's existence is the substantive claim and the level is
+    not.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (P07 (phase 09))
+- id: cost_tael_per_adult
+  name: cost tael per adult
+  parameter_set: MigrationParameters
+  definition: silver an adult needs to travel for a season
+  unit: tael per adult
+  mechanism: migration
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.2
+  central_text: null
+  sources: []
+  reasoning: Declared travel cost.
+  uncertainty: As above.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (P07 (phase 09))
+- id: transit_loss_share
+  name: transit loss share
+  parameter_set: MigrationParameters
+  definition: share of the movement edge's risk realised as lost property in transit
+  unit: multiple of the declared edge risk
+  mechanism: migration
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Turns the graph's risk into a loss; declared.
+  uncertainty: The graph's risk field is a P02 assumption.
+  sensitivity_priority: medium
+  version: migration-parameters-v1 (P07 (phase 09))
+  ledger_entries:
+  - pop-shaanxi-migration-push
+- id: minimum_households_to_move
+  name: minimum households to move
+  parameter_set: MigrationParameters
+  definition: smallest group of households worth moving in one month
+  unit: households
+  mechanism: migration
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 5.0
+  central_text: null
+  sources: []
+  reasoning: Keeps the event log from filling with single-household moves; declared.
+  uncertainty: A numerical guard.
+  sensitivity_priority: low
+  version: migration-parameters-v1 (P07 (phase 09))

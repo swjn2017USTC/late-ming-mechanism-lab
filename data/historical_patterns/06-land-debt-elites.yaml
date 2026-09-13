@@ -1,0 +1,48 @@
+schema_version: historical-patterns-v1
+cluster: land_debt_elites
+patterns:
+  - id: burden-shift-and-evasion
+    cluster: land_debt_elites
+    name: The burden shifts onto those who cannot evade it
+    statement: >-
+      The fiscal sources describe a divergence between registered and actual holdings, with the
+      assessment burden falling on those who could not evade it while exemptions and evasion
+      accumulated for those who could.
+    window: "1522-1644"
+    geography: "Ming China, county-level in principle"
+    evidence_grade: B
+    sources: [mingshi, liang-fangzhong-1980, ray-huang-1974]
+    locators:
+      - "Mingshi, fiscal treatise (食貨志)"
+      - "Liang Fangzhong 1980, statistical tables"
+      - "Ray Huang 1974, chapters on assessment and evasion"
+    calibration_role: constraint
+    signatures:
+      - quantity: "hidden land share, per-household tax burden by cohort class"
+        expected: "the burden per household falling more heavily on smallholders than on elite-held land"
+        scoring: "ordering between classes; no magnitude"
+    falsifiers:
+      - "an equal or regressive-by-class burden distribution"
+
+  - id: debt-transfers-land
+    cluster: land_debt_elites
+    name: Credit relations transfer land in distress
+    statement: >-
+      Loans secured on land, at high monthly rates, are described as the mechanism through which
+      holdings moved to creditors during bad years; land prices in distress fell below normal values.
+    window: "1600-1644"
+    geography: "Ming China"
+    evidence_grade: B
+    sources: [ray-huang-1974, ray-huang-chc8, huang-1985]
+    locators:
+      - "Ray Huang 1974, chapters on credit and land"
+      - "Ray Huang, ch. 8 (fiscal administration)"
+      - "Huang 1985, chapters on land and credit practice"
+    calibration_role: target
+    signatures:
+      - quantity: "elite land share and the cohort land gini"
+        expected: "both rise through the crisis as households sell and default"
+        scoring: "direction and co-movement with distress; no magnitude"
+    falsifiers:
+      - "elite land share flat while distress and land sales rise"
+      - "land gini falling through the crisis"

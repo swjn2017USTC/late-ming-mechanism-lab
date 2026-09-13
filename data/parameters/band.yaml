@@ -1,0 +1,360 @@
+schema_version: parameter-cards-v1
+parameter_set: BandParameters
+cards:
+- id: minimum_formation_troops
+  name: minimum formation troops
+  parameter_set: BandParameters
+  definition: members a group needs before the model calls it a band
+  unit: members
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 40.0
+  central_text: null
+  sources: []
+  reasoning: The record describes bands that formed from small groups and grew; the cut-off size is a
+    declared reading line.
+  uncertainty: There is no threshold in the sources.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+  ledger_entries:
+  - rebel-li-shanhaiguan-size
+  - rebel-multiple-bands
+- id: formation_unmet_ratio
+  name: formation unmet ratio
+  parameter_set: BandParameters
+  definition: distress at which a node's households form a band
+  unit: ratio (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.15
+  central_text: null
+  sources: []
+  reasoning: Hunger driving armed organization is the form the sources describe; the threshold is declared.
+  uncertainty: Band formation also followed official failure, local defence and opportunity.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+  ledger_entries:
+  - rebel-multiple-bands
+- id: formation_recruitment_months
+  name: formation recruitment months
+  parameter_set: BandParameters
+  definition: months of distressed recruitment a forming band concentrates into its seed
+  unit: months
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 6.0
+  central_text: null
+  sources: []
+  reasoning: Makes formation reachable when the monthly recruitment rate alone is too small; declared.
+  uncertainty: A modelling bridge, not an observed horizon.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: recruitment_rate_of_eligible_adults
+  name: recruitment rate of eligible adults
+  parameter_set: BandParameters
+  definition: share of distress-eligible adults a band recruits per month
+  unit: adults
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.01
+  central_text: null
+  sources: []
+  reasoning: Declared rate.
+  uncertainty: No source measures band recruitment rates.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+  ledger_entries:
+  - rebel-army-absorption
+- id: food_shi_per_member_month
+  name: food shi per member month
+  parameter_set: BandParameters
+  definition: grain a band member needs each month
+  unit: shi per member per month
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.3
+  central_text: null
+  sources: []
+  reasoning: An armed man eats at least what a household adult eats; the value is tied to the subsistence
+    assumption.
+  uncertainty: Bands also took livestock and seed grain, which the model's single grain stock ignores.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+  range:
+    low: 0.2
+    high: 0.5
+    basis: above the civilian floor with a declared activity margin
+    conflicts: ''
+- id: raid_extraction_multiple
+  name: raid extraction multiple
+  parameter_set: BandParameters
+  definition: grain a band takes per month as a multiple of its own need
+  unit: multiple of the band's own monthly need
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.5
+  central_text: null
+  sources: []
+  reasoning: Bands lived off the land and took more than they ate; the multiple is declared.
+  uncertainty: The burden a band imposed is one of the quantitative things the sources describe anecdotally
+    and never measure.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: raid_asset_share_per_month
+  name: raid asset share per month
+  parameter_set: BandParameters
+  definition: share of a node's movable property a band seizes each month
+  unit: share of assets per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Declared rate.
+  uncertainty: No source.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: arms_per_asset_valuation
+  name: arms per asset valuation
+  parameter_set: BandParameters
+  definition: arms a band converts from one tael of seized property
+  unit: arms per tael of seized property
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Declared conversion; the only way arms enter the model.
+  uncertainty: Arms came from capture, deserters and local manufacture, not only from loot.
+  sensitivity_priority: low
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: arms_per_member_for_full_capability
+  name: arms per member for full capability
+  parameter_set: BandParameters
+  definition: arms per member at which a band counts as fully equipped
+  unit: arms per member
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Declared normalisation for the capability index.
+  uncertainty: Most band members in the record were probably not fully equipped; the index is a model
+    construct.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: movement_mobility_floor
+  name: movement mobility floor
+  parameter_set: BandParameters
+  definition: mobility below which a band will not move
+  unit: index (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.3
+  central_text: null
+  sources: []
+  reasoning: Declared floor.
+  uncertainty: Mobility is a construct.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: movement_avoidance_ratio
+  name: movement avoidance ratio
+  parameter_set: BandParameters
+  definition: losses, as a share of its own size, at which a band prefers to move
+  unit: share of own size (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Bands moved away from pressure; the ratio is declared.
+  uncertainty: Nothing measures the threshold at which a band dispersed or moved.
+  sensitivity_priority: high
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: mobility_gain_from_move
+  name: mobility gain from move
+  parameter_set: BandParameters
+  definition: mobility a band gains by moving
+  unit: index points per move (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: Model construct.
+  sensitivity_priority: low
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: mobility_decay_per_month
+  name: mobility decay per month
+  parameter_set: BandParameters
+  definition: mobility a stationary band loses per month
+  unit: index points per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: Model construct.
+  sensitivity_priority: low
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: cohesion_gain_per_month
+  name: cohesion gain per month
+  parameter_set: BandParameters
+  definition: cohesion a fed band gains per month
+  unit: index points per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.04
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: Model construct.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+  ledger_entries:
+  - rebel-army-absorption
+- id: cohesion_decay_per_month
+  name: cohesion decay per month
+  parameter_set: BandParameters
+  definition: cohesion a hungry band loses per month
+  unit: index points per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: Model construct.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: network_gain_per_month
+  name: network gain per month
+  parameter_set: BandParameters
+  definition: local support a band that is not raiding gains per month
+  unit: index points per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.03
+  central_text: null
+  sources: []
+  reasoning: Local ties are the plan's 'local support' field; the rate is declared.
+  uncertainty: Support is not observable.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: network_loss_from_raid_per_month
+  name: network loss from raid per month
+  parameter_set: BandParameters
+  definition: local support a band loses by raiding the people around it
+  unit: index points per month (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: The stated trade-off of living off the land; the rate is declared.
+  uncertainty: The trade-off is argued from the record's descriptions, not measured.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: split_troops_threshold
+  name: split troops threshold
+  parameter_set: BandParameters
+  definition: size above which an incoherent band may split
+  unit: members
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 400.0
+  central_text: null
+  sources: []
+  reasoning: Declared threshold.
+  uncertainty: Consolidation and fragmentation in the record were political and personal, which this arithmetic
+    does not model.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: split_cohesion_below
+  name: split cohesion below
+  parameter_set: BandParameters
+  definition: cohesion below which a large band splits
+  unit: index (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.45
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: As above.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+- id: merge_cohesion_above
+  name: merge cohesion above
+  parameter_set: BandParameters
+  definition: cohesion above which two co-located bands merge
+  unit: index (0-1)
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.6
+  central_text: null
+  sources: []
+  reasoning: Declared.
+  uncertainty: Mergers in the record followed leadership and opportunity.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))
+  ledger_entries:
+  - rebel-army-absorption
+- id: dissolve_troops_below
+  name: dissolve troops below
+  parameter_set: BandParameters
+  definition: size below which a band is disbanded
+  unit: members
+  mechanism: band formation, action, consolidation
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 40.0
+  central_text: null
+  sources: []
+  reasoning: Declared threshold.
+  uncertainty: Small bands in the record often persisted as banditry.
+  sensitivity_priority: medium
+  version: band-parameters-v1 (P06 (phase 12-14))

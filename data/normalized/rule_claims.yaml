@@ -1,0 +1,375 @@
+schema_version: rule-claims-v1
+note: Every simulation rule, its support class, and the ledger entries that carry it. A rule declared
+  evidence-backed must cite entries; a rule with no evidence is declared theoretically-assumed or exploratory
+  rather than left unlabelled.
+rules:
+- id: climate-shock
+  name: Climate shock forcing
+  module: systems/climate.py
+  rule_version: climate-shock-v1
+  statement: A monthly environmental shock is drawn for each node from the configured climate model (baseline,
+    synthetic or replayed), and the period classification follows the declared warm-up and shock window.
+  support_class: exploratory
+  parameters: []
+  ledger_entries:
+  - drought-chongzhen-severity
+  - drought-chongzhen-comparison
+  - drought-north-china-pattern
+  notes: The interface is a scaffold for a sourced reconstruction; the synthetic model is not a historical
+    series.
+- id: agricultural-state
+  name: Zone yield factor
+  module: systems/agriculture.py
+  rule_version: null
+  statement: A node's agrarian zone and its accumulated climate impact set the yield factor that modulates
+    production.
+  support_class: exploratory
+  parameters:
+  - CropParameters.yield_loss_scale
+  ledger_entries:
+  - drought-chongzhen-comparison
+  notes: The mapping from an anomaly to a yield fraction is the model's own; no source constrains it.
+- id: harvest
+  name: Harvest production and rent
+  module: systems/agriculture.py
+  rule_version: harvest-v1
+  statement: Grain produced is land times per-mu yield times the zone factor, bounded by the labour the
+    cohort can supply; a tenant cohort pays a share of the harvest as rent to the local elite house.
+  support_class: evidence-backed
+  parameters:
+  - CropParameters.yield_shi_per_mu
+  - CropParameters.land_per_adult_capacity_mu
+  - HouseholdParameters.rent_share_of_harvest
+  ledger_entries:
+  - agri-northern-dryland-yields
+  - agri-national-yield-trend
+  notes: The form follows the farm-economy literature; the levels are the model's.
+- id: coping-ladder
+  name: Household coping ladder
+  module: systems/household_survival.py
+  rule_version: household-survival-v1
+  statement: 'A cohort meets its subsistence floor in a fixed order: stored grain, then consumption reduction,
+    then borrowing, then selling movable property, then land, and only then migration or recruitment eligibility.'
+  support_class: theoretically-assumed
+  parameters:
+  - HouseholdParameters.minimum_consumption_fraction
+  - HouseholdParameters.subsistence_grain_per_adult_month_shi
+  - HouseholdParameters.surplus_keep_ratio_of_annual_need
+  ledger_entries:
+  - famine-drought-famine-sequence
+  - famine-county-scale
+  - famine-grain-price-escalation
+  notes: The ordering is the phase's substantive claim and is argued from the subsistence-crisis literature;
+    each rung's size is declared.
+- id: market-clearing
+  name: Local grain price and clearing
+  module: systems/markets.py
+  rule_version: market-v1
+  statement: 'Each priced node posts one price per month: reference price scaled by the gap between target
+    cover and inventory, clamped between declared bounds; households and institutions trade at that price.'
+  support_class: evidence-backed
+  parameters:
+  - MarketParameters.reference_price_tael_per_shi
+  - MarketParameters.price_elasticity
+  - MarketParameters.target_cover_months
+  ledger_entries:
+  - price-yansui-1631
+  - price-famine-spikes-1639-43
+  - famine-grain-price-escalation
+  - price-long-run-increase
+  notes: No price series is in the registry, so neither the level nor the elasticity is constrained.
+- id: intercounty-trade
+  name: Intercounty grain trade
+  module: systems/markets.py
+  rule_version: market-v1
+  statement: Merchant houses arbitrage along the trade graph while the destination-origin margin exceeds
+    transport cost plus a declared minimum; moving capacity, link risk and the exporter's stock all bind.
+  support_class: evidence-backed
+  parameters:
+  - MarketParameters.transport_cost_tael_per_cost_unit_per_shi
+  - MarketParameters.capacity_unit_shi_per_month
+  - MarketParameters.max_export_share_of_stock
+  ledger_entries:
+  - mil-finance-frontier-grain
+  notes: That grain moved between markets and that transport cost limited it is well attested; the conversion
+    from the graph's units to silver is the model's.
+- id: credit-and-debt
+  name: Interest, repayment and collateral
+  module: systems/household_survival.py
+  rule_version: debt-service-v1
+  statement: Debt accrues monthly interest; a cohort repays from silver and grain subject to declared
+    reserves, and elite lending is bounded by collateral value and the lender's silver.
+  support_class: theoretically-assumed
+  parameters:
+  - EliteParameters.interest_rate_monthly
+  - EliteParameters.loan_to_value
+  ledger_entries:
+  - land-debt-credit-relations
+  - land-debt-dual-register
+  notes: Monthly interest and lending against land at a discount are documented in form; the rates are
+    declared priors.
+- id: land-purchase
+  name: Elite land purchase
+  module: systems/elites.py
+  rule_version: land-market-v1
+  statement: An elite house buys household land at a declared price when it has silver and the household
+    is selling.
+  support_class: theoretically-assumed
+  parameters:
+  - EliteParameters.land_purchase_price_tael_per_mu
+  - HouseholdParameters.land_reference_value_tael_per_mu
+  ledger_entries:
+  - land-debt-credit-relations
+  - land-debt-burden-shift
+  notes: Distress land transfer is central to the literature on the period; the price and the discount
+    are the model's.
+- id: elite-private-relief
+  name: Private relief
+  module: systems/elites.py
+  rule_version: elite-relief-v1
+  statement: An elite house releases a share of its grain to cohorts whose measured unmet ratio exceeds
+    a declared line, keeping a declared carry-over.
+  support_class: theoretically-assumed
+  parameters:
+  - EliteParameters.relief_eligibility_unmet_ratio
+  - EliteParameters.relief_share_of_grain_stock
+  - EliteParameters.relief_carry_over_ratio_of_local_need
+  ledger_entries:
+  - relief-community-funding
+  - relief-distribution-modes
+  notes: Elite relief in famine is attested in form; the thresholds and shares are declared.
+- id: tax-assessment
+  name: Quota and assessment
+  module: systems/fiscal.py
+  rule_version: tax-collection-v1
+  statement: A county assesses a money quota against the land it can see, which is household land plus
+    the elite land that escapes assessment in proportion to weak information capacity.
+  support_class: evidence-backed
+  parameters:
+  - FiscalParameters.assessed_value_tael_per_mu
+  - FiscalParameters.elite_hidden_land_share
+  ledger_entries:
+  - tax-quota-structure
+  - tax-quota-decline
+  - tax-single-whip-reform
+  notes: The decomposition (quota, effort, cost, receipts, arrears) follows the fiscal literature; the
+    assessed value per mu is not from a quota book.
+- id: tax-collection
+  name: Collection effort, liquidation and arrears
+  module: systems/fiscal.py
+  rule_version: tax-collection-v1
+  statement: Collection effort converts the assessed quota into reachable demand at a cost; a household
+    pays from silver, then by selling grain, movable property and land, then through an elite advance,
+    and whatever is not collected becomes arrears.
+  support_class: evidence-backed
+  parameters:
+  - FiscalParameters.collection_cost_per_effort_tael
+  - HouseholdParameters.tax_grain_sale_floor_ratio_of_annual_need
+  - EliteParameters.tax_mediation_advance_share
+  ledger_entries:
+  - land-debt-burden-shift
+  - tax-quota-structure
+  - tax-quota-decline
+  notes: The payment order and the arrears concept follow the literature on Ming taxation; every rate
+    is declared.
+- id: official-relief
+  name: Granary and official relief
+  module: systems/fiscal.py
+  rule_version: relief-v1
+  statement: A county fills its granary toward a declared cover target when it has silver, and releases
+    grain to cohorts whose unmet ratio exceeds a declared line, bounded by the relief capacity and the
+    local need.
+  support_class: evidence-backed
+  parameters:
+  - FiscalParameters.granary_target_cover_months
+  - FiscalParameters.relief_share_of_need
+  - FiscalParameters.relief_logistics_cost_per_shi_tael
+  ledger_entries:
+  - relief-granary-system
+  - relief-distribution-modes
+  - relief-community-funding
+  - famine-relief-failure
+  notes: State famine relief and granary norms are documented institutionally; coverage and cost are declared.
+- id: migration-permanent
+  name: Permanent household migration
+  module: systems/migration.py
+  rule_version: migration-v1
+  statement: 'A cohort whose 12-month unmet ratio exceeds the declared line may send households away for
+    good: they carry people, grain, silver and movable property to the cheapest reachable county (or leave
+    the region), and abandon the fields they were working.'
+  support_class: evidence-backed
+  parameters:
+  - MigrationParameters.permanent_share_of_households_per_month
+  - MigrationParameters.cost_tael_per_household
+  - HouseholdParameters.permanent_migration_unmet_ratio
+  ledger_entries:
+  - pop-shaanxi-migration-push
+  - pop-ming-qing-decline
+  notes: Famine migration and the abandonment of fields are attested in form; the rates, the cost and
+    the destination rule are the model's.
+- id: migration-temporary
+  name: Seasonal absence
+  module: systems/migration.py
+  rule_version: temporary-migration-v1
+  statement: A cohort above the temporary-migration distress line sends a share of its adults to a neighbouring
+    node for a declared term; they eat there at the local price from the cohort's silver and return when
+    the term ends or the money runs out.
+  support_class: evidence-backed
+  parameters:
+  - MigrationParameters.temporary_share_of_adults_per_month
+  - MigrationParameters.temporary_term_months
+  - HouseholdParameters.temporary_migration_unmet_ratio
+  ledger_entries:
+  - pop-shaanxi-migration-push
+  notes: Seasonal labour migration is well attested for north China in form; the share and term are declared.
+- id: military-finance
+  name: Garrison pay and rations
+  module: systems/military.py
+  rule_version: military-finance-v1
+  statement: A garrison is owed pay each month at a declared rate; the county pays from a declared share
+    of its treasury and its unpaid obligation becomes visible arrears. Rations come from the unit's own
+    store, then the county granary, then the market, and shortfalls move morale and cohesion.
+  support_class: evidence-backed
+  parameters:
+  - MilitaryParameters.pay_tael_per_soldier_month
+  - MilitaryParameters.pay_share_of_treasury
+  - MilitaryParameters.food_shi_per_soldier_month
+  ledger_entries:
+  - mil-finance-treasury-share
+  - mil-finance-frontier-grain
+  - mil-finance-grain-to-silver
+  notes: Pay, arrears and the treasury's inability to cover them are the period's documented fiscal-military
+    problem in form; the rates are declared.
+- id: desertion
+  name: Desertion and its destinations
+  module: systems/military.py
+  rule_version: desertion-v1
+  statement: A garrison loses a monthly share of its soldiers given this month's unpaid share, this month's
+    ration shortfall and fallen morale; leavers go home, into the unorganized pool, or out of the modelled
+    population.
+  support_class: theoretically-assumed
+  parameters:
+  - MilitaryParameters.desertion_base_rate
+  - MilitaryParameters.desertion_pay_weight
+  - MilitaryParameters.desertion_food_weight
+  - MilitaryParameters.deserter_band_share
+  ledger_entries:
+  - mil-finance-grain-to-silver
+  - mil-finance-treasury-share
+  notes: Arrears driving soldiers away, and deserters joining armed groups, are the phase's central historical
+    argument in form; every coefficient is declared.
+- id: garrison-levy
+  name: Conscription levy
+  module: systems/military.py
+  rule_version: null
+  statement: A garrison below its declared target strength levies adults from every cohort at its node,
+    taking the hungriest households first.
+  support_class: theoretically-assumed
+  parameters:
+  - MilitaryParameters.levy_rate_of_eligible_adults
+  - MilitaryParameters.garrison_target_troops
+  ledger_entries:
+  - rebel-army-absorption
+  notes: Conscription as a household obligation is attested in form; the rate and the target are declared.
+- id: band-formation
+  name: Band formation
+  module: systems/military.py
+  rule_version: null
+  statement: Where unorganized deserters accumulate past a declared minimum, or where distress is high
+    enough and the distress-eligible pool can staff a band over a declared horizon, a band forms.
+  support_class: evidence-backed
+  parameters:
+  - BandParameters.minimum_formation_troops
+  - BandParameters.formation_unmet_ratio
+  - BandParameters.formation_recruitment_months
+  ledger_entries:
+  - rebel-multiple-bands
+  - rebel-li-shanhaiguan-size
+  - rebel-army-absorption
+  notes: Armed groups forming from soldiers and hungry households is attested in form; the thresholds
+    are reading lines.
+- id: band-raid
+  name: Living off the land
+  module: systems/military.py
+  rule_version: band-action-v1
+  statement: A band takes grain each month up to a declared multiple of its own need, drawn in proportion
+    to the stores of the cohorts, the elite house and the county granary at its node, and converts seized
+    movable property into arms at a declared rate.
+  support_class: theoretically-assumed
+  parameters:
+  - BandParameters.raid_extraction_multiple
+  - BandParameters.raid_asset_share_per_month
+  - BandParameters.arms_per_asset_valuation
+  ledger_entries:
+  - rebel-multiple-bands
+  notes: Bands living off the countryside is attested in form and the burden it imposed is described anecdotally;
+    the multiple and the shares are declared.
+- id: band-movement
+  name: Band movement
+  module: systems/military.py
+  rule_version: band-action-v1
+  statement: A band that is hungry, or that the local garrison could wear down past a declared share of
+    its size, moves to the reachable node holding the most household grain.
+  support_class: exploratory
+  parameters:
+  - BandParameters.movement_avoidance_ratio
+  - BandParameters.movement_mobility_floor
+  ledger_entries: []
+  notes: That bands moved is attested; this decision rule is the model's own and is deliberately simple.
+- id: band-consolidation
+  name: Cohesion, split and merge
+  module: systems/military.py
+  rule_version: band-action-v1
+  statement: A fed band gains cohesion and a hungry one loses it; absorbing a large intake caps cohesion;
+    a band above a size threshold with low cohesion splits, and two sufficiently cohesive bands in one
+    node merge.
+  support_class: evidence-backed
+  parameters:
+  - BandParameters.split_troops_threshold
+  - BandParameters.split_cohesion_below
+  - BandParameters.merge_cohesion_above
+  - BandParameters.cohesion_gain_per_month
+  ledger_entries:
+  - rebel-army-absorption
+  notes: Consolidation and fragmentation are the plan's central observable; the arithmetic is the model's.
+- id: suppression
+  name: Suppression
+  module: systems/military.py
+  rule_version: suppression-v1
+  statement: A garrison removes members from bands at its node in proportion to its strength, discounted
+    by the band's local support and by how well it is armed, at a cost in food and cohesion; bands reduced
+    below a declared size are disbanded and their members go home.
+  support_class: exploratory
+  parameters:
+  - MilitaryParameters.suppression_effectiveness
+  - MilitaryParameters.suppression_arms_mitigation
+  - BandParameters.dissolve_troops_below
+  ledger_entries: []
+  notes: Suppression is described in the record as partial and often ineffective; the rate here is declared
+    rather than derived from it.
+- id: governance-indicators
+  name: Governance warning indicators
+  module: analysis/governance.py
+  rule_version: governance-indicators-v1
+  statement: Eight measured quantities are each compared with a declared reading line and reported with
+    the count of crossed lines; no aggregate index is computed.
+  support_class: exploratory
+  parameters:
+  - GovernanceIndicatorParameters.receipts_below_quota_share
+  - GovernanceIndicatorParameters.largest_band_share
+  ledger_entries: []
+  notes: 'Reading rules, not evidence: they exist so a reader can move a line without touching the model.'
+- id: population-accounting
+  name: Balance and conservation accounting
+  module: actors/ledger.py
+  rule_version: ledger-v1
+  statement: Every actor's balances move only through recorded transitions; grain cannot go negative,
+    silver enters only from named sources, and people, food and war material are conserved or leave through
+    a named outflow.
+  support_class: exploratory
+  parameters: []
+  ledger_entries: []
+  notes: 'An accounting discipline, not a historical claim: it is what makes the other rules checkable.
+    Declared exploratory because it makes no historical claim: it is the accounting discipline that makes
+    every other rule checkable, and it is listed under the exploratory class rather than left looking
+    like a rule awaiting evidence.'

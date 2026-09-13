@@ -1,0 +1,51 @@
+schema_version: historical-patterns-v1
+cluster: taxation_levies
+patterns:
+  - id: quota-erosion-and-surcharge
+    cluster: taxation_levies
+    name: Formal quotas erode while surcharges accumulate
+    statement: >-
+      The compilations record formal summer and autumn quotas that declined from their early-Ming
+      baseline (by roughly 0.9 million shi of wheat and more than 2.5 million shi of autumn grain by
+      the Jiajing period), while the single-whip reform consolidated obligations onto land and adult
+      males; the record also describes surcharges added on top of the regular quota.
+    window: "1522-1644"
+    geography: "Ming China"
+    evidence_grade: B
+    sources: [mingshi, liang-fangzhong-1980, ray-huang-1974]
+    locators:
+      - "Mingshi, fiscal treatise (食貨志), quota figures"
+      - "Liang Fangzhong 1980, tables of quota and registered land"
+      - "Ray Huang 1974, chapters on assessment and collection"
+    calibration_role: hold-out
+    signatures:
+      - quantity: "nominal quota against the visible tax base over the run"
+        expected: "the assessed quota does not rise in step with the base, and receipts fall short of the quota"
+        scoring: "compare the direction of the two series and the receipts-to-quota ratio; no fitting"
+    falsifiers:
+      - "receipts tracking the quota closely through the crisis"
+      - "a visible base that grows while registered land is recorded as eroding"
+
+  - id: receipts-shortfall-chronic
+    cluster: taxation_levies
+    name: Receipts fall short of assessment
+    statement: >-
+      Assessment and receipt were not the same thing: collection was incomplete, arrears accumulated,
+      and the burden shifted as the registering system decayed; the state's fiscal problem in the
+      period is described as a shortfall between what was assessed and what arrived.
+    window: "1600-1644"
+    geography: "Ming China"
+    evidence_grade: B
+    sources: [ray-huang-1974, ray-huang-chc8, mingshi]
+    locators:
+      - "Ray Huang 1974, chapters on collection and arrears"
+      - "Ray Huang, ch. 8 (fiscal administration)"
+      - "Mingshi, fiscal treatise"
+    calibration_role: target
+    signatures:
+      - quantity: "actual receipts against nominal quota, and the tax arrears stock"
+        expected: "receipts persistently below the assessed quota, with arrears accumulating"
+        scoring: "direction and persistence: the shortfall should be structural, not episodic"
+    falsifiers:
+      - "receipts meeting the quota in most years"
+      - "arrears falling to zero and staying there"

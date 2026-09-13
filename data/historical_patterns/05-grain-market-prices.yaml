@@ -1,0 +1,50 @@
+schema_version: historical-patterns-v1
+cluster: grain_market_prices
+patterns:
+- id: price-spike-concentration
+  cluster: grain_market_prices
+  name: The worst price years are the last five
+  statement: Famine-price observations concentrate extraordinarily in 1639-1643; one gazetteer corpus
+    places a large share of all its famine-price reports inside that five-year window, while a border
+    series shows a twentyfold rise from a normal mid-fifteenth-century price to the 1631 peak.
+  window: 1631-1643
+  geography: North China, with border-market series at Yansui
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, temporal distribution of famine records
+  calibration_role: hold-out
+  signatures:
+  - quantity: cross-node price dispersion and the worst max/min price ratio
+    expected: concentrated peaks in the late 1630s and early 1640s
+    scoring: rank years by dispersion and compare the peak cluster; the model's price ceiling means magnitudes
+      will fall short
+  falsifiers:
+  - price dispersion flat across the run
+  - the worst dispersion before the first severe shock
+- id: price-famine-vs-normal-level
+  cluster: grain_market_prices
+  name: A normal price and a famine peak are an order of magnitude apart
+  statement: Border and gazetteer series put normal prices near 0.2 tael per shi and the famine peak at
+    4 taels per shi or more, i.e. the crisis is a multiple of the normal level rather than a proportional
+    rise; long-run increases across the dynasty are also documented.
+  window: 1450-1644 (long-run series), 1631 (peak)
+  geography: Northern Shaanxi (Yansui), Shangzhou
+  evidence_grade: C
+  sources:
+  - quan-1991-northern-prices
+  - shaanxi-famine-gazetteers
+  - brook-2023-price-collapse
+  locators:
+  - Quan 1991, pp. 653-700
+  - dfz.shaanxi.gov.cn, Shangzhou fu zhi 1631 entry
+  - DOI 10.1515/9780691253701 (argument on trend and prices)
+  calibration_role: constraint
+  signatures:
+  - quantity: the reference price and the ceiling the market layer will post
+    expected: the ratio between a simulated famine-year peak and a normal year is a large multiple
+    scoring: compare the ratio's order of magnitude; the model's declared ceiling bounds it below the
+      record, and the report says so
+  falsifiers:
+  - a simulated famine price within a few per cent of a normal year

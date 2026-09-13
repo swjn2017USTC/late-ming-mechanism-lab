@@ -1,0 +1,269 @@
+schema_version: parameter-cards-v1
+parameter_set: HouseholdParameters
+cards:
+- id: subsistence_grain_per_adult_month_shi
+  name: subsistence grain per adult month shi
+  parameter_set: HouseholdParameters
+  definition: grain an adult needs each month to stay at the subsistence floor
+  unit: shi per adult per month
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.25
+  central_text: null
+  sources: []
+  reasoning: The floor has a defensible derivation from caloric requirements and a grain-equivalent conversion,
+    but neither the requirement series nor the conversion is in the registry, so the number is ours.
+  uncertainty: Any value in roughly a factor-of-two band is defensible from the caloric literature; the
+    conversion from calories to shi is itself assumption-laden.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  range:
+    low: 0.2
+    high: 0.6
+    basis: caloric requirement per adult converted to grain at declared values
+    conflicts: ''
+  ledger_entries:
+  - famine-county-scale
+- id: minimum_consumption_fraction
+  name: minimum consumption fraction
+  parameter_set: HouseholdParameters
+  definition: the smallest share of the floor a household will still eat before cutting elsewhere
+  unit: share of the floor (0-1)
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.75
+  central_text: null
+  sources: []
+  reasoning: The coping ladder needs a lower bound on consumption reduction; no source measures how far
+    households cut before borrowing or selling.
+  uncertainty: The ladder's ordering is the substantive claim; this parameter only sets how much room
+    the first rung has.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: wage_grain_shi_per_adult_month
+  name: wage grain shi per adult month
+  parameter_set: HouseholdParameters
+  definition: in-kind wage an adult earns from labouring for others
+  unit: shi per adult per month
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.3
+  central_text: null
+  sources: []
+  reasoning: Wage labour existed and was paid partly in grain; no wage series for the region and period
+    is in the registry.
+  uncertainty: Wages moved with the harvest and the season; a single monthly rate cannot represent that.
+  sensitivity_priority: medium
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  range:
+    low: 0.3
+    high: 1.0
+    basis: declared prior around the subsistence floor
+    conflicts: ''
+- id: land_reference_value_tael_per_mu
+  name: land reference value tael per mu
+  parameter_set: HouseholdParameters
+  definition: reference value of a mu used to price collateral and land sales
+  unit: tael per mu
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 5.0
+  central_text: null
+  sources: []
+  reasoning: Land was pledged and sold for silver; the value is set to be consistent with the model's
+    reference grain price rather than taken from a price series.
+  uncertainty: Land prices in a famine collapse relative to normal years, and the model applies one value.
+  sensitivity_priority: medium
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: tax_grain_sale_floor_ratio_of_annual_need
+  name: tax grain sale floor ratio of annual need
+  parameter_set: HouseholdParameters
+  definition: share of annual need a household will keep in grain before selling to pay tax
+  unit: multiple of annual need
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Sets how much grain the tax collector's liquidation path can reach; no source measures the
+    reserve a household held back.
+  uncertainty: A household's reserve is a strategic response, not a constant.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: surplus_keep_ratio_of_annual_need
+  name: surplus keep ratio of annual need
+  parameter_set: HouseholdParameters
+  definition: share of annual need a household keeps before selling surplus on the market
+  unit: multiple of annual need
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: The market needs a seller-side threshold; the value is a declared prior.
+  uncertainty: Sale timing in the record follows prices and debt, which the model does not represent here.
+  sensitivity_priority: medium
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: debt_repayment_silver_reserve_tael_per_household
+  name: debt repayment silver reserve tael per household
+  parameter_set: HouseholdParameters
+  definition: silver a household keeps before repaying debt
+  unit: tael per household
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: One of the two reserves in the repayment rule; declared rather than sourced.
+  uncertainty: Reserve behaviour is not observable in the sources this phase registers.
+  sensitivity_priority: low
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: debt_repayment_grain_ratio_of_annual_need
+  name: debt repayment grain ratio of annual need
+  parameter_set: HouseholdParameters
+  definition: share of annual need a household keeps in grain before repaying debt in grain
+  unit: multiple of annual need
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: The grain-side twin of the silver reserve above; declared.
+  uncertainty: 'As above: a strategic reserve treated as a constant.'
+  sensitivity_priority: low
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: harvest_recovery_grain_ratio
+  name: harvest recovery grain ratio
+  parameter_set: HouseholdParameters
+  definition: grain a household retains after a harvest before other claims
+  unit: share of the harvest (0-1)
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Sets the split between what is kept and what is sold or owed at harvest; declared.
+  uncertainty: Real splits depend on tenancy, debt and tax, which are separate mechanisms here.
+  sensitivity_priority: low
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  ledger_entries:
+  - famine-drought-famine-sequence
+- id: temporary_migration_unmet_ratio
+  name: temporary migration unmet ratio
+  parameter_set: HouseholdParameters
+  definition: unmet share of the floor at which a cohort may send adults away for a season
+  unit: ratio (0-1)
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: 'The ladder''s eligibility rule: the *form* (distress gates migration) follows the subsistence-crisis
+    literature, the threshold is a declared reading line.'
+  uncertainty: A threshold on a 12-month window is a modelling convenience; the record shows migration
+    also following opportunity, not only distress.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  range:
+    low: 0.05
+    high: 0.4
+    basis: declared band around the current line
+    conflicts: ''
+- id: permanent_migration_unmet_ratio
+  name: permanent migration unmet ratio
+  parameter_set: HouseholdParameters
+  definition: unmet share of the floor at which a cohort may leave for good
+  unit: ratio (0-1)
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.2
+  central_text: null
+  sources: []
+  reasoning: As above, set higher than the seasonal line on the argument that leaving for good costs more
+    than a season away.
+  uncertainty: The relative height of the two thresholds is an assumption, not a finding.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  range:
+    low: 0.1
+    high: 0.5
+    basis: declared band around the current line
+    conflicts: ''
+- id: recruitment_unmet_ratio
+  name: recruitment unmet ratio
+  parameter_set: HouseholdParameters
+  definition: unmet share of the floor at which a cohort's adults become recruitable
+  unit: ratio (0-1)
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.2
+  central_text: null
+  sources: []
+  reasoning: The pool the army and the bands draw on is defined by measured distress; the form is declared,
+    the line is ours.
+  uncertainty: Recruitment also ran through registration and coercion that this rule does not represent.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: recruitment_max_land_per_household_mu
+  name: recruitment max land per household mu
+  parameter_set: HouseholdParameters
+  definition: land above which a household is not recruitable
+  unit: mu per household
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 2.0
+  central_text: null
+  sources: []
+  reasoning: Keeps the solvent out of the recruit pool; the cut-off is a declared prior.
+  uncertainty: The record shows both the poor and the registered being taken.
+  sensitivity_priority: medium
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+- id: rent_share_of_harvest
+  name: rent share of harvest
+  parameter_set: HouseholdParameters
+  definition: share of the harvest a tenant pays as rent
+  unit: share of harvest (0-1), per cohort class
+  mechanism: household survival and the coping ladder
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: null
+  central_text: tenant-household=0.4
+  sources: []
+  reasoning: Share tenancy at a fixed fraction of the crop is well attested in form; the fraction varies
+    by region and contract and no source in the registry fixes it here.
+  uncertainty: Rents in the record were often fixed in grain rather than as a share, which the model does
+    not distinguish.
+  sensitivity_priority: high
+  version: household-parameters-v1 (P03 (phase 04, 06, 09))
+  range:
+    low: 0.3
+    high: 0.6
+    basis: customary share-rent fractions reported for north China
+    conflicts: ''

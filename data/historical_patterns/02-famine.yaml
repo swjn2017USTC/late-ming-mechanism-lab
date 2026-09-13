@@ -1,0 +1,74 @@
+schema_version: historical-patterns-v1
+cluster: famine
+note: 'The famine cluster''s patterns are about sequence and concentration, because that is what the record
+  supports: the sources describe the order of events and the timing of the worst years, and no source
+  in this registry measures a mortality or an unmet-need series at county resolution.'
+patterns:
+- id: famine-lags-harvest-failure
+  cluster: famine
+  name: Famine follows harvest failure with a lag
+  statement: 'The record describes a sequence rather than a single event: precipitation deficit, then
+    harvest failure, then famine, with the crisis deepening as the deficit persists across years; famine
+    records become widespread in the early 1630s after onset in the late 1620s.'
+  window: 1628-1635
+  geography: North China
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, figs. 6-8
+  calibration_role: constraint
+  signatures:
+  - quantity: mean unmet ratio of the subsistence floor (COHORT_STATE and CONSUMPTION series)
+    expected: the rise in unmet need follows the rise in shock severity, by at least one harvest cycle
+    scoring: compare the sign of the lag between the two series; a coincident or preceding response would
+      contradict the record
+  - quantity: share of cohorts in the destitute coping stage
+    expected: rising after, not with, the first severe shock year
+    scoring: ordering test only
+  falsifiers:
+  - distress falling while shocks worsen, or rising before any shock
+  - no lag at all between the climate series and the distress series
+- id: famine-worst-years-1639-43
+  cluster: famine
+  name: The worst famine years are at the end of the window
+  statement: Famine-price observations and famine records concentrate extraordinarily in the last five
+    years of the period, when deficit, harvest failure and famine converged; one corpus places a large
+    share of all its famine-price reports inside that window.
+  window: 1639-1643
+  geography: North China
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, temporal distribution of famine records
+  calibration_role: hold-out
+  signatures:
+  - quantity: annual count of famine-class distress events (destitute cohorts, grain seizures)
+    expected: concentrated in the final five years of the run rather than spread through it
+    scoring: compare the share of events in the last five years against the record's concentration
+  falsifiers:
+  - famine events spread evenly across the two decades
+  - the model's worst distress in the first half of the window
+- id: famine-local-price-extremes
+  cluster: famine
+  name: Local famine prices reach extreme levels
+  statement: 'Gazetteers record extreme local prices in the famine years: 4 taels of silver per dou of
+    rice at Shangzhou in 1631, with escalating prices at Shenmu in 1640-41 — an acute local peak, not
+    a provincial average.'
+  window: 1631-1641
+  geography: Shangzhou and Shenmu, Shaanxi
+  evidence_grade: B
+  sources:
+  - shaanxi-famine-gazetteers
+  locators:
+  - dfz.shaanxi.gov.cn, Shangzhou fu zhi and Shenmu xian zhi entries
+  calibration_role: target
+  signatures:
+  - quantity: cross-node price dispersion (coefficient of variation, max/min ratio)
+    expected: dispersion rising sharply in famine years, with the worst local ratio far above normal
+    scoring: compare the ordering of years by dispersion; the model's ceiling means the magnitude is expected
+      to fall short, and that shortfall is reported
+  falsifiers:
+  - uniform prices across nodes in famine years
+  - dispersion falling as the crisis deepens

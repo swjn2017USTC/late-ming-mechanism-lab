@@ -1,0 +1,192 @@
+schema_version: parameter-cards-v1
+parameter_set: MarketParameters
+cards:
+- id: reference_price_tael_per_shi
+  name: reference price tael per shi
+  parameter_set: MarketParameters
+  definition: the grain price the market layer treats as normal
+  unit: tael per shi
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: 0.6
+  central_text: null
+  sources:
+  - quan-1991-northern-prices
+  - shaanxi-famine-gazetteers
+  reasoning: The Yansui series puts a normal border price near 0.2 tael per shi and the 1631 famine peak
+    at 4, a twentyfold range; the model's reference price sits at the low end of that range, which is
+    the honest place for a normal-year constant.
+  uncertainty: The level sets the scale of every silver quantity in the model. A sourced series would
+    move it, and the report records that nothing here constrains it.
+  sensitivity_priority: high
+  version: market-parameters-v1 (P04 (phase 05))
+  range:
+    low: 0.2
+    high: 2.0
+    basis: Yansui series and gazetteer famine prices; the famine peak is a spike, not a reference
+    conflicts: ''
+  ledger_entries:
+  - price-yansui-1631
+  - price-famine-spikes-1639-43
+  - famine-grain-price-escalation
+- id: price_elasticity
+  name: price elasticity
+  parameter_set: MarketParameters
+  definition: how sharply price responds to the gap between target cover and inventory
+  unit: elasticity exponent
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.8
+  central_text: null
+  sources: []
+  reasoning: The rule's form (price rising as cover falls) is argued from market behaviour; the elasticity
+    is a placeholder that makes the response monotone and bounded.
+  uncertainty: Nothing in the registry estimates an elasticity for a pre-modern grain market.
+  sensitivity_priority: high
+  version: market-parameters-v1 (P04 (phase 05))
+  ledger_entries:
+  - price-long-run-increase
+- id: target_cover_months
+  name: target cover months
+  parameter_set: MarketParameters
+  definition: months of local need the market treats as normal cover
+  unit: months
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 6.0
+  central_text: null
+  sources: []
+  reasoning: Granary norms and market convention both used cover targets; the number of months here is
+    a declared prior.
+  uncertainty: Cover norms in the record are administrative (granary quotas), not market behaviour.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (P04 (phase 05))
+- id: price_floor_ratio
+  name: price floor ratio
+  parameter_set: MarketParameters
+  definition: lowest price the clearing rule will post, as a fraction of the reference
+  unit: share of the reference price (0-1)
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: A numerical floor prevents a negative or zero price when inventory is abundant; declared.
+  uncertainty: Real markets posted very low prices in good years without a floor.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (P04 (phase 05))
+- id: price_ceiling_ratio
+  name: price ceiling ratio
+  parameter_set: MarketParameters
+  definition: highest price the clearing rule will post, as a fraction of the reference
+  unit: multiple of the reference price
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: C
+  central: 6.0
+  central_text: null
+  sources:
+  - shaanxi-famine-gazetteers
+  - quan-1991-northern-prices
+  reasoning: Recorded famine prices reach twenty to fifty times a normal price, so the model's ceiling
+    deliberately excludes the historical extreme; that is a known and recorded understatement of the worst
+    years, not a calibration to them.
+  uncertainty: The ceiling bounds the worst years below what the sources record, so the model cannot reproduce
+    the magnitude of a famine spike; it can still reproduce its direction and its timing.
+  sensitivity_priority: high
+  version: market-parameters-v1 (P04 (phase 05))
+  ledger_entries:
+  - famine-grain-price-escalation
+  - price-yansui-1631
+- id: transport_cost_tael_per_cost_unit_per_shi
+  name: transport cost tael per cost unit per shi
+  parameter_set: MarketParameters
+  definition: silver it costs to move one shi one unit of the trade graph's cost
+  unit: tael per cost unit per shi
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.35
+  central_text: null
+  sources: []
+  reasoning: Transport was costly relative to grain value and that is why markets stayed local; the conversion
+    from the graph's dimensionless cost to silver is ours.
+  uncertainty: The graph's cost unit was declared in P02 without a physical anchor, so this parameter
+    inherits that looseness.
+  sensitivity_priority: high
+  version: market-parameters-v1 (P04 (phase 05))
+- id: capacity_unit_shi_per_month
+  name: capacity unit shi per month
+  parameter_set: MarketParameters
+  definition: shi a link can carry per month per unit of declared edge capacity
+  unit: shi per month per capacity unit
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: Converts the graph's capacity unit into physical volume; declared.
+  uncertainty: No source describes monthly carrying capacity on these links.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (P04 (phase 05))
+- id: risk_loss_fraction_scale
+  name: risk loss fraction scale
+  parameter_set: MarketParameters
+  definition: how much of a link's declared risk becomes lost cargo
+  unit: multiple of the declared edge risk
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: Turns the graph's risk into a loss fraction; declared.
+  uncertainty: Banditry and official exactions were the real risks and are not what the graph's risk field
+    was built from.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (P04 (phase 05))
+- id: minimum_trade_margin_tael_per_shi
+  name: minimum trade margin tael per shi
+  parameter_set: MarketParameters
+  definition: margin below which a merchant will not move grain
+  unit: tael per shi
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: Prevents unprofitable shipments; declared.
+  uncertainty: Merchants also moved grain for obligation and for relationship, which this rule omits.
+  sensitivity_priority: low
+  version: market-parameters-v1 (P04 (phase 05))
+- id: max_export_share_of_stock
+  name: max export share of stock
+  parameter_set: MarketParameters
+  definition: share of its stock a node will ship out
+  unit: share of stock (0-1)
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Keeps a node from exporting everything it holds; declared.
+  uncertainty: A precautionary stock rule of this shape is plausible but unsourced.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (P04 (phase 05))

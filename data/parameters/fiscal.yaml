@@ -1,0 +1,179 @@
+schema_version: parameter-cards-v1
+parameter_set: FiscalParameters
+cards:
+- id: assessed_value_tael_per_mu
+  name: assessed value tael per mu
+  parameter_set: FiscalParameters
+  definition: assessed value of a mu for tax purposes
+  unit: tael per mu
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: 0.35
+  central_text: null
+  sources:
+  - mingshi
+  - liang-fangzhong-1980
+  - ray-huang-1974
+  reasoning: The Ming land levy is documented as a summer and autumn quota assessed on registered land,
+    and the compilations give national quota magnitudes; a per-mu silver value for one Shaanxi county
+    is an inference from those totals and is not fixed by them.
+  uncertainty: County quota books are the source that would fix this, and the registry names them as an
+    archival gap rather than approximating them.
+  sensitivity_priority: high
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+  range:
+    low: 0.05
+    high: 0.4
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - tax-quota-structure
+  - tax-quota-decline
+- id: collection_cost_per_effort_tael
+  name: collection cost per effort tael
+  parameter_set: FiscalParameters
+  definition: silver the county spends per unit of collection effort
+  unit: tael per unit of collection effort
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Collection cost is real and the model charges it; the rate is declared.
+  uncertainty: No source quantifies collection cost per unit of effort.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+- id: collection_cost_logistics_floor
+  name: collection cost logistics floor
+  parameter_set: FiscalParameters
+  definition: minimum collection cost the county bears whatever the effort
+  unit: tael per month
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: Prevents a free collection; declared.
+  uncertainty: As above.
+  sensitivity_priority: low
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+- id: elite_hidden_land_share
+  name: elite hidden land share
+  parameter_set: FiscalParameters
+  definition: share of elite land that escapes assessment at full information capacity
+  unit: share of land (0-1)
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.6
+  central_text: null
+  sources: []
+  reasoning: Tax avoidance through influence and registration is one of the best-attested features of
+    the period in form; the share that escapes is ours.
+  uncertainty: The sources establish that the burden shifted onto those who could not evade it and that
+    quotas eroded; they do not give a share that escapes in a county.
+  sensitivity_priority: high
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+  range:
+    low: 0.0
+    high: 0.6
+    basis: declared band; the sources describe the mechanism, not its size
+    conflicts: ''
+  ledger_entries:
+  - land-debt-burden-shift
+  - tax-quota-decline
+- id: relief_eligibility_unmet_ratio
+  name: relief eligibility unmet ratio
+  parameter_set: FiscalParameters
+  definition: unmet share at which a county releases official relief
+  unit: ratio (0-1)
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Official famine relief is attested in form; the threshold is a declared reading line.
+  uncertainty: Relief in the record was also political and discretionary.
+  sensitivity_priority: low
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+  ledger_entries:
+  - famine-relief-failure
+  - relief-distribution-modes
+- id: relief_share_of_need
+  name: relief share of need
+  parameter_set: FiscalParameters
+  definition: share of the local relief need the county will try to cover in a month
+  unit: share of need (0-1)
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Sets the scale of relief; declared.
+  uncertainty: No source quantifies coverage.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+  ledger_entries:
+  - relief-distribution-modes
+- id: relief_logistics_cost_per_shi_tael
+  name: relief logistics cost per shi tael
+  parameter_set: FiscalParameters
+  definition: silver the county spends to move and issue one shi of relief
+  unit: tael per shi relieved
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Relief logistics cost money; the rate is declared.
+  uncertainty: Famine-relief logistics in the record were expensive and irregular.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+- id: granary_target_cover_months
+  name: granary target cover months
+  parameter_set: FiscalParameters
+  definition: months of local need the county tries to keep in the granary
+  unit: months
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: Ever-normal granary norms of cover are documented administratively; the number here is a
+    declared prior informed by that form.
+  uncertainty: Norms were rarely met; whether the model should target the norm or the shortfall is open.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))
+  ledger_entries:
+  - relief-granary-system
+- id: granary_purchase_share_of_silver
+  name: granary purchase share of silver
+  parameter_set: FiscalParameters
+  definition: share of its silver the county will spend filling the granary
+  unit: share of silver (0-1)
+  mechanism: tax assessment, collection, official relief
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Sets the competition between grain purchase and other spending; declared.
+  uncertainty: No source fixes the share.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (P05 (phase 07, 08))

@@ -1,0 +1,74 @@
+schema_version: historical-patterns-v1
+cluster: drought_climate
+note: 'Patterns for pattern-oriented comparison later. None of this is a calibration target yet: the calibration
+  role says what a later phase may do with it, and the signatures name quantities the model already reports
+  so that a comparison is possible without changing the model to fit.'
+patterns:
+- id: chongzhen-drought-sequence
+  cluster: drought_climate
+  name: The Chongzhen drought sequence
+  statement: Documentary reconstructions place a multi-year drought across North China from the late 1620s
+    into the early 1640s, with the greatest severity in the late 1630s and early 1640s; different reconstructions
+    date the onset to 1627 or 1628, and the dry-wet index identifies the episode as the most severe in
+    eastern China of the past 1,500 years.
+  window: 1627-1644
+  geography: North China, with the northern interior (Shaanxi, Shanxi, Henan) most affected
+  evidence_grade: B
+  sources:
+  - zheng-2006-precip
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.3319/TAO.2006.17.3.579(A), sec. 3-4
+  - DOI 10.5194/cp-20-2287-2024, figs. 3-5 and figs. 6-8
+  calibration_role: hold-out
+  signatures:
+  - quantity: monthly climate shock severity by node (CLIMATE_SHOCK events)
+    expected: severe shocks concentrated in the late 1630s and early 1640s rather than evenly spread
+    scoring: rank the years of the run by shock severity and compare the peak window, not the magnitudes
+  - quantity: share of nodes in the shock class by year
+    expected: a rising share through the 1630s, with the worst years near the end of the window
+    scoring: compare the ordering of years; no absolute calibration
+  falsifiers:
+  - severe shocks distributed evenly across the window, with no late concentration
+  - the model's worst simulated years falling in the warm-up period rather than the 1630s-40s
+- id: drought-northern-concentration
+  cluster: drought_climate
+  name: Drought concentrated in the northern interior
+  statement: The episode's severity was greatest in the northern interior; the county-level reconstruction
+    shows drought records concentrated in Shaanxi, Shanxi and Henan rather than spread across the empire.
+  window: 1627-1644
+  geography: Shaanxi, Shanxi, Henan
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  - zheng-2006-precip
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, figs. 3-5
+  - DOI 10.3319/TAO.2006.17.3.579(A), sec. 3 (North China sub-series)
+  calibration_role: constraint
+  signatures:
+  - quantity: node-level distribution of accumulated climate impact
+    expected: the loess-dryland nodes carry at least as much accumulated deficit as the plain nodes
+    scoring: compare the ordering of zones; a plain-zone maximum would contradict the record
+  falsifiers:
+  - the model's most affected nodes lying outside the northern interior by construction
+- id: drought-onset-ambiguity
+  cluster: drought_climate
+  name: Onset date is not agreed in the sources
+  statement: Reconstructions disagree on the onset year (1627 in one county-level compilation, 1628 in
+    a climate-history synthesis), so any model comparison must tolerate a one-to-two-year offset in the
+    start of the sequence.
+  window: 1627-1628
+  geography: North China
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, sec. 2 (period definition)
+  calibration_role: not-calibrated
+  signatures:
+  - quantity: first year in which simulated shocks exceed the warm-up baseline
+    expected: within one to two years of 1627-1628
+    scoring: report the offset; do not fit it
+  falsifiers:
+  - a simulated crisis whose onset follows the recorded one by a decade or more

@@ -1,0 +1,51 @@
+schema_version: historical-patterns-v1
+cluster: rebellion_armed_groups
+patterns:
+  - id: many-bands-then-consolidation
+    cluster: rebellion_armed_groups
+    name: Many bands, then consolidation
+    statement: >-
+      By the early 1630s more than thirty separate bands were reported operating across Shaanxi and
+      Shanxi; by 1644 the largest field army at Shanhaiguan is put at roughly 60,000 men by one
+      authority and above 100,000 by another, with consolidation achieved by absorbing other bands,
+      surrendered government troops and famine refugees.
+    window: "1630-1644"
+    geography: "Shaanxi and Shanxi, later Henan"
+    evidence_grade: B
+    sources: [lorge-2005, wakeman-1985, mote-1999, mingshi]
+    locators:
+      - "Lorge 2005, chapters on the late Ming military"
+      - "Wakeman 1985, vol. 1 (Shanhaiguan)"
+      - "Mote 1999, chapters on the Ming collapse"
+      - "Mingshi, rebel biographies and annals"
+    calibration_role: hold-out
+    signatures:
+      - quantity: "number of bands and the largest band's share of armed men over the run"
+        expected: "many bands early, with the largest share rising over time through absorption"
+        scoring: "compare the direction of the share series and the count's early level; the model's band sizes are of a different order from a field army, and the comparison is about the shape, not the size"
+    falsifiers:
+      - "a single band from the beginning, or a largest share that falls through the crisis"
+      - "band counts and share moving in the same direction throughout, which is not what consolidation implies"
+
+  - id: absorption-of-deserters-and-refugees
+    cluster: rebellion_armed_groups
+    name: Armed groups grew by absorbing soldiers and refugees
+    statement: >-
+      Rebel forces expanded by absorbing other bands, surrendered Ming soldiers and famine refugees,
+      which made their composition fluid and their growth closely tied to the state's own failures.
+    window: "1628-1644"
+    geography: "Shaanxi, Shanxi, Henan"
+    evidence_grade: B
+    sources: [lorge-2005, mingshi, wakeman-1985]
+    locators:
+      - "Lorge 2005, chapters on rebel recruitment"
+      - "Mingshi, rebel biographies - not opened"
+      - "Wakeman 1985, vol. 1 (rebel growth)"
+    calibration_role: target
+    signatures:
+      - quantity: "band recruitment from the deserter pool and from distress-eligible households"
+        expected: "band membership growing when desertion and distress rise, i.e. the state's losses becoming the bands' recruits"
+        scoring: "co-movement between desertion/distress and band in-take; no magnitude"
+    falsifiers:
+      - "band growth uncorrelated with desertion or distress"
+      - "bands growing while both garrisons and households are well off"

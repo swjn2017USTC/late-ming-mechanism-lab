@@ -1,0 +1,81 @@
+schema_version: parameter-cards-v1
+parameter_set: CropParameters
+cards:
+- id: yield_shi_per_mu
+  name: yield shi per mu
+  parameter_set: CropParameters
+  definition: clean grain a mu yields in a normal year on the zone's modal soil
+  unit: shi per mu, per agrarian zone
+  mechanism: harvest and agricultural state
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: null
+  central_text: loess-dryland=0.9; north-china-plain=1.1
+  sources:
+  - guo-2001-grain-yields
+  - broadberry-gupta-wang-2024-ming
+  reasoning: The northern dryland reconstruction puts good land at about 1 shi per mu, medium at 0.5-0.8
+    and poor at 0.2-0.4, with a weighted northern average near 0.77-0.8; the model's per-zone values sit
+    inside that band. The step from a regional reconstruction to a per-zone constant is the model's, which
+    is why the card is evidence-informed rather than evidence-fixed.
+  uncertainty: Reported north-China yields vary by an order of magnitude across units, crops and soil,
+    and none of the estimates is county-level for 1625-1644.
+  sensitivity_priority: high
+  version: crop-parameters-v1 (P03 (phase 02-03))
+  range:
+    low: 0.4
+    high: 1.1
+    basis: northern dryland reconstruction (poor to good land)
+    conflicts: ''
+  ledger_entries:
+  - agri-northern-dryland-yields
+  - agri-national-yield-trend
+- id: land_per_adult_capacity_mu
+  name: land per adult capacity mu
+  parameter_set: CropParameters
+  definition: land one adult can work in a season under the model's technology
+  unit: mu per adult
+  mechanism: harvest and agricultural state
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: 12.0
+  central_text: null
+  sources:
+  - guo-2001-grain-yields
+  reasoning: The labour a household can apply per mu is implied by the same reconstruction of northern
+    dryland farming; the model's capacity sits inside that implication.
+  uncertainty: Family-farm labour ratios in the literature span roughly fourfold and depend on crop mix.
+  sensitivity_priority: medium
+  version: crop-parameters-v1 (P03 (phase 02-03))
+  range:
+    low: 5.0
+    high: 20.0
+    basis: family-farm labour ratios reported for north China
+    conflicts: ''
+  ledger_entries:
+  - agri-northern-dryland-yields
+- id: yield_loss_scale
+  name: yield loss scale
+  parameter_set: CropParameters
+  definition: how much of a stated climate anomaly becomes lost yield
+  unit: multiple of the declared anomaly
+  mechanism: harvest and agricultural state
+  level: micro
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: No source in the registry maps a drought index onto a yield fraction for this region; the
+    scale exists so the climate interface has an effect and can be varied.
+  uncertainty: The mapping is the model's own invention; the extreme values (0, 1) bracket 'no effect'
+    and 'total loss', and nothing excludes them.
+  sensitivity_priority: high
+  version: crop-parameters-v1 (P03 (phase 02-03))
+  range:
+    low: 0.5
+    high: 2.0
+    basis: declared prior width around the current value
+    conflicts: ''

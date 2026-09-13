@@ -1,0 +1,386 @@
+schema_version: parameter-cards-v1
+parameter_set: MilitaryParameters
+cards:
+- id: pay_tael_per_soldier_month
+  name: pay tael per soldier month
+  parameter_set: MilitaryParameters
+  definition: nominal monthly pay of a soldier in silver
+  unit: tael per soldier per month
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: 0.25
+  central_text: null
+  sources:
+  - ray-huang-1974
+  - ray-huang-chc8
+  - ray-huang-1970
+  reasoning: Ray Huang documents frontier pay increasingly commuted into silver and soldiers dependent
+    on local markets, which is the form the rule takes; the monthly rate itself is the model's declared
+    prior.
+  uncertainty: Pay was often commuted into grain or paid in kind, which the model does not represent.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+  range:
+    low: 0.1
+    high: 1.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - mil-finance-grain-to-silver
+  - mil-finance-treasury-share
+- id: pay_share_of_treasury
+  name: pay share of treasury
+  parameter_set: MilitaryParameters
+  definition: share of the county treasury the pay rule will spend on the garrison each month
+  unit: share of treasury (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: C
+  central: 0.5
+  central_text: null
+  sources:
+  - ray-huang-chc8
+  - ray-huang-1970
+  reasoning: Military expenditure consumed the majority of central treasury silver in the period (reported
+    at 53-85 per cent, occasionally higher). The model's 0.4 is a county-level share applying to a county
+    treasury, not a central one, so the source constrains the order of magnitude of the claim rather than
+    fixing the value.
+  uncertainty: Nothing establishes how a county prioritised; the tick order decides who is paid first.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+  ledger_entries:
+  - mil-finance-treasury-share
+- id: food_shi_per_soldier_month
+  name: food shi per soldier month
+  parameter_set: MilitaryParameters
+  definition: grain a soldier needs each month
+  unit: shi per soldier per month
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: C
+  central: 0.3
+  central_text: null
+  sources:
+  - ray-huang-1974
+  - ray-huang-chc8
+  reasoning: Frontier garrisons depended on transported grain for most of their consumption, so a grain
+    ration per soldier is the documented form; the monthly quantity is scaled from the subsistence floor
+    with a declared activity margin.
+  uncertainty: Rations varied with the soldier's household status and were often commuted.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+  range:
+    low: 0.2
+    high: 0.5
+    basis: scaled from the subsistence floor with a declared margin
+    conflicts: ''
+  ledger_entries:
+  - mil-finance-frontier-grain
+- id: ration_purchase_share_of_silver
+  name: ration purchase share of silver
+  parameter_set: MilitaryParameters
+  definition: share of the treasury spent buying rations when stores and granary are short
+  unit: share of silver (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: C
+  central: 0.3
+  central_text: null
+  sources:
+  - ray-huang-1974
+  - ray-huang-chc8
+  reasoning: Market purchase of provisions is documented as the direction military finance moved; the
+    share of a treasury spent on it is the model's.
+  uncertainty: No source quantifies how counties funded rations.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+  ledger_entries:
+  - mil-finance-frontier-grain
+  - mil-finance-grain-to-silver
+- id: desertion_base_rate
+  name: desertion base rate
+  parameter_set: MilitaryParameters
+  definition: monthly quit rate of a fully paid and fed garrison
+  unit: share of the garrison per month
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.002
+  central_text: null
+  sources: []
+  reasoning: There is a background rate even in good conditions; the level is a declared prior.
+  uncertainty: Desertion also followed rotation, illness and family need, which are not modelled.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: desertion_pay_weight
+  name: desertion pay weight
+  parameter_set: MilitaryParameters
+  definition: how much this month's unpaid share raises the quit rate
+  unit: coefficient on the monthly pay shortfall
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Arrears driving desertion is the phase's central argument and is well attested in form; the
+    weight is a declared response coefficient.
+  uncertainty: The record shows units mutinying, dispersing and being re-enrolled, not only individuals
+    quitting in proportion.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: desertion_food_weight
+  name: desertion food weight
+  parameter_set: MilitaryParameters
+  definition: how much this month's ration shortfall raises the quit rate
+  unit: coefficient on the monthly ration shortfall
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.04
+  central_text: null
+  sources: []
+  reasoning: As above for food; declared coefficient.
+  uncertainty: Hunger on campaign and hunger in garrison are different situations.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: desertion_morale_weight
+  name: desertion morale weight
+  parameter_set: MilitaryParameters
+  definition: how much fallen morale raises the quit rate
+  unit: coefficient on fallen morale
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: A cohesion channel; declared.
+  uncertainty: Morale is a model construct with no direct historical measure.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: desertion_max_rate
+  name: desertion max rate
+  parameter_set: MilitaryParameters
+  definition: ceiling on the monthly quit rate
+  unit: share of the garrison per month
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.08
+  central_text: null
+  sources: []
+  reasoning: Keeps a collapsing garrison from evaporating in one tick; declared.
+  uncertainty: The ceiling is a numerical guard, not an empirical bound.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: deserter_home_share
+  name: deserter home share
+  parameter_set: MilitaryParameters
+  definition: share of deserters who return to households at the same node
+  unit: share (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.4
+  central_text: null
+  sources: []
+  reasoning: Deserters went home, to the hills, or dispersed; the shares are declared.
+  uncertainty: The record describes all three destinations without proportions.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: deserter_band_share
+  name: deserter band share
+  parameter_set: MilitaryParameters
+  definition: share of deserters who join the unorganized pool that forms bands
+  unit: share (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.3
+  central_text: null
+  sources: []
+  reasoning: 'This is the link the plan''s M5 rests on: soldiers leaving the state becoming armed groups.
+    That the link existed is attested; its size is declared.'
+  uncertainty: The share is one of the most consequential assumptions in the model and nothing measures
+    it.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: morale_pay_weight
+  name: morale pay weight
+  parameter_set: MilitaryParameters
+  definition: how much this month's pay shortfall lowers morale
+  unit: coefficient on the monthly pay shortfall
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.08
+  central_text: null
+  sources: []
+  reasoning: Declared coefficient on a constructed variable.
+  uncertainty: As with all morale weights.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: morale_food_weight
+  name: morale food weight
+  parameter_set: MilitaryParameters
+  definition: how much this month's ration shortfall lowers morale
+  unit: coefficient on the monthly ration shortfall
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: Declared coefficient.
+  uncertainty: As above.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: morale_recovery
+  name: morale recovery
+  parameter_set: MilitaryParameters
+  definition: how fast morale recovers when a garrison is paid and fed
+  unit: index points per paid month (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: Declared recovery rate.
+  uncertainty: Recovery is not observable.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: cohesion_food_weight
+  name: cohesion food weight
+  parameter_set: MilitaryParameters
+  definition: how much hunger costs a unit's cohesion
+  unit: coefficient on the ration shortfall
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.1
+  central_text: null
+  sources: []
+  reasoning: Declared coefficient.
+  uncertainty: Cohesion is a constructed index.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: suppression_effectiveness
+  name: suppression effectiveness
+  parameter_set: MilitaryParameters
+  definition: members a garrison can remove from a band per month per soldier, before discounts
+  unit: members per soldier per month
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Suppression worked sometimes and failed often; the model needs a rate and uses a declared
+    one.
+  uncertainty: This parameter governs how long a band survives contact with the army and nothing in the
+    registry constrains it.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: suppression_arms_mitigation
+  name: suppression arms mitigation
+  parameter_set: MilitaryParameters
+  definition: share of suppression losses a fully armed band avoids
+  unit: share of losses avoided (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Equipment mattered; the size of the effect is declared.
+  uncertainty: No source quantifies the effect of arms on casualties in this setting.
+  sensitivity_priority: medium
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: suppression_food_cost_per_troop_shi
+  name: suppression food cost per troop shi
+  parameter_set: MilitaryParameters
+  definition: grain a garrison spends per member it suppresses
+  unit: shi per soldier suppressing
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Operations consumed supplies; declared.
+  uncertainty: No source.
+  sensitivity_priority: low
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: suppression_cohesion_cost
+  name: suppression cohesion cost
+  parameter_set: MilitaryParameters
+  definition: morale-like cost a garrison pays for suppressing
+  unit: index points per suppression (0-1)
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.02
+  central_text: null
+  sources: []
+  reasoning: Declared cost.
+  uncertainty: The record suggests suppression also damaged the army's local standing, which is not modelled.
+  sensitivity_priority: low
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: garrison_target_troops
+  name: garrison target troops
+  parameter_set: MilitaryParameters
+  definition: the garrison strength the levy tries to maintain
+  unit: soldiers per node
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 300.0
+  central_text: null
+  sources: []
+  reasoning: A claim size has to exist for the levy rule; it is set at the toy scale, not from a garrison
+    roster.
+  uncertainty: Actual garrison strengths are exactly what the archive would give and the registry does
+    not hold one.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+- id: levy_rate_of_eligible_adults
+  name: levy rate of eligible adults
+  parameter_set: MilitaryParameters
+  definition: share of a node's adults the levy takes per month
+  unit: adults
+  mechanism: military finance, desertion, suppression
+  level: meso
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.002
+  central_text: null
+  sources: []
+  reasoning: Conscription took adults from households; the monthly rate is declared.
+  uncertainty: Recruitment in the record was episodic and registration-based, not a monthly rate.
+  sensitivity_priority: high
+  version: military-parameters-v1 (P06 (phase 10-14))
+  ledger_entries:
+  - rebel-army-absorption

@@ -1,0 +1,312 @@
+schema_version: evidence-ledger-v1
+note: Claims for the drought/climate, famine, agriculture, population/migration and grain-price clusters.
+  Each entry states what the cited sources say (assertion) and separately what the model may take from
+  it (interpretation); a claim of *form* or *direction* is recorded as such and does not license a value.
+entries:
+- id: drought-chongzhen-severity
+  cluster: drought_climate
+  assertion: A severe multi-year drought affected North China from the late 1620s through the early 1640s,
+    identified in the documentary dry-wet index as the most extreme drought event in eastern China of
+    the past 1,500 years.
+  interpretation: The model should represent a prolonged precipitation deficit across its domain, beginning
+    around 1627-1628 and persisting for years, rather than a single-year shock.
+  strength: magnitude
+  evidence_grade: B
+  sources:
+  - zheng-2006-precip
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.3319/TAO.2006.17.3.579(A), sec. 3-4 (dry-wet index; most severe event identified)
+  - DOI 10.5194/cp-20-2287-2024, Appendix A (disaster-record compilation) and figs. 3-5
+  supports_parameters: []
+  supports_rules:
+  - agricultural-state
+  - climate-shock
+  notes: 'Onset differs by source (1627 in Chen 2024, 1628 in Brook 2017, 1634-1644 as the most severe
+    phase in Zheng 2006). No source quantifies the deficit in a unit the model could use, so the drought
+    is recorded as a form-and-magnitude claim about persistence, not as a yield value. Citations to sources
+    whose records are unverified were removed from this claim, because they cannot carry a claim graded
+    above what was checked: brook-2017-nine-sloughs, chen-2020-megadrought, ming-shilu.'
+- id: drought-chongzhen-comparison
+  cluster: drought_climate
+  assertion: The Chongzhen-era drought was the most severe drought event in eastern China over the past
+    1,500 years according to the documentary dry-wet index reconstruction.
+  interpretation: The simulated episode should be represented as an extreme event, not a routine dry spell.
+  strength: magnitude
+  evidence_grade: B
+  sources:
+  - zheng-2006-precip
+  locators:
+  - DOI 10.3319/TAO.2006.17.3.579(A), sec. 3 (extreme-event identification)
+  supports_parameters:
+  - CropParameters.yield_loss_scale
+  supports_rules:
+  - agricultural-state
+  - climate-shock
+  notes: 'The comparison to the preceding millennium and a half comes from Zheng 2006 and is repeated
+    in Chen 2020; no source states a magnitude in millimetres or a yield fraction. Citations to sources
+    whose records are unverified were removed from this claim, because they cannot carry a claim graded
+    above what was checked: brook-2017-nine-sloughs, chen-2020-megadrought.'
+- id: drought-north-china-pattern
+  cluster: drought_climate
+  assertion: The drought was concentrated in North China, affecting Shaanxi, Shanxi, Henan and neighbouring
+    provinces, with the greatest severity in the northern interior.
+  interpretation: The model's domain lies inside the core drought zone, so the deficit should be strongest
+    there rather than uniform across the region.
+  strength: direction
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  - zheng-2006-precip
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, figs. 3-5 (county-level spatial distribution)
+  - DOI 10.3319/TAO.2006.17.3.579(A), sec. 3 (North China sub-series)
+  supports_parameters: []
+  supports_rules:
+  - climate-shock
+  notes: 'A spatial direction, not a magnitude: no Shaanxi-only index was located. Chen 2024''s maps are
+    county-level, which is the resolution the model would eventually want.'
+- id: famine-county-scale
+  cluster: famine
+  assertion: The Chongzhen period's disaster record as compiled in the 2024 reconstruction contains 6,282
+    merged records, of which 1,802 are drought and 1,977 are famine, drawn from counties across North
+    China.
+  interpretation: Famine was widespread and recorded at county scale, so the model should produce shortfall
+    across many nodes rather than at a single locality.
+  strength: magnitude
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, abstract, data-availability statement and Appendix A
+  supports_parameters: []
+  supports_rules:
+  - coping-ladder
+  notes: The counts are from the article's abstract and data statement, confirmed on the Copernicus landing
+    page; the full text was not opened.
+- id: famine-drought-famine-sequence
+  cluster: famine
+  assertion: 'A drought-famine sequence is documented for North China: drought onset in the late 1620s,
+    widespread famine by the early 1630s, and intensification through the late 1630s and early 1640s.'
+  interpretation: 'The model should show a lagged famine response: harvest failure follows the deficit,
+    famine follows the harvest failure, and the crisis deepens as the drought persists.'
+  strength: direction
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, figs. 6-8 (temporal drought-famine relation)
+  supports_parameters:
+  - HouseholdParameters.harvest_recovery_grain_ratio
+  supports_rules:
+  - coping-ladder
+  - harvest
+  notes: 'The lag is described qualitatively in all four sources; none gives it in months. Gao 2024 was
+    located only as a stub, so it carries no claim beyond the article''s existence. Gao 2024 is recorded
+    in the registry as a stub whose text was never read, so it is not cited here as support. Citations
+    to sources whose records are unverified were removed from this claim, because they cannot carry a
+    claim graded above what was checked: brook-2017-nine-sloughs, zheng-2014-collapse.'
+- id: famine-grain-price-escalation
+  cluster: famine
+  assertion: 'Shaanxi gazetteers record extreme local grain prices in the Chongzhen famine: 4 taels of
+    silver per dou of rice at Shangzhou in 1631, and escalating prices at Shenmu in 1640-41.'
+  interpretation: Local grain prices must be able to reach famine levels, far above the normal market
+    range, during severe drought years.
+  strength: magnitude
+  evidence_grade: B
+  sources:
+  - shaanxi-famine-gazetteers
+  locators:
+  - dfz.shaanxi.gov.cn, Shangzhou fu zhi and Shenmu xian zhi (Chongzhen-era entries, PDF directory)
+  supports_parameters:
+  - MarketParameters.reference_price_tael_per_shi
+  - MarketParameters.price_ceiling_ratio
+  supports_rules:
+  - market-clearing
+  notes: 'The 1631 figure (4 taels per dou, i.e. of the order of 40 taels per shi) is an acute local famine
+    peak in one prefecture, not a provincial average, and the model''s price ceiling is far below it:
+    the claim says the model''s ceiling understates the recorded extreme, which is recorded rather than
+    corrected here. Citations to sources whose records are unverified were removed from this claim, because
+    they cannot carry a claim graded above what was checked: brook-2017-nine-sloughs, ming-shilu, zheng-2014-collapse.'
+- id: famine-relief-failure
+  cluster: famine
+  assertion: 'The relief system was overwhelmed by the scale and duration of the famine: shipments were
+    slow or inadequate, and the state could not move grain, remit taxes and pay troops at the same time.'
+  interpretation: The model should not assume effective relief during the worst years; relief should be
+    constrained by fiscal exhaustion and competing military demand.
+  strength: form
+  evidence_grade: C
+  sources:
+  - brook-2017-nine-sloughs
+  - zheng-2014-collapse
+  - ming-shilu
+  locators:
+  - DOI 10.1017/jch.2016.25, state-capacity discussion
+  - DOI 10.1007/s10584-014-1244-7, abstract
+  - Chongzhen juan (Zhonghua Shuju edition), relief memorials - not opened
+  supports_parameters:
+  - FiscalParameters.relief_eligibility_unmet_ratio
+  - FiscalParameters.relief_share_of_need
+  supports_rules:
+  - official-relief
+  - tax-collection
+  notes: Stated qualitatively in all three sources; no relief failure rate or delivery delay is quantified
+    anywhere.
+- id: agri-national-yield-trend
+  cluster: agriculture
+  assertion: Countrywide average grain yield rose from roughly 220 jin per mu around 1402 to roughly 256
+    jin per mu around 1626 in the national accounting estimates, combining southern rice with northern
+    dryland crops.
+  interpretation: A late-Ming national average of roughly 120-130 kg per mu exists as a reference, but
+    it is a national composite and must not be used as a Shaanxi value.
+  strength: magnitude
+  evidence_grade: C
+  sources:
+  - broadberry-gupta-wang-2024-ming
+  locators:
+  - Cambridge Economic History of China vol. 1 (national accounting tables); working paper at pzacad.pitzer.edu
+  supports_parameters:
+  - CropParameters.yield_shi_per_mu
+  supports_rules:
+  - harvest
+  notes: Figures come from secondary citations of the working paper; neither version was opened. The conversion
+    from a national average to the model's per-zone yield is exactly the step the model has not taken,
+    which is why `yield_shi_per_mu` remains grade S.
+- id: agri-northern-dryland-yields
+  cluster: agriculture
+  assertion: Guo Songyi (2001) reconstructs late-Ming northern dryland yields of about 1 shi per mu on
+    good land, 0.5-0.8 on medium and 0.2-0.4 on poor land, with a weighted northern average of approximately
+    0.77-0.8 shi per mu; wheat, millet, sorghum and beans dominated the crop mix.
+  interpretation: The northern dryland range is the relevant order of magnitude for the model's loess
+    zone (roughly 0.5-1.0 shi per mu in normal years), and the crop mix should be wheat and millet.
+  strength: magnitude
+  evidence_grade: C
+  sources:
+  - guo-2001-grain-yields
+  - broadberry-gupta-wang-2024-ming
+  locators:
+  - Guo 2001, 中国社会科学院历史研究所学刊 第一集, pp. 373-396 (yield tables) - pages not opened
+  - Cambridge Economic History of China vol. 1 (national context)
+  supports_parameters:
+  - CropParameters.yield_shi_per_mu
+  - CropParameters.land_per_adult_capacity_mu
+  supports_rules:
+  - harvest
+  notes: 'The weighted average comes from secondary summaries of Guo 2001. This entry is the closest the
+    phase gets to a northern yield figure, and it is still one inference away from the model''s parameter:
+    no Shaanxi-specific series for 1628-1644 was found.'
+- id: pop-ming-qing-decline
+  cluster: population_migration
+  assertion: China's population fell sharply across the Ming-Qing transition, with famine, warfare and
+    epidemic disease contributing to mortality.
+  interpretation: The model should be capable of producing population decline through famine mortality,
+    out-migration and reduced formation of new households over the period.
+  strength: direction
+  evidence_grade: C
+  sources:
+  - cao-2024-population
+  - ge-2024-concise-population
+  locators:
+  - Cao 2024, ch. 6 (Ming-Qing population decline), DOI 10.1163/9789004688933
+  - Ge 2024, chapter on the Ming-Qing transition, ISBN 978-1-032-60416-9
+  supports_parameters: []
+  supports_rules:
+  - migration-permanent
+  notes: Both works are paywalled and neither was opened; the direction is well established in the literature
+    but no Shaanxi magnitude for 1628-1644 was obtained.
+- id: pop-shaanxi-migration-push
+  cluster: population_migration
+  assertion: Famine, drought and military disruption in Shaanxi pushed households to move, both seasonally
+    in search of food and permanently out of the province, as recorded in local gazetteers and the transition
+    literature.
+  interpretation: Migration in the model should be triggered by measured distress, should include both
+    a seasonal and a permanent form, and should make Shaanxi a net outflow region in severe years.
+  strength: form
+  evidence_grade: C
+  sources:
+  - shaanxi-famine-gazetteers
+  - cao-2024-population
+  - brook-2017-nine-sloughs
+  locators:
+  - dfz.shaanxi.gov.cn, gazetteer entries on depopulation and displacement
+  - Cao 2024, ch. 6 (Ming-Qing decline and migration) - not opened
+  - DOI 10.1017/jch.2016.25, migration and rebellion section
+  supports_parameters:
+  - MigrationParameters.permanent_share_of_households_per_month
+  - MigrationParameters.temporary_share_of_adults_per_month
+  supports_rules:
+  - migration-permanent
+  - migration-temporary
+  notes: The existence and direction of famine migration is documented; no source in this registry quantifies
+    a rate or a seasonal share, so both migration rates stay grade S and theoretically assumed.
+- id: price-yansui-1631
+  cluster: grain_market_prices
+  assertion: Quan Hansheng (1991) reports the silver-denominated grain price at Yansui in northern Shaanxi
+    rising from about 0.2 tael per shi in the mid-fifteenth century to 4 taels per shi in Chongzhen 4
+    (1631), a roughly twentyfold long-run increase.
+  interpretation: Grain prices in the model should be able to rise by an order of magnitude, and the early
+    1630s should be a period of acute local scarcity rather than gradual inflation.
+  strength: magnitude
+  evidence_grade: C
+  sources:
+  - quan-1991-northern-prices
+  - shaanxi-famine-gazetteers
+  - ming-shilu
+  locators:
+  - Quan 1991, 中国经济史研究, pp. 653-700 (Yansui price table) - pages not opened
+  - dfz.shaanxi.gov.cn, Shangzhou fu zhi Chongzhen 4 price entry
+  - Chongzhen juan (Zhonghua Shuju edition) - not opened
+  supports_parameters:
+  - MarketParameters.reference_price_tael_per_shi
+  - MarketParameters.price_ceiling_ratio
+  supports_rules:
+  - market-clearing
+  notes: Yansui was a border military market, not a general Shaanxi average, so the ratio is suggestive
+    rather than representative. Recorded because the model's price ceiling would exclude prices of this
+    order entirely.
+- id: price-long-run-increase
+  cluster: grain_market_prices
+  assertion: Northern grain prices rose substantially over the Ming, driven by silver monetisation, frontier
+    military demand and supply shocks, with the Chongzhen famine at the extreme end of the trend.
+  interpretation: The model's price level should be understood as a point on an upward trend, and its
+    spikes as the extreme of that trend rather than as noise around a constant.
+  strength: direction
+  evidence_grade: C
+  sources:
+  - quan-1991-northern-prices
+  - brook-2023-price-collapse
+  - zheng-2014-collapse
+  locators:
+  - Quan 1991, pp. 653-700 (long-run series) - pages not opened
+  - DOI 10.1515/9780691253701 (Little Ice Age and grain prices) - not opened
+  - DOI 10.1007/s10584-014-1244-7, abstract
+  supports_parameters:
+  - MarketParameters.reference_price_tael_per_shi
+  - MarketParameters.price_elasticity
+  supports_rules:
+  - market-clearing
+  notes: A direction claim only. No late-Ming elasticity estimate was located, so the model's elasticity
+    remains exploratory.
+- id: price-famine-spikes-1639-43
+  cluster: grain_market_prices
+  assertion: Famine-price observations in North China concentrate extraordinarily in 1639-1643, with a
+    large share of the gazetteer corpus's famine-price reports falling inside that five-year window.
+  interpretation: The model's most extreme price behaviour should fall in the late 1630s and early 1640s,
+    when deficit, harvest failure and famine converged, rather than being spread evenly across the period.
+  strength: magnitude
+  evidence_grade: B
+  sources:
+  - chen-2024-chongzhen
+  locators:
+  - DOI 10.5194/cp-20-2287-2024, temporal distribution of famine records, figs. 6-8
+  supports_parameters:
+  - MarketParameters.reference_price_tael_per_shi
+  - MarketParameters.price_ceiling_ratio
+  - MarketParameters.price_floor_ratio
+  supports_rules:
+  - market-clearing
+  notes: 'The 183-of-553 concentration is the one quantitative pattern this half of the registry can support
+    for prices; Brook 2017 itself was not opened, so the number is recorded as reported second-hand and
+    its grade is capped accordingly. Citations to sources whose records are unverified were removed from
+    this claim, because they cannot carry a claim graded above what was checked: brook-2017-nine-sloughs,
+    zheng-2014-collapse.'

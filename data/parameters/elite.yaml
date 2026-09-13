@@ -1,0 +1,173 @@
+schema_version: parameter-cards-v1
+parameter_set: EliteParameters
+cards:
+- id: land_purchase_price_tael_per_mu
+  name: land purchase price tael per mu
+  parameter_set: EliteParameters
+  definition: silver an elite house pays for a mu of household land
+  unit: tael per mu
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 2.5
+  central_text: null
+  sources: []
+  reasoning: Elites bought land in distress, at prices below its normal value; the discount here is a
+    declared prior, not a measured ratio.
+  uncertainty: Recorded land transactions are scattered and contractual; conversion to silver per mu for
+    this region and period is not established in the registry.
+  sensitivity_priority: high
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - land-debt-credit-relations
+- id: loan_to_value
+  name: loan to value
+  parameter_set: EliteParameters
+  definition: share of collateral value an elite will lend against
+  unit: share of collateral value (0-1)
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Pawn and mortgage lending against land at a discount to value is well attested in form; the
+    discount is ours.
+  uncertainty: Lending terms varied with the borrower's standing and the lender's need.
+  sensitivity_priority: high
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - land-debt-credit-relations
+- id: interest_rate_monthly
+  name: interest rate monthly
+  parameter_set: EliteParameters
+  definition: monthly interest on elite lending
+  unit: share of principal per month
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.005
+  central_text: null
+  sources: []
+  reasoning: Monthly rates on grain and silver loans were high in the period and are the reason debt could
+    transfer land; the specific rate is a declared prior.
+  uncertainty: Any sourced rate would be for a particular contract type; the model applies one rate.
+  sensitivity_priority: high
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  range:
+    low: 0.01
+    high: 0.1
+    basis: rates reported for pre-modern Chinese credit in the literature
+    conflicts: ''
+  ledger_entries:
+  - land-debt-credit-relations
+- id: max_lending_share_of_silver
+  name: max lending share of silver
+  parameter_set: EliteParameters
+  definition: share of its silver an elite house will have out on loan
+  unit: share of silver (0-1)
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.8
+  central_text: null
+  sources: []
+  reasoning: Bounds elite exposure; declared.
+  uncertainty: Portfolio behaviour is not observable in the sources registered here.
+  sensitivity_priority: medium
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - land-debt-burden-shift
+- id: relief_eligibility_unmet_ratio
+  name: relief eligibility unmet ratio
+  parameter_set: EliteParameters
+  definition: unmet share at which an elite house releases private relief
+  unit: ratio (0-1)
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Elite relief in famine is attested in form; the threshold is a declared reading line.
+  uncertainty: Elite relief also followed obligation, reputation and coercion, none of which this rule
+    represents.
+  sensitivity_priority: low
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - relief-community-funding
+- id: relief_share_of_grain_stock
+  name: relief share of grain stock
+  parameter_set: EliteParameters
+  definition: share of its granary an elite house will release per month
+  unit: share of grain stock (0-1)
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 0.05
+  central_text: null
+  sources: []
+  reasoning: Sets the scale of private relief; declared.
+  uncertainty: No source quantifies private releases.
+  sensitivity_priority: medium
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - relief-community-funding
+  - relief-distribution-modes
+- id: relief_carry_over_ratio_of_local_need
+  name: relief carry over ratio of local need
+  parameter_set: EliteParameters
+  definition: grain an elite house keeps back before relieving, in months of local need
+  unit: months of local need
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: A precautionary reserve; declared.
+  uncertainty: As above.
+  sensitivity_priority: medium
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+  ledger_entries:
+  - relief-granary-system
+- id: grain_sale_carry_over_ratio_of_local_need
+  name: grain sale carry over ratio of local need
+  parameter_set: EliteParameters
+  definition: grain an elite house keeps back before selling, in months of local need
+  unit: months of local need
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: exploratory
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: Separates the sale decision from the relief decision; declared.
+  uncertainty: Elite selling behaviour in famine is documented anecdotally, not quantitatively.
+  sensitivity_priority: medium
+  version: elite-parameters-v1 (P04 (phase 06, 08))
+- id: tax_mediation_advance_share
+  name: tax mediation advance share
+  parameter_set: EliteParameters
+  definition: share of a client's tax demand an elite will advance
+  unit: share (0-1)
+  mechanism: elite lending, land purchase, private relief
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: Tax farming and advances on a household's behalf, creating a claim, are attested in form;
+    the share advanced is ours.
+  uncertainty: Advances were negotiated case by case and often attached to land rather than to a demand.
+  sensitivity_priority: medium
+  version: elite-parameters-v1 (P04 (phase 06, 08))

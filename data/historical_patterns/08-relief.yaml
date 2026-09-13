@@ -1,0 +1,51 @@
+schema_version: historical-patterns-v1
+cluster: relief
+patterns:
+- id: layered-granary-institutions
+  cluster: relief
+  name: Relief ran through layered institutions
+  statement: The institutional record describes preparedness granaries at prefecture and county level,
+    ever-normal granaries for price regulation, and community granaries funded by local contribution,
+    with relief delivered as free grain in severe famine, as spring loans repaid after harvest in moderate
+    cases, and as reduced-price sales otherwise.
+  window: 1368-1644
+  geography: Ming China
+  evidence_grade: B
+  sources:
+  - mingshi
+  - ray-huang-chc8
+  locators:
+  - Mingshi, fiscal treatise (食貨志), granary institutions
+  - Ray Huang, ch. 8 (granary and relief administration)
+  calibration_role: constraint
+  signatures:
+  - quantity: relief channels present (official relief events, elite private relief events)
+    expected: more than one channel, with the official channel bounded by granary stock and the private
+      one by elite grain
+    scoring: presence and separation of channels; no magnitude
+  falsifiers:
+  - a model in which relief exists through a single institution only
+- id: relief-overwhelmed-in-worst-years
+  cluster: relief
+  name: Relief is overwhelmed when need peaks
+  statement: In the worst years relief shipments were slow or inadequate against the scale of need, and
+    the state was simultaneously unable to move grain, remit taxes and pay its soldiers.
+  window: 1630-1644
+  geography: North China
+  evidence_grade: C
+  sources:
+  - mingshi
+  - brook-2017-nine-sloughs
+  - zheng-2014-collapse
+  locators:
+  - Mingshi, relief memorials and edicts (fiscal treatise) - not opened
+  - DOI 10.1017/jch.2016.25, state-capacity discussion (see ledger entry famine-relief-failure)
+  - DOI 10.1007/s10584-014-1244-7, abstract
+  calibration_role: hold-out
+  signatures:
+  - quantity: relief released against measured unmet need, by year
+    expected: the covered share of need falls as need peaks
+    scoring: compare the sign of the co-movement between coverage and need; no magnitude
+  falsifiers:
+  - relief coverage rising with need through the worst years
+  - unmet need falling while shocks intensify

@@ -1,0 +1,50 @@
+schema_version: historical-patterns-v1
+cluster: military_finance
+patterns:
+  - id: pay-monetised-and-arrears
+    cluster: military_finance
+    name: Pay was monetised and chronically in arrears
+    statement: >-
+      By the later sixteenth century the state increasingly sent silver to frontier garrisons instead
+      of grain in kind, leaving soldiers dependent on local markets for food; military expenditure
+      consumed the majority of central treasury silver (reported at 53-85 per cent, occasionally
+      higher), and arrears were a chronic complaint rather than an exception.
+    window: "1580-1644"
+    geography: "Northern frontier, including Shaanxi garrisons"
+    evidence_grade: A
+    sources: [ray-huang-1974, ray-huang-chc8, ray-huang-1970, lorge-2005]
+    locators:
+      - "Ray Huang 1974, chapters on military finance"
+      - "Ray Huang, ch. 8 (treasury and military expenditure)"
+      - "Ray Huang 1970, ch. on the frontier and silver"
+      - "Lorge 2005, chapters on late Ming military practice"
+    calibration_role: hold-out
+    signatures:
+      - quantity: "garrison pay arrears stock and the monthly pay shortfall share"
+        expected: "arrears that accumulate rather than clear, and a pay shortfall that is structural"
+        scoring: "direction and persistence; the model's county-level share is not the central share, so no magnitude comparison"
+    falsifiers:
+      - "arrears returning to zero and staying there through the crisis"
+      - "a pay shortfall that appears only in shock years"
+
+  - id: frontier-depends-on-transported-grain
+    cluster: military_finance
+    name: Frontier garrisons depended on grain from elsewhere
+    statement: >-
+      For the late fifteenth and early sixteenth centuries, most grain consumed on the northern
+      frontier came from interior sources rather than local military-colony production, which is why
+      transport, granaries and market purchases were central to keeping garrisons fed.
+    window: "1470-1520 (documented), sustained into the 1640s"
+    geography: "Northern frontier"
+    evidence_grade: A
+    sources: [ray-huang-1974, ray-huang-chc8]
+    locators:
+      - "Ray Huang 1974, chapters on frontier supply"
+      - "Ray Huang, ch. 8 (transport and granary administration)"
+    calibration_role: constraint
+    signatures:
+      - quantity: "sources of garrison rations (own stores, county granary, market purchase)"
+        expected: "garrisons structurally dependent on grain they do not produce, so a garrison with an empty store and an empty granary must go hungry"
+        scoring: "presence of the dependency in the rule structure; the model has no military colony production at all, which satisfies the constraint trivially and is recorded as such"
+    falsifiers:
+      - "a garrison that feeds itself indefinitely from its own initial store without any outside supply"
