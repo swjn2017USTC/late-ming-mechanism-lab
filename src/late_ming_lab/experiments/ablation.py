@@ -99,9 +99,11 @@ P10_WORKERS: Final[int] = 2
 MORRIS_TRAJECTORIES: Final[int] = 2
 MORRIS_LEVELS: Final[int] = 4
 
-#: Sobol: eight base samples with second-order indices is 80 runs for four parameters. This is a
-#: very small design; the report quotes every confidence interval for exactly that reason.
-SOBOL_BASE: Final[int] = 8
+#: Sobol: four base samples with second-order indices is 40 runs for four parameters — the design
+#: the phase actually ran, and small enough that its indices came back unestimable. It is set here
+#: because the artifact's manifest records it: `run_p10` must reproduce the batch the report quotes,
+#: and the constant is what makes that true.
+SOBOL_BASE: Final[int] = 4
 
 #: The grid: three values per axis, one run per cell.
 GRID_POINTS: Final[int] = 3
