@@ -11,8 +11,8 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P09 (Calibration / Hold-out) complete, on top of P08 (Historical Evidence / Parameter Registry) and
-P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
+P10 (Ablation / Sensitivity / Counterfactual) complete, on top of P09 (Calibration / Hold-out), P08
+(Historical Evidence / Parameter Registry) and P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
 (P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with an explicit
 coping ladder (P03), a county grain market with merchant houses and elite lending, land purchase and
 private relief (P04), a county fiscal apparatus (P05) with state capacity kept as five separate
@@ -39,6 +39,16 @@ calibration window (1625–1634) and it refuses the other two thirds of the run;
 reserved claims the model contradicts — written into `docs/calibration/`. No mechanism, rule or
 parameter value was changed to make a historical pattern come out.
 
+P10 turned the model on itself: an experiment runner runs one declared baseline and nine named
+mechanisms removed from it (drought, extraction escalation, military pay, relief, elite credit, trade
+disruption, band merger, suppression, the migration gate) plus three two-way arms, all under common
+random numbers; a Morris design screens every card-bounded parameter and a Sobol design then measures
+the selected ones with second-order indices, so interactions are measured rather than assumed; and a
+two-parameter grid shows the region rather than the curve. The reports under `docs/experiments/`
+carry distributions rather than means — paired median differences with bootstrap intervals, Cliff's
+deltas, collapse probabilities with Wilson intervals, the crossed-lines distribution behind the
+breakdown line, and binned response curves with their curvature.
+
 Everything shipped so far is an assumption, not history: both spatial fixtures and every cohort
 endowment are graded `S` throughout, the shock experiment's severity axis is a scenario parameter,
 never an estimate of a historical drought, and the governance indicators are declared reading
@@ -46,7 +56,7 @@ lines rather than evidence. Real geography enters only
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P09.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P10.md`.
 Why the military actors are declared abstractions rather than tactics:
 `docs/adr/0002-military-abstractions.md`; how the tick order and its dependencies are enforced and
 drawn: `docs/architecture/system-dependency.md`.
@@ -77,6 +87,14 @@ uv run python -c "from late_ming_lab.experiments.calibration import run_calibrat
     run_calibration_batch('.')"
 uv run python -c "from late_ming_lab.experiments.calibration import write_calibration_reports; \
     write_calibration_reports('.')"
+```
+
+The P10 experiment runner is the same two-step shape: run the three experiments (ablation, Morris
+then Sobol, and the two-parameter grid) into `outputs/experiments/`, then regenerate the four reports
+from those artifacts.
+
+```bash
+uv run python -c "from late_ming_lab.experiments.ablation import run_p10; run_p10('.')"
 ```
 
 A run writes an immutable directory under `outputs/runs/<run_id>/` (manifest, config
@@ -122,6 +140,7 @@ uv run mypy
 | `docs/epistemics/evidence-grades.md` | A/B/C/D/S grades, parameter cards, evidence ledger |
 | `docs/evidence/` | Generated: what the evidence base covers, how uncertain it is, where the gaps are |
 | `docs/calibration/` | Generated: the frozen objective, the posterior, the mismatches, the held-out predictions |
+| `docs/experiments/` | Generated: the ablations, the interactions, the sensitivity indices and the tipping grid |
 | `docs/phase-reports/` | One report per phase |
 
 Each phase ends with a report, logical commits, a clean tree, and a stop. Never start the next

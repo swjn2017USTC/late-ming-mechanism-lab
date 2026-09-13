@@ -1,12 +1,13 @@
 # System Overview
 
-Status: P09 (calibration and hold-out) on top of P07 (integrated crisis engine). The whole chain is
-wired — climate, agriculture, households, market and credit, taxation and relief, migration,
-military finance, armed bands, violence — under an explicit, validated monthly scheduler, and runs
-for the full 1625–1644 window on a five-county and a twelve-county fixture. Inter-county military movement, trade disruption driven
-by band activity, births and deaths, and runtime-LLM decisions do not exist. There are no tactics,
-battles or named leaders, by decision — see `docs/adr/0002-military-abstractions.md`; the tick order
-and its dependency rule are enforced and drawn in `docs/architecture/system-dependency.md`. Every
+Status: P10 (ablation, sensitivity and counterfactual) on top of P09 (calibration and hold-out) and
+P07 (integrated crisis engine). The whole chain is wired — climate, agriculture, households, market
+and credit, taxation and relief, migration, military finance, armed bands, violence — under an
+explicit, validated monthly scheduler, and runs for the full 1625–1644 window on a five-county and a
+twelve-county fixture. Inter-county military movement, trade disruption driven by band activity,
+births and deaths, and runtime-LLM decisions do not exist. There are no tactics, battles or named
+leaders, by decision — see `docs/adr/0002-military-abstractions.md`; the tick order and its
+dependency rule are enforced and drawn in `docs/architecture/system-dependency.md`. Every
 dataset and rate is an assumption: none of it is history.
 Binding rules: `.omp/RULES.md`. Source of truth for scope and phasing:
 `docs/OMP_ENGINEERING_PLAN.md`.
@@ -444,12 +445,16 @@ src/late_ming_lab/
 ├── evidence/    provenance.py (P01), grades.py (P02); registry, parameters (P08)
 ├── storage/     tables.py, run_store.py, warehouse.py  (implemented in P01)
 ├── analysis/    distress.py, concentration.py, fiscal.py  (P03-P05)
+│                governance.py, integrated.py, migration.py, military.py  (P06-P07)
+│                outcomes.py                        (implemented in P10)
 ├── policies/    fiscal.py                          (implemented in P05)
 ├── experiments/ assembly.py, household_shock.py, market_credit.py,
 │                extraction.py                      (P03-P05)
 │                integrated.py                      (implemented in P07)
 │                evidence.py                        (implemented in P08)
 │                calibration.py                     (implemented in P09)
+│                interventions.py, runner.py, counterfactual.py,
+│                sensitivity.py, ablation.py        (implemented in P10)
 ├── calibration/ windows.py, summary_stats.py, targets.py, prediction.py, priors.py,
 │                simulator.py, smc.py, freeze.py, ensemble.py, reports.py
 │                                                   (implemented in P09)
