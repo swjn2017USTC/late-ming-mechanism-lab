@@ -1,9 +1,9 @@
 # System Overview
 
-Status: P07 (integrated crisis engine). The whole chain is wired — climate, agriculture,
-households, market and credit, taxation and relief, migration, military finance, armed bands,
-violence — under an explicit, validated monthly scheduler, and runs for the full 1625–1644 window on
-a five-county and a twelve-county fixture. Inter-county military movement, trade disruption driven
+Status: P09 (calibration and hold-out) on top of P07 (integrated crisis engine). The whole chain is
+wired — climate, agriculture, households, market and credit, taxation and relief, migration,
+military finance, armed bands, violence — under an explicit, validated monthly scheduler, and runs
+for the full 1625–1644 window on a five-county and a twelve-county fixture. Inter-county military movement, trade disruption driven
 by band activity, births and deaths, and runtime-LLM decisions do not exist. There are no tactics,
 battles or named leaders, by decision — see `docs/adr/0002-military-abstractions.md`; the tick order
 and its dependency rule are enforced and drawn in `docs/architecture/system-dependency.md`. Every
@@ -447,12 +447,18 @@ src/late_ming_lab/
 ├── policies/    fiscal.py                          (implemented in P05)
 ├── experiments/ assembly.py, household_shock.py, market_credit.py,
 │                extraction.py                      (P03-P05)
-├── calibration/ cli/ ui/
+│                integrated.py                      (implemented in P07)
+│                evidence.py                        (implemented in P08)
+│                calibration.py                     (implemented in P09)
+├── calibration/ windows.py, summary_stats.py, targets.py, prediction.py, priors.py,
+│                simulator.py, smc.py, freeze.py, ensemble.py, reports.py
+│                                                   (implemented in P09)
+├── cli/ ui/
 ```
 
 Implemented so far: `late_ming_lab/__init__.py`, `cli.py` (`--version`, `smoke-run`),
-`analysis/`, `actors/`, `core/`, `evidence/`, `experiments/`, `networks/`, `systems/`,
-`storage/`. Everything else is created by the phase that needs it.
+`analysis/`, `actors/`, `calibration/`, `core/`, `evidence/`, `experiments/`, `networks/`,
+`systems/`, `storage/`. Everything else is created by the phase that needs it.
 
 ## Phase roadmap
 

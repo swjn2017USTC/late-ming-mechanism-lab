@@ -17,6 +17,7 @@ htmlcov/
 
 outputs/runs/
 outputs/analysis/
+outputs/calibration/
 
 data/raw/private/
 sources/literature/private/
