@@ -74,6 +74,31 @@ The previous project's specific historical conclusions, private PDFs, and projec
 claims must not be copied. Every item is classified **COPY / CONFIGURE / REBUILD / DO NOT COPY**
 before it enters this repository.
 
+## What was reused from the earlier Academic Literature Pipeline (P08)
+
+The earlier pipeline's *structure* was reused; nothing of its content was. Every item was
+classified before it entered this repository:
+
+| Item | Decision | Where it lives now |
+| --- | --- | --- |
+| Source-record schema (id, title, creators, year, container, locator, access, rights, verification) | **CONFIGURE** | `evidence/registry.py`, `sources/registry/*.yaml` |
+| Registry-as-YAML with a `schema_version` header | **CONFIGURE** | `sources/registry/`, `data/parameters/`, `data/historical_patterns/` |
+| Search and verification workflow (official APIs first, a record is verified only when a page stating its identity was loaded, missing fields left empty rather than filled) | **CONFIGURE** | documented in the phase report; the registry requires `verified_against` for any verified record |
+| Human acquisition gate for licensed material | **COPY** | `access: institution \| human-only` with a mandatory `rights_note`; structural, not advisory |
+| Claim-delta / evidence-ledger idea | **REBUILD** | `evidence/ledger.py`: our entries assert *what a source says* and separately what the model may use |
+| Parameter cards | **REBUILD** | `data/parameters/*.yaml` against the schema above, plus a `support_class` the earlier pipeline did not have |
+| Signal/digest extraction scripts tuned to another corpus | **DO NOT COPY** | the two projects measure different things; nothing was ported |
+| That project's sources, conclusions, excerpts, private PDFs, queues and module files | **DO NOT COPY** | not read for content and not present here |
+
+Two rules follow from that table and are enforced in code rather than trusted:
+
+1. **No agent acquires restricted material.** The registry has no field for a local path, and the
+   invariant suite asserts that no locator is a downloaded file and that every restricted source
+   states its condition. Acquisition is a human act recorded in the registry.
+2. **Layers stay separate.** A claim resting on a primary source, on a dataset and on modern
+   scholarship is recorded with the layer named, and the coverage report counts them apart, because
+   "the sources agree" means something different in each case.
+
 ## Data placement
 
 | Path | Content |
@@ -87,7 +112,10 @@ before it enters this repository.
 | `data/parameters/` | Parameter cards produced from the ledger |
 | `data/historical_patterns/` | Patterns targeted by calibration and hold-out |
 | `data/scenarios/` | Scenario definitions (initial conditions, shocks, policy sets) |
-| `src/late_ming_lab/evidence/` | Code: `registry.py`, `parameters.py`, `provenance.py` |
+| `data/normalized/evidence_ledger*.yaml` | The evidence ledger: claims, their sources, and what they support |
+| `data/normalized/rule_claims*.yaml` | Every simulation rule with its support class and its parameters |
+| `docs/evidence/` | Generated reports: coverage, parameter uncertainty, gaps |
+| `src/late_ming_lab/evidence/` | Code: `registry.py`, `cards.py`, `ledger.py`, `coverage.py`, `parameters.py`, `provenance.py` |
 
 Raw data is never edited in place. Normalization is a scripted, re-runnable transformation with
 recorded provenance.
