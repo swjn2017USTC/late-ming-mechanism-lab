@@ -63,6 +63,11 @@ python_version = "3.12"
 strict = true
 files = ["src", "tests"]
 
+# PyMC ships no py.typed marker; the P09 sampler is the only place the project imports it.
+[[tool.mypy.overrides]]
+module = ["pymc", "pymc.*"]
+ignore_missing_imports = true
+
 [dependency-groups]
 dev = [
     "hypothesis>=6.168.0",

@@ -22,6 +22,7 @@ so that no result can be read as a historical claim.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
@@ -37,8 +38,23 @@ from late_ming_lab.analysis.integrated import (
 from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.core.kernel import KernelResult, SimulationKernel
 from late_ming_lab.evidence.parameters import (
+    BandParameters,
+    CropParameters,
+    EliteParameters,
+    FiscalParameters,
     GovernanceIndicatorParameters,
+    HouseholdParameters,
+    MarketParameters,
+    MigrationParameters,
+    MilitaryParameters,
+    core_default_band_parameters,
+    core_default_crop_parameters,
+    core_default_elite_parameters,
+    core_default_fiscal_parameters,
     core_default_governance_indicators,
+    core_default_household_parameters,
+    core_default_market_parameters,
+    core_default_migration_parameters,
     core_default_military_parameters,
 )
 from late_ming_lab.experiments.assembly import Economy, build_toy_economy
@@ -154,27 +170,69 @@ def climate_for(scenario: IntegratedScenario) -> ClimateModel:
     )
 
 
-def run_integrated_scenario(
-    scenario: IntegratedScenario, *, config: SimulationConfig | None = None
-) -> IntegratedRun:
-    """Build the whole sandbox for one scenario and run the window to its end."""
-    thresholds = core_default_governance_indicators()
-    military = core_default_military_parameters().model_copy(
+def build_integrated_economy(
+    scenario: IntegratedScenario,
+    *,
+    parameter_sets: Mapping[str, object] | None = None,
+) -> Economy:
+    """Build the sandbox's economy for one scenario, with an optional parameter draw applied.
+
+    The sandbox has one wiring and this is it: the calibration runner passes a drawn parameter set
+    per name and gets the same economy, in the same tick order, that the P07 scenarios run. A draw
+    that does not name a set leaves that set at its declared default, and a draw whose object is not
+    the set it claims to be is refused rather than silently ignored.
+    """
+    overrides = parameter_sets or {}
+    military = _overridden(
+        overrides, MilitaryParameters, core_default_military_parameters
+    ).model_copy(
         update={
             "pay_share_of_treasury": scenario.pay_share_of_treasury,
             "garrison_target_troops": scenario.garrison_troops,
         }
     )
-    economy = build_toy_economy(
+    return build_toy_economy(
         dataset=dataset_for(scenario),
         climate_model=climate_for(scenario),
         with_fiscal=True,
         with_military=True,
         with_migration=True,
-        military_parameters=military,
-        garrison_troops=scenario.garrison_troops,
         nominal_pressure=scenario.nominal_pressure,
+        garrison_troops=scenario.garrison_troops,
+        crop_parameters=_overridden(overrides, CropParameters, core_default_crop_parameters),
+        household_parameters=_overridden(
+            overrides, HouseholdParameters, core_default_household_parameters
+        ),
+        market_parameters=_overridden(overrides, MarketParameters, core_default_market_parameters),
+        elite_parameters=_overridden(overrides, EliteParameters, core_default_elite_parameters),
+        fiscal_parameters=_overridden(overrides, FiscalParameters, core_default_fiscal_parameters),
+        military_parameters=military,
+        band_parameters=_overridden(overrides, BandParameters, core_default_band_parameters),
+        migration_parameters=_overridden(
+            overrides, MigrationParameters, core_default_migration_parameters
+        ),
     )
+
+
+def _overridden[T](overrides: Mapping[str, object], model: type[T], default: Callable[[], T]) -> T:
+    """The draw's parameter set under this name, or the default; anything else is an error."""
+    supplied = overrides.get(model.__name__)
+    if supplied is None:
+        return default()
+    if not isinstance(supplied, model):
+        raise TypeError(f"parameter set {model.__name__} was given a {type(supplied).__name__}")
+    return supplied
+
+
+def run_integrated_scenario(
+    scenario: IntegratedScenario,
+    *,
+    config: SimulationConfig | None = None,
+    parameter_sets: Mapping[str, object] | None = None,
+) -> IntegratedRun:
+    """Build the whole sandbox for one scenario and run the window to its end."""
+    thresholds = core_default_governance_indicators()
+    economy = build_integrated_economy(scenario, parameter_sets=parameter_sets)
     starting_households = sum(cohort.households for cohort in economy.population)
     starting_adults = sum(cohort.adults for cohort in economy.population)
     run_config = config or SimulationConfig.model_validate(
