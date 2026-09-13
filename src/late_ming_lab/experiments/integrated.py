@@ -29,6 +29,7 @@ from typing import Final
 
 import polars as pl
 
+from late_ming_lab.actors.government import StateCapacity
 from late_ming_lab.analysis.governance import governance_indicators, governance_series
 from late_ming_lab.analysis.integrated import (
     METRIC_COLUMNS,
@@ -59,7 +60,9 @@ from late_ming_lab.evidence.parameters import (
 )
 from late_ming_lab.experiments.assembly import Economy, build_toy_economy
 from late_ming_lab.networks.dataset import SpatialDataset
+from late_ming_lab.networks.disruption import TradeDisruption
 from late_ming_lab.networks.fixtures import medium_spatial_dataset, toy_spatial_dataset
+from late_ming_lab.policies.fiscal import ExtractionPolicy
 from late_ming_lab.storage.tables import write_table
 from late_ming_lab.systems.climate import BaselineClimate, ClimateModel, SyntheticClimate
 
@@ -174,13 +177,17 @@ def build_integrated_economy(
     scenario: IntegratedScenario,
     *,
     parameter_sets: Mapping[str, object] | None = None,
+    disruption: TradeDisruption | None = None,
+    extraction_policy: ExtractionPolicy | None = None,
+    capacity: StateCapacity | None = None,
 ) -> Economy:
-    """Build the sandbox's economy for one scenario, with an optional parameter draw applied.
+    """Build the sandbox's economy for one scenario, with declared overrides applied.
 
-    The sandbox has one wiring and this is it: the calibration runner passes a drawn parameter set
-    per name and gets the same economy, in the same tick order, that the P07 scenarios run. A draw
-    that does not name a set leaves that set at its declared default, and a draw whose object is not
-    the set it claims to be is refused rather than silently ignored.
+    The sandbox has one wiring and this is it: a runner passes a drawn parameter set per name, or a
+    disruption regime, an extraction policy or a set of state capacities, and gets the same economy,
+    in the same tick order, that the P07 scenarios run. Every override defaults to the behaviour the
+    P07 scenarios have, so an omitted argument changes nothing; one whose object is not the thing it
+    claims to be is refused rather than silently ignored.
     """
     overrides = parameter_sets or {}
     military = _overridden(
@@ -197,6 +204,9 @@ def build_integrated_economy(
         with_fiscal=True,
         with_military=True,
         with_migration=True,
+        disruption=disruption,
+        extraction_policy=extraction_policy,
+        capacity=capacity,
         nominal_pressure=scenario.nominal_pressure,
         garrison_troops=scenario.garrison_troops,
         crop_parameters=_overridden(overrides, CropParameters, core_default_crop_parameters),
