@@ -1,0 +1,336 @@
+# validation-protocol-v2 — frozen before any V2 result is read.
+#
+# Every V2 report reads its definitions from this file and from nothing else: what counts as an
+# outcome, which direction is the adverse one, which window it is read in, how it is aggregated,
+# what a missing value means, what difference counts as substantive, and what kind of historical
+# comparison the evidence could support. The file is hashed into every V2 batch manifest, and a batch
+# whose recorded hash differs from this one is refused rather than re-scored.
+#
+# Two rules this file exists to keep:
+#
+#   * thresholds are not history. Where a line turns a measurement into a verdict it is declared here
+#     as a normative choice or a model assumption, with a range, and the verdict's dependence on the
+#     line is reported (`threshold-ensemble-v2.yaml`). No V2 report may write a crossed line as a
+#     finding about the past.
+#   * breakdown is derived. The primary outcomes are continuous and multi-dimensional; the crossed-line
+#     count and the binary breakdown reading are computed *from* them, reported beside them, and never
+#     used as the headline.
+schema_version: validation-protocol-v2
+version: "2.0.0"
+frozen_on: "2026-09-14"
+status: frozen
+run_ticks: 240
+summary: >-
+  Outcomes, windows, aggregation, missingness, minimum substantive effects and comparison levels for
+  the V2 historical core. Frozen before any V2 batch was scored.
+
+windows:
+  - id: calibration
+    role: scoring
+    start_tick: 0
+    end_tick: 119
+    note: >-
+      The warm-up plus the first shock decade. Only an objective may read it, and only parameters the
+      cards bound.
+  - id: hold-out
+    role: scoring
+    start_tick: 120
+    end_tick: 215
+    note: Reserved. Nothing is fitted to it; it exists to falsify the ensemble afterwards.
+  - id: extrapolation
+    role: scoring
+    start_tick: 216
+    end_tick: 239
+    note: The hard case - the last two years, beyond the decade any fit was shaped on.
+  - id: whole-run
+    role: reporting
+    start_tick: 0
+    end_tick: 239
+    note: The full window, used for reporting outcomes, never for fitting.
+
+isolation:
+  rule: >-
+    A score computed in one window may not read another. The calibration objective refuses every
+    window but calibration; the prediction checks refuse the calibration window; a report that reads
+    the whole run says so and may not be used as a fitting target. The isolation is enforced in both
+    directions by the protocol loader, and a batch whose recorded protocol hash differs from this
+    file's is refused rather than re-scored.
+  enforced_by:
+    - src/late_ming_lab/protocol/freeze.py
+    - src/late_ming_lab/calibration/targets.py
+    - src/late_ming_lab/calibration/prediction.py
+
+#: How a value that the run did not produce is handled. Missingness is a finding, not a zero.
+missingness:
+  default: refuse
+  rules:
+    - id: refuse
+      when: a primary outcome cannot be computed from a run's event log
+      action: >-
+        The run scores as missing for that outcome: it is counted, listed by run and outcome, and
+        excluded from that outcome's aggregate. It is never imputed and never treated as zero.
+    - id: declared-imputation
+      when: the input itself is a documented aggregate with declared gaps (the historical core's
+        unrecorded node-years)
+      action: >-
+        Allowed only where the input's own provenance declares the imputation and counts it; the
+        share is reported beside the outcome it feeds.
+    - id: not-applicable
+      when: the quantity does not exist for that run by construction (a band statistic with no bands)
+      action: reported as not applicable rather than as missing or zero, and listed separately.
+
+#: The primary outcomes: continuous, multi-dimensional, one row per run and dimension.
+primary_outcomes:
+  - id: fiscal_realisation
+    dimension: fiscal
+    definition: >-
+      Receipts over the assessed quota for the run, summed across counties over the whole window:
+      how much of what the county demanded it actually collected.
+    direction: lower-is-adverse
+    aggregation: ratio of window totals
+    form: measure
+    unit: share of assessed quota
+    minimum_substantive_effect: 0.05
+    measurements:
+      - receipts_over_quota_total
+    historical_comparison: direction
+    historical_note: >-
+      The record documents that receipts fell persistently short of the quota and that the register
+      eroded; it does not measure a county's receipts, so only the direction is comparable.
+    evidence: [receipts-shortfall-chronic, quota-erosion-and-surcharge]
+
+  - id: fiscal_base
+    dimension: fiscal
+    definition: Relative change in the assessable land the counties can see, first to last observation.
+    direction: lower-is-adverse
+    aggregation: relative change of per-county first and last values
+    form: vector
+    unit: share of starting mu
+    minimum_substantive_effect: 0.02
+    measurements:
+      - tax_base_change_mu
+      - tax_base_end_mu
+    historical_comparison: direction
+    historical_note: The erosion of the registered base is documented in form; no mu figure is.
+    evidence: [quota-erosion-and-surcharge]
+
+  - id: fiscal_arrears
+    dimension: fiscal
+    definition: The military pay arrears stock at the end of the window, and its growth per month.
+    direction: higher-is-adverse
+    aggregation: end state and per-month mean change
+    form: vector
+    unit: tael
+    minimum_substantive_effect: 1000.0
+    measurements:
+      - military_pay_arrears_end_tael
+      - military_pay_arrears_max_tael
+    historical_comparison: direction
+    historical_note: >-
+      Pay arrears and desertion are documented as a condition; the level figures in the registry are
+      central-treasury or frontier quantities at another level of government.
+    evidence: [mil-finance-treasury-share, pay-monetised-and-arrears]
+
+  - id: relief_coverage
+    dimension: relief
+    definition: >-
+      Grain released as relief against the subsistence need the run measures: relief_released_shi
+      over subsistence_need_shi, both summed over the window.
+    direction: lower-is-adverse
+    aggregation: ratio of window totals, and the same ratio in the last five years of the window
+    form: ratio
+    unit: share of need
+    minimum_substantive_effect: 0.05
+    measurements:
+      - relief_released_shi
+      - subsistence_need_shi
+    historical_comparison: direction
+    historical_note: >-
+      The granary and relief institutions are documented in form and their sequence in the crisis is
+      documented; no coverage rate at county resolution exists.
+    evidence: [relief-granary-system, relief-distribution-modes]
+
+  - id: military_supply
+    dimension: military_supply
+    definition: >-
+      The pay arrears the garrison ran up over the window: the maximum stock it carried
+      (military_pay_arrears_max_tael), reported beside the end stock in fiscal_arrears. The
+      share of the obligation that arrived is a reading line, not a measurement, and is not part
+      of the primary vector.
+    direction: higher-shortfall-is-adverse
+    aggregation: mean over months, end state for strength
+    form: measure
+    unit: share of obligation; troops
+    minimum_substantive_effect: 0.05
+    measurements:
+      - military_pay_arrears_max_tael
+    historical_comparison: direction
+    historical_note: >-
+      Arrears and desertion are documented as a condition with named episodes; the model's monthly
+      obligation is its own construct.
+    evidence: [mil-finance-frontier-grain, mil-finance-grain-to-silver]
+
+  - id: migration_outflow
+    dimension: migration
+    definition: Households that left the core counties, against the households that started there; and the net flow at the worst node.
+    direction: higher-is-adverse
+    aggregation: ratio of window totals; minimum net node flow
+    form: vector
+    unit: share of starting households
+    minimum_substantive_effect: 0.01
+    measurements:
+      - households_exited
+      - migration_net_node_min
+    historical_comparison: direction
+    historical_note: >-
+      The record documents movement out of Shaanxi and its timing in the crisis years; it does not
+      measure a rate.
+    evidence: [pop-shaanxi-migration-push, shaanxi-net-outflow]
+
+  - id: market_connectivity
+    dimension: market
+    definition: The share of declared trade links that carried traffic, and the share of nodes in the largest trading component.
+    direction: lower-is-adverse
+    aggregation: share of links active at any point; largest component at the end
+    form: vector
+    unit: share
+    minimum_substantive_effect: 0.1
+    measurements:
+      - market_active_link_share
+      - market_largest_component_share
+    historical_comparison: none
+    historical_note: >-
+      The registry holds no measure of link activity or market integration for this window, so this
+      dimension is reported without a historical comparison level.
+    evidence: []
+
+  - id: livelihood_shortfall
+    dimension: livelihood
+    definition: >-
+      The share of the subsistence floor left unmet across cohorts and months:
+      subsistence_unmet_shi over subsistence_need_shi, both summed over the window.
+    direction: higher-is-adverse
+    aggregation: ratio of window totals
+    form: ratio
+    unit: share of need
+    minimum_substantive_effect: 0.05
+    measurements:
+      - subsistence_unmet_shi
+      - subsistence_need_shi
+    historical_comparison: direction
+    historical_note: >-
+      Famine and destitution are documented as a condition and a sequence; nothing measures unmet
+      need at county resolution.
+    evidence: [famine-drought-famine-sequence, land-abandonment-in-famine]
+
+  - id: armed_concentration
+    dimension: armed_concentration
+    definition: >-
+      The number of armed bands at the end (bands_at_end) and the largest band's maximum share
+      of all armed men over the window (largest_band_share_max).
+    direction: higher-share-is-adverse
+    aggregation: end state; maximum share over the window
+    form: vector
+    unit: bands; share of armed men
+    minimum_substantive_effect: 0.05
+    measurements:
+      - bands_at_end
+      - largest_band_share_max
+    historical_comparison: ordering
+    historical_note: >-
+      The record is explicit that bands were many and small, then fewer and larger, and gives army
+      sizes in the tens of thousands; it supports an ordering, not a share.
+    evidence: [rebel-army-absorption, rebel-li-shanhaiguan-size]
+
+#: Derived readings. Computed from the primary outcomes and the threshold ensemble, reported beside
+#: them, never as the headline.
+#: The intermediate quantities the phase requires to be retained, by mechanism chain, so a later
+#: report can read the chain and not only its end state. Each is a series the project already
+#: produces; nothing here is a new measurement, and nothing here is a scalar.
+intermediates:
+  - id: county_fiscal_month
+    granularity: node-month
+    source: src/late_ming_lab/analysis/fiscal.py:county_fiscal_series
+    chain: extraction inversion
+    fields: [quota_tael, assessment_rate, collection_effort, receipts_tael, arrears_tael, taxable_land_mu]
+    note: >-
+      The chain's own links at each county each month: what was assessed, how hard it was pressed,
+      what came in, and what the base did while it was pressed.
+  - id: military_standing_month
+    granularity: month
+    source: src/late_ming_lab/analysis/military.py:garrison_series
+    chain: fiscal-military
+    fields: [garrison_troops, garrison_grain_shi, pay_arrears_tael, mean_morale, mean_cohesion]
+    note: >-
+      The pay claim, what was paid, what is owed and the strength paying it, so an arrears stock is
+      not the first place a reader meets the shortage.
+  - id: armed_bands_month
+    granularity: month
+    source: src/late_ming_lab/analysis/military.py:band_series
+    chain: armed organisation
+    fields: [number_of_bands, total_band_troops, largest_band_troops, largest_band_share]
+    note: >-
+      Formation, intake, merger and split as they happen, alongside the concentration the
+      consolidation reading is taken from.
+  - id: migration_month
+    granularity: month
+    source: src/late_ming_lab/analysis/migration.py:migration_flows
+    chain: crisis gating
+    fields: [households_departed, adults_departed, land_abandoned_mu, households_exited]
+    note: Departure, arrival and exit, month by month, with the land that left with the household.
+  - id: migration_by_node
+    granularity: node
+    source: src/late_ming_lab/analysis/migration.py:node_migration
+    chain: crisis gating
+    fields: [households_left, households_gone, households_came, net_households]
+    note: Where the base left from and where it went, per node, over the window.
+  - id: trade_link
+    granularity: link
+    source: src/late_ming_lab/analysis/concentration.py:trade_summary
+    chain: market and trade
+    fields: [shipped_shi, arrived_shi, lost_shi, proceeds_tael]
+    note: Each declared trade link's traffic, so connectivity is a measurement and not a flag.
+  - id: governance_sample
+    granularity: indicator-tick
+    source: src/late_ming_lab/analysis/governance.py:governance_series
+    chain: the reading lines
+    fields: [garrison_troops, pay_arrears_tael, military_states, bands, sample_index]
+    note: >-
+      The run sampled through time, so a reader can see when a line moved rather than only that it
+      ended across. The ensemble is applied to a run's whole-window measures, which this series
+      dates rather than replaces.
+
+derived_readings:
+  - id: crossed_lines
+    definition: How many of the eight governance reading lines are crossed at a sampled tick of the window.
+    source: src/late_ming_lab/analysis/governance.py
+    note: >-
+      A reading rule, not evidence. Every V2 report prints the count distribution and the share
+      recomputed across the threshold ensemble (`threshold-ensemble-v2.yaml`).
+  - id: breakdown
+    definition: >-
+      A binary reading: the run is in breakdown when at least `breakdown_min_crossed` of the eight
+      lines are crossed at a sampled tick.
+    thresholds:
+      breakdown_min_crossed:
+        value: 6
+        identity: model-assumption
+        range: [4, 8]
+        note: >-
+          P07 measured five lines crossing in calm runs, so six was the earliest line that separated
+          the crisis arms from their own baseline. It is a reading choice with a range, and the
+          derived share is reported at every value in that range.
+    note: >-
+      Derived, never primary. A claim that rests on "the county broke down" is a claim about this
+      rule until the threshold dependence is reported beside it.
+
+#: Naming the comparison levels the record can actually support, so a report cannot upgrade one.
+comparison_levels:
+  - id: direction
+    meaning: the record supports which way a quantity moved, not its size
+  - id: ordering
+    meaning: the record supports a ranking between places or periods, not a magnitude
+  - id: magnitude
+    meaning: a source states the quantity itself, at the resolution the model uses
+  - id: none
+    meaning: no comparison is supported; the outcome is reported as a model quantity only
