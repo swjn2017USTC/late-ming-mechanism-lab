@@ -2,8 +2,10 @@
 
 ```text
 docs/evidence/coverage.md       what the evidence base supports, per cluster and per rule
-docs/evidence/uncertainty.md    every parameter's grade, range and reasoning
+docs/evidence/uncertainty.md    every parameter's grade, range and the sources behind it
 docs/evidence/gaps.md           what is missing, including the human-only acquisition queue
+docs/evidence/tasks.md          the evidence tasks, ranked by relevance x debt
+docs/evidence/tasks.json        the same ranking, machine-readable
 ```
 
 Run it after touching any registry, ledger, card or pattern file:
@@ -35,8 +37,12 @@ from late_ming_lab.evidence.ledger import (
     load_rule_claims,
 )
 from late_ming_lab.evidence.registry import SourceRegistry, load_registry
+from late_ming_lab.evidence.snapshots import SnapshotManifest, load_snapshots
+from late_ming_lab.evidence.tasks import build_tasks, render_tasks, render_tasks_json
 
 COVERAGE_ARTIFACT: Final[str] = "coverage.md"
+TASKS_ARTIFACT: Final[str] = "tasks.md"
+TASKS_JSON_ARTIFACT: Final[str] = "tasks.json"
 UNCERTAINTY_ARTIFACT: Final[str] = "uncertainty.md"
 GAPS_ARTIFACT: Final[str] = "gaps.md"
 REPORT_DIR: Final[str] = "docs/evidence"
@@ -51,6 +57,7 @@ class EvidenceBase:
     cards: ParameterCards
     rules: RuleClaimSet
     patterns: PatternRegistry
+    snapshots: SnapshotManifest
 
 
 def load_evidence_base(root: str | Path) -> EvidenceBase:
@@ -61,6 +68,7 @@ def load_evidence_base(root: str | Path) -> EvidenceBase:
         cards=load_cards(directory),
         rules=load_rule_claims(directory),
         patterns=load_patterns(directory),
+        snapshots=load_snapshots(directory),
     )
 
 
@@ -77,20 +85,25 @@ def write_evidence_reports(
         cards=base.cards,
         patterns=base.patterns,
         rules=base.rules,
+        snapshots=base.snapshots,
     )
-    uncertainty = uncertainty_report(base.cards)
+    uncertainty = uncertainty_report(base.cards, base.registry)
     gaps = gap_report(
         registry=base.registry,
         ledger=base.ledger,
         cards=base.cards,
         patterns=base.patterns,
         rules=base.rules,
+        snapshots=base.snapshots,
     )
+    tasks = build_tasks(registry=base.registry, cards=base.cards, snapshots=base.snapshots)
     written: list[Path] = []
     for name, text in (
         (COVERAGE_ARTIFACT, coverage),
         (UNCERTAINTY_ARTIFACT, uncertainty),
         (GAPS_ARTIFACT, gaps),
+        (TASKS_ARTIFACT, render_tasks(tasks)),
+        (TASKS_JSON_ARTIFACT, render_tasks_json(tasks)),
     ):
         path = directory / name
         path.write_text(text, encoding="utf-8")

@@ -23,7 +23,7 @@ from collections import Counter
 from typing import Final
 
 from late_ming_lab.evidence.cards import ParameterCards, SupportClass
-from late_ming_lab.evidence.grades import EvidenceGrade
+from late_ming_lab.evidence.grades import EvidenceGrade, ReadDepth
 from late_ming_lab.evidence.ledger import (
     CalibrationRole,
     EvidenceLedger,
@@ -32,9 +32,11 @@ from late_ming_lab.evidence.ledger import (
 )
 from late_ming_lab.evidence.registry import (
     EVIDENCE_CLUSTERS,
+    AccessCondition,
     SourceRegistry,
     Verification,
 )
+from late_ming_lab.evidence.snapshots import SnapshotManifest
 
 GRADES_IN_ORDER: Final[tuple[EvidenceGrade, ...]] = (
     EvidenceGrade.A,
@@ -63,6 +65,7 @@ def coverage_report(
     cards: ParameterCards,
     patterns: PatternRegistry,
     rules: RuleClaimSet,
+    snapshots: SnapshotManifest,
 ) -> str:
     """Per-cluster and per-rule coverage, with the breaks named rather than summarised away."""
     rendered_support = ", ".join(
@@ -84,6 +87,11 @@ def coverage_report(
         f"({_grade_counts([card.evidence_grade for card in cards])})",
         f"- declared rules: {len(rules)} ({rendered_support})",
         f"- historical patterns: {len(patterns)} ({rendered_roles})",
+        f"- verification: {_verification_counts(registry)}",
+        f"- read depth: {_read_depth_counts(registry)}",
+        f"- snapshots recorded: {len(snapshots)} "
+        f"({len(snapshots.acquired_records)} acquired, {len(snapshots.pending_records)} "
+        f"pending); licences: {_licence_counts(snapshots)}",
         "",
         "## By cluster",
         "",
@@ -174,7 +182,112 @@ def coverage_report(
         f"{', '.join(patterns.clusters_without_patterns()) or 'none'}",
         "",
     ]
+    lines += _rights_section(registry, snapshots)
+    lines += _read_depth_section(registry, ledger)
     return "\n".join(lines)
+
+
+def _verification_counts(registry: SourceRegistry) -> str:
+    verified = sum(1 for source in registry if source.verification is Verification.VERIFIED)
+    unverified = len(registry) - verified
+    return f"{verified} verified, {unverified} unverified"
+
+
+def _read_depth_counts(registry: SourceRegistry) -> str:
+    counts = Counter(source.read_depth.value for source in registry)
+    return ", ".join(f"{depth.value}:{counts.get(depth.value, 0)}" for depth in ReadDepth)
+
+
+def _licence_counts(snapshots: SnapshotManifest) -> str:
+    counts = Counter(record.rights.status.value for record in snapshots)
+    return ", ".join(f"{name}:{count}" for name, count in sorted(counts.items()))
+
+
+def _rights_section(registry: SourceRegistry, snapshots: SnapshotManifest) -> list[str]:
+    """Access, licence and redistribution, per source and per snapshot."""
+    access = Counter(source.access.value for source in registry)
+    lines: list[str] = [
+        "## Access, licence and redistribution",
+        "",
+        "How each source can be reached, and what the project may do with the bytes it holds. A",
+        "raw snapshot is never a tracked file: every one lives under `data/raw/private/`, which",
+        "git ignores, and `derived_output_rule` in the snapshot record says what may be published",
+        "instead.",
+        "",
+        "| access condition | sources |",
+        "| --- | --- |",
+    ]
+    for condition in AccessCondition:
+        lines.append(f"| {condition.value} | {access.get(condition.value, 0)} |")
+    lines += [
+        "",
+        f"- human-only or institution-gated: {', '.join(registry.human_only_ids) or 'none'}",
+        f"- snapshots whose bytes may be redistributed: "
+        f"{', '.join(r.id for r in snapshots if r.raw_publishable) or 'none'}",
+        f"- snapshots held locally only (record and rule in git, file not): "
+        f"{', '.join(r.id for r in snapshots.local_only_records) or 'none'}",
+        "",
+        "| snapshot | source | version | licence | redistribution | acquired | sha256 |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for record in snapshots:
+        digest = (record.acquisition.sha256 or "-")[:12]
+        acquired = "yes" if record.acquired else record.acquisition.method.value
+        lines.append(
+            f"| {record.id} | {record.source_id} | {record.version} | "
+            f"{record.rights.status.value} | {record.rights.redistribution.value} | "
+            f"{acquired} | {digest} |"
+        )
+    lines.append("")
+    return lines
+
+
+def _read_depth_section(registry: SourceRegistry, ledger: EvidenceLedger) -> list[str]:
+    """What was read, and which claims are graded above what was read."""
+    crossed = Counter((source.read_depth.value, source.verification.value) for source in registry)
+    lines: list[str] = [
+        "## What was read",
+        "",
+        "A verified record means the bibliographic identity was confirmed against a page that was",
+        "loaded. It does not mean the source was read. This is the difference, and the claims that",
+        "sit on the wrong side of it.",
+        "",
+        "| read depth | verified | unverified |",
+        "| --- | --- | --- |",
+    ]
+    for depth in ReadDepth:
+        verified = crossed.get((depth.value, Verification.VERIFIED.value), 0)
+        unverified = crossed.get((depth.value, Verification.UNVERIFIED.value), 0)
+        lines.append(f"| {depth.value} | {verified} | {unverified} |")
+    by_id = {source.id: source for source in registry}
+    over_claimed = [
+        entry
+        for entry in ledger
+        if entry.evidence_grade in {EvidenceGrade.A, EvidenceGrade.B}
+        and entry.sources
+        and all(
+            by_id[source_id].read_depth is ReadDepth.IDENTITY_ONLY
+            for source_id in entry.sources
+            if source_id in by_id
+        )
+        and all(source_id in by_id for source_id in entry.sources)
+    ]
+    lines += [
+        "",
+        f"{len(over_claimed)} of {len(ledger)} ledger entries carry grade A or B while every",
+        "source behind them is identity-only: the claim is real as a bibliographic fact and",
+        "unverified as a statement about the text. They are listed rather than downgraded here,",
+        "because a grade is a judgement about a source and belongs to the record:",
+        "",
+    ]
+    if over_claimed:
+        for entry in sorted(over_claimed, key=lambda item: item.id):
+            sources = ", ".join(f"`{source_id}`" for source_id in entry.sources)
+            lines.append(f"- **{entry.id}** ({entry.evidence_grade.value}): {sources}")
+    else:
+        lines.append("- none")
+    lines.append("")
+    return lines
 
 
 def _parameter_is_declared(cards: ParameterCards, qualified: str) -> bool:
@@ -185,8 +298,9 @@ def _parameter_is_declared(cards: ParameterCards, qualified: str) -> bool:
     return cards.get(parameter_set, parameter) is not None
 
 
-def uncertainty_report(cards: ParameterCards) -> str:
-    """Every parameter's grade, range and reasoning, with the unsourced ones listed separately."""
+def uncertainty_report(cards: ParameterCards, registry: SourceRegistry) -> str:
+    """Every parameter's grade, range and reasoning, with the sources behind it and how far
+    those sources were read."""
     lines: list[str] = [
         "# Parameter uncertainty",
         "",
@@ -200,6 +314,7 @@ def uncertainty_report(cards: ParameterCards) -> str:
         f"- grade S: {sum(1 for c in cards if c.evidence_grade is EvidenceGrade.S)}",
         f"- grade D: {sum(1 for c in cards if c.evidence_grade is EvidenceGrade.D)}",
         f"- sensitivity candidates: {len(cards.sensitivity_candidates)}",
+        f"- cards whose sources are all identity-only: {_identity_only_cards(cards, registry)}",
         "",
         "## Cards",
         "",
@@ -220,6 +335,31 @@ def uncertainty_report(cards: ParameterCards) -> str:
             f"{card.sensitivity_priority} |"
         )
 
+    lines += [
+        "",
+        "## Sources behind each card, and how far they were read",
+        "",
+        "`identity` means the bibliographic record was confirmed and the text was not read;",
+        "`abstract` means an abstract was read; `full-text` means the passage was read. A sourced",
+        "card whose sources are all identity-only is a value resting on a title.",
+        "",
+        "| card | grade | sources | verification and read depth |",
+        "| --- | --- | --- | --- |",
+    ]
+    for card in cards:
+        if not card.sources:
+            lines.append(f"| {card.id} | {card.evidence_grade.value} | — | — |")
+            continue
+        marks = []
+        for source_id in card.sources:
+            source = registry.require(source_id)
+            marks.append(f"`{source_id}` {source.verification.value}/{source.read_depth.value}")
+        lines.append(
+            f"| {card.id} | {card.evidence_grade.value} | {len(card.sources)} | "
+            f"{'; '.join(marks)} |"
+        )
+    lines.append("")
+
     conflicts = [card for card in cards if card.range is not None and card.range.conflicts]
     lines += ["", "## Recorded conflicts", ""]
     if conflicts:
@@ -233,6 +373,21 @@ def uncertainty_report(cards: ParameterCards) -> str:
     return "\n".join(lines)
 
 
+def _identity_only_cards(cards: ParameterCards, registry: SourceRegistry) -> int:
+    """Cards that cite sources and every one of them is identity-only."""
+    return sum(
+        1
+        for card in cards
+        if card.sources
+        and all(
+            registry.require(source_id).read_depth is ReadDepth.IDENTITY_ONLY
+            for source_id in card.sources
+            if registry.has(source_id)
+        )
+        and all(registry.has(source_id) for source_id in card.sources)
+    )
+
+
 def gap_report(
     *,
     registry: SourceRegistry,
@@ -240,6 +395,7 @@ def gap_report(
     cards: ParameterCards,
     patterns: PatternRegistry,
     rules: RuleClaimSet,
+    snapshots: SnapshotManifest,
 ) -> str:
     """What is missing, including the acquisition queue that only a human may work."""
     unverified = [source for source in registry if source.verification is Verification.UNVERIFIED]
@@ -316,6 +472,7 @@ def gap_report(
     ]
     for source in unverified:
         lines.append(f"- `{source.id}` — {source.title} ({source.layer.value})")
+        lines.append(f"  - next action: {source.next_action}")
     if not unverified:
         lines.append("- none")
 
@@ -333,6 +490,46 @@ def gap_report(
     if not restricted:
         lines.append("- none")
 
+    lines += [
+        "",
+        "## Inputs acquired, and inputs still owed",
+        "",
+        f"{len(snapshots)} snapshot(s) are recorded in `sources/snapshots/`: "
+        f"{len(snapshots.acquired_records)} acquired and hashed,",
+        f"{len(snapshots.pending_records)} pending. A raw file is never tracked; what the",
+        "repository keeps is the record, the derived-output rule and the hash.",
+        "",
+        "| snapshot | source | licence | redistribution | state | next step |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for record in snapshots:
+        state = "acquired" if record.acquired else record.acquisition.method.value
+        if record.acquired:
+            next_step = record.derived_output_rule.split(". ")[0].rstrip(".") + "."
+        else:
+            next_step = record.acquisition.human_note
+        lines.append(
+            f"| {record.id} | {record.source_id} | {record.rights.status.value} | "
+            f"{record.rights.redistribution.value} | {state} | {next_step} |"
+        )
+    unresolved = [record for record in snapshots if record.rights.unresolved_question]
+    lines += [
+        "",
+        "## Licence questions that are still open",
+        "",
+        "An unresolved licence is recorded as a question, not as permission. Until an answer is on",
+        "file, the rule is: aggregated derived output may be published with attribution, the file",
+        "and any transcription of it may not.",
+        "",
+    ]
+    if unresolved:
+        for record in unresolved:
+            lines.append(
+                f"- **{record.id}** ({record.rights.status.value}): "
+                f"{record.rights.unresolved_question}"
+            )
+    else:
+        lines.append("- none")
     lines += [
         "",
         "## Structural gaps this phase did not close",

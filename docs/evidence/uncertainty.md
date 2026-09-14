@@ -10,6 +10,7 @@ evidence is weak but exists. Both are sensitivity candidates by the project's ru
 - grade S: 93
 - grade D: 0
 - sensitivity candidates: 93
+- cards whose sources are all identity-only: 9
 
 ## Cards
 
@@ -117,6 +118,118 @@ evidence is weak but exists. Both are sensitivity candidates by the project's ru
 | suppression_cohesion_cost | MilitaryParameters | S | exploratory | 0.02 | index points per suppression (0-1) | — | — | low |
 | suppression_effectiveness | MilitaryParameters | S | exploratory | 0.02 | members per soldier per month | — | — | high |
 | suppression_food_cost_per_troop_shi | MilitaryParameters | S | exploratory | 0.02 | shi per soldier suppressing | — | — | low |
+
+## Sources behind each card, and how far they were read
+
+`identity` means the bibliographic record was confirmed and the text was not read;
+`abstract` means an abstract was read; `full-text` means the passage was read. A sourced
+card whose sources are all identity-only is a value resting on a title.
+
+| card | grade | sources | verification and read depth |
+| --- | --- | --- | --- |
+| arms_per_asset_valuation | S | — | — |
+| arms_per_member_for_full_capability | S | — | — |
+| cohesion_decay_per_month | S | — | — |
+| cohesion_gain_per_month | S | — | — |
+| dissolve_troops_below | S | — | — |
+| food_shi_per_member_month | S | — | — |
+| formation_recruitment_months | S | — | — |
+| formation_unmet_ratio | S | — | — |
+| merge_cohesion_above | S | — | — |
+| minimum_formation_troops | S | — | — |
+| mobility_decay_per_month | S | — | — |
+| mobility_gain_from_move | S | — | — |
+| movement_avoidance_ratio | S | — | — |
+| movement_mobility_floor | S | — | — |
+| network_gain_per_month | S | — | — |
+| network_loss_from_raid_per_month | S | — | — |
+| raid_asset_share_per_month | S | — | — |
+| raid_extraction_multiple | S | — | — |
+| recruitment_rate_of_eligible_adults | S | — | — |
+| split_cohesion_below | S | — | — |
+| split_troops_threshold | S | — | — |
+| land_per_adult_capacity_mu | C | 1 | `guo-2001-grain-yields` unverified/identity-only |
+| yield_loss_scale | S | — | — |
+| yield_shi_per_mu | C | 2 | `guo-2001-grain-yields` unverified/identity-only; `broadberry-gupta-wang-2024-ming` unverified/identity-only |
+| grain_sale_carry_over_ratio_of_local_need | S | — | — |
+| interest_rate_monthly | S | — | — |
+| land_purchase_price_tael_per_mu | S | — | — |
+| loan_to_value | S | — | — |
+| max_lending_share_of_silver | S | — | — |
+| relief_carry_over_ratio_of_local_need | S | — | — |
+| relief_eligibility_unmet_ratio | S | — | — |
+| relief_share_of_grain_stock | S | — | — |
+| tax_mediation_advance_share | S | — | — |
+| assessed_value_tael_per_mu | C | 3 | `mingshi` verified/identity-only; `liang-fangzhong-1980` verified/identity-only; `ray-huang-1974` verified/identity-only |
+| collection_cost_logistics_floor | S | — | — |
+| collection_cost_per_effort_tael | S | — | — |
+| elite_hidden_land_share | S | — | — |
+| granary_purchase_share_of_silver | S | — | — |
+| granary_target_cover_months | S | — | — |
+| relief_eligibility_unmet_ratio | S | — | — |
+| relief_logistics_cost_per_shi_tael | S | — | — |
+| relief_share_of_need | S | — | — |
+| arrears_growth_tael_per_month | S | — | — |
+| band_troops_share_of_adults | S | — | — |
+| largest_band_share | S | — | — |
+| out_migration_share_of_households | S | — | — |
+| pay_shortfall_share | S | — | — |
+| receipts_below_quota_share | S | — | — |
+| tax_base_contraction_share | S | — | — |
+| unmet_share_of_need | S | — | — |
+| debt_repayment_grain_ratio_of_annual_need | S | — | — |
+| debt_repayment_silver_reserve_tael_per_household | S | — | — |
+| harvest_recovery_grain_ratio | S | — | — |
+| land_reference_value_tael_per_mu | S | — | — |
+| minimum_consumption_fraction | S | — | — |
+| permanent_migration_unmet_ratio | S | — | — |
+| recruitment_max_land_per_household_mu | S | — | — |
+| recruitment_unmet_ratio | S | — | — |
+| rent_share_of_harvest | S | — | — |
+| subsistence_grain_per_adult_month_shi | S | — | — |
+| surplus_keep_ratio_of_annual_need | S | — | — |
+| tax_grain_sale_floor_ratio_of_annual_need | S | — | — |
+| temporary_migration_unmet_ratio | S | — | — |
+| wage_grain_shi_per_adult_month | S | — | — |
+| capacity_unit_shi_per_month | S | — | — |
+| max_export_share_of_stock | S | — | — |
+| minimum_trade_margin_tael_per_shi | S | — | — |
+| price_ceiling_ratio | C | 2 | `shaanxi-famine-gazetteers` verified/identity-only; `quan-1991-northern-prices` unverified/identity-only |
+| price_elasticity | S | — | — |
+| price_floor_ratio | S | — | — |
+| reference_price_tael_per_shi | C | 2 | `quan-1991-northern-prices` unverified/identity-only; `shaanxi-famine-gazetteers` verified/identity-only |
+| risk_loss_fraction_scale | S | — | — |
+| target_cover_months | S | — | — |
+| transport_cost_tael_per_cost_unit_per_shi | S | — | — |
+| cost_tael_per_adult | S | — | — |
+| cost_tael_per_household | S | — | — |
+| minimum_households_to_move | S | — | — |
+| permanent_share_of_households_per_month | S | — | — |
+| temporary_share_of_adults_per_month | S | — | — |
+| temporary_term_months | S | — | — |
+| transit_loss_share | S | — | — |
+| cohesion_food_weight | S | — | — |
+| deserter_band_share | S | — | — |
+| deserter_home_share | S | — | — |
+| desertion_base_rate | S | — | — |
+| desertion_food_weight | S | — | — |
+| desertion_max_rate | S | — | — |
+| desertion_morale_weight | S | — | — |
+| desertion_pay_weight | S | — | — |
+| food_shi_per_soldier_month | C | 2 | `ray-huang-1974` verified/identity-only; `ray-huang-chc8` verified/identity-only |
+| garrison_target_troops | S | — | — |
+| levy_rate_of_eligible_adults | S | — | — |
+| morale_food_weight | S | — | — |
+| morale_pay_weight | S | — | — |
+| morale_recovery | S | — | — |
+| pay_share_of_treasury | C | 2 | `ray-huang-chc8` verified/identity-only; `ray-huang-1970` verified/identity-only |
+| pay_tael_per_soldier_month | C | 3 | `ray-huang-1974` verified/identity-only; `ray-huang-chc8` verified/identity-only; `ray-huang-1970` verified/identity-only |
+| ration_purchase_share_of_silver | C | 2 | `ray-huang-1974` verified/identity-only; `ray-huang-chc8` verified/identity-only |
+| suppression_arms_mitigation | S | — | — |
+| suppression_cohesion_cost | S | — | — |
+| suppression_effectiveness | S | — | — |
+| suppression_food_cost_per_troop_shi | S | — | — |
+
 
 ## Recorded conflicts
 
