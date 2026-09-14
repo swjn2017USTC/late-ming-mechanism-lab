@@ -1,0 +1,230 @@
+schema_version: source-snapshot-v1
+note: 'CHGIS Version 6 (2016), the administrative-geography spine V2-P02 will build the historical core on. The
+  licence is the governing document here: academic use is free, redistribution is not. Every raw file was downloaded
+  from the official Harvard Dataverse distribution into data/raw/private/chgis-v6/, which git ignores; what this
+  repository keeps is the record, the rule and (from V2-P02 on) derived tables that carry the mandatory citation.'
+snapshots:
+- id: chgis-v6-eula
+  source_id: chgis-v6
+  title: CHGIS Version 6 (2016) End User License Agreement
+  version: 6 (December 2016)
+  format: pdf
+  locator: https://doi.org/10.7910/DVN/FDLFJ3 (Dataverse file 2966398)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Terms of use: "Access to, and use of, these data is restricted to non-commercial use for academic
+      research and educational purposes." Citation is mandatory: "CHGIS Version 6. (c) Fairbank Center for Chinese
+      Studies and the Institute for Chinese Historical Geography at Fudan University, Dec 2016." Redistribution:
+      "You may not incorporate the entirety of CHGIS Data Layers in a work of your own intended for public dissemination,
+      whether modified or not, without the express permission of the Management Committee"; electronic redistribution
+      or downloadable distribution of the datasets is not allowed.'
+    basis: CHGIS_Version_6_EULA.pdf, opened 2026-09-14; clauses (3), (4), (5) and (7)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/2966398
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/2966398
+    bytes: 88889
+    sha256: feef110b1654cc2f400fe0ff89946f9e8d3f35b35c4afc6e5988b7c3225799ec
+    local_path: data/raw/private/chgis-v6/CHGIS_Version_6_EULA.pdf
+  derived_output_rule: The licence terms themselves may be quoted. No CHGIS layer, and no work incorporating an
+    entire layer, may be redistributed. Derived tables (node identity, name, date range, coordinates, catchment)
+    may be published with the mandatory citation and a description of the changes made; a reader obtains the CHGIS
+    data from the official distributor.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: 'The PDF is the CHGIS V6 EULA: title page, seven numbered clauses, and the mandatory citation
+      string match the licence summary on the CHGIS V6 landing page at https://chgis.fas.harvard.edu/data/chgis/v6/.'
+    read_depth: full-text
+  notes: The EULA is the document that decides what may be done with every other CHGIS snapshot; the landing page
+    repeats its substance ("free for academic research, no commercial use, resale, or redistribution permitted").
+- id: chgis-v6-readme
+  source_id: chgis-v6
+  title: CHGIS V6 README
+  version: 6 (December 2016)
+  format: pdf
+  locator: https://doi.org/10.7910/DVN/6CHSR7 (Dataverse file 2966512)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: academic use only, no redistribution of the data layers.'
+    basis: chgis-v6-eula (clauses 3 and 5); the Dataverse record carries no separate licence
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/2966512
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/2966512
+    bytes: 87961
+    sha256: 6ddc7d281b6e9db0c72e59aebfce5fb1344ead4d9c2b33e7de7634d84cfc232e
+    local_path: data/raw/private/chgis-v6/CHGIS_V6_README.pdf
+  derived_output_rule: Facts about the dataset (layers, date coverage, field semantics) may be restated with the
+    mandatory citation; the document itself is not republished.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: Downloaded from the Dataverse dataset the CHGIS V6 landing page names as its distribution point;
+      the file is the V6 README PDF (87,961 bytes).
+    read_depth: identity-only
+  notes: Read in V2-P02, when the layer semantics are actually needed to build nodes; identity and hash recorded
+    here so the file can be checked then.
+- id: chgis-v6-data-dictionary
+  source_id: chgis-v6
+  title: CHGIS V6 data dictionary tables
+  version: 6 (dictionary from V4, published with V6)
+  format: zip
+  locator: https://doi.org/10.7910/DVN/SNCEAU (Dataverse file 2966673)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: academic use only, no redistribution.'
+    basis: chgis-v6-eula (clauses 3 and 5)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/2966673
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/2966673
+    bytes: 47149
+    sha256: 77592074e1de4d082ab2e0141a3337598cac13fdaed30ef8409368ac7b52e505
+    local_path: data/raw/private/chgis-v6/CHGIS_data_dictionary.zip
+  derived_output_rule: Field names and their meanings may be restated in a derived schema with the mandatory citation;
+    the dictionary tables are not republished.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: Dataverse dataset "V6 Data Dictionary" lists this zip beside the periods file and README_DATA_DICTIONARY.txt;
+      the README text enumerates the six tables it holds.
+    read_depth: identity-only
+  notes: 'Describes the field names in all CHGIS tables: the field-level evidence V2-P02 needs to say what each
+    node attribute is, and to record which fields it did not use.'
+- id: chgis-v6-periods
+  source_id: chgis-v6
+  title: China periods and reign dates (CHGIS V6 distribution)
+  version: 6 (major periods 2015; China_chron 2004)
+  format: zip
+  locator: https://doi.org/10.7910/DVN/SNCEAU (Dataverse file 2966672)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: academic use only, no redistribution.'
+    basis: chgis-v6-eula (clauses 3 and 5)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/2966672
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/2966672
+    bytes: 155774
+    sha256: 7452ae6cf8d7dedbd0b06ea4e0e8343be9bac4075069ca8eb89e8ff0451c355e
+    local_path: data/raw/private/chgis-v6/China_Periods_ReignDates.zip
+  derived_output_rule: Period and reign boundaries may be restated as dates in a derived table with the mandatory
+    citation; the tables are not republished.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: Listed in the same Dataverse dataset as the data dictionary, and described in README_DATA_DICTIONARY.txt
+      as the major-periods and reign-date tables.
+    read_depth: identity-only
+  notes: Needed to place the 1625-1644 window on CHGIS period boundaries rather than on Gregorian years alone; the
+    Ming-Qing boundary is a versioned claim, not a constant.
+- id: chgis-v6-dictionary-readme
+  source_id: chgis-v6
+  title: README for the CHGIS V6 data dictionary tables
+  version: '6'
+  format: text
+  locator: https://doi.org/10.7910/DVN/SNCEAU (Dataverse file 2966674)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: academic use only, no redistribution.'
+    basis: chgis-v6-eula (clauses 3 and 5)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/2966674
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/2966674
+    bytes: 960
+    sha256: 629b6562c4781729a0f279a59011c3fcdf9643363517f8529d9bd40d701d0d68
+    local_path: data/raw/private/chgis-v6/README_DATA_DICTIONARY.txt
+  derived_output_rule: May be quoted to describe the dictionary's scope; not republished.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: 'Read in full: it names the six dictionary tables, the 2015 major-periods table and the 2004
+      reign chronology, and says the dictionary was published with V4 and not updated for V6.'
+    read_depth: full-text
+  notes: 'Records a real limitation of the dictionary V2-P02 will lean on: it is a V4 artifact shipped with V6.'
+- id: chgis-v6-county-points
+  source_id: chgis-v6
+  title: CHGIS V6 Time Series County Points (UTF-8, WGS84)
+  version: 6 (files dated 2017-08-21)
+  format: ESRI shapefile in zip
+  locator: https://doi.org/10.7910/DVN/Q9VOF5 (Dataverse file 3048165)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: non-commercial academic use; the county layer, or any work incorporating
+      the entirety of a layer, may not be redistributed without a separate agreement.'
+    basis: chgis-v6-eula (clauses 3, 4 and 5)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/3048165
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/3048165
+    bytes: 544703
+    sha256: 3b431d2e587bcb738e632385703824d252e0b4744ddd726fc5eb10364dd2d8c5
+    local_path: data/raw/private/chgis-v6/v6_time_cnty_pts_utf_wgs84.zip
+  derived_output_rule: 'The V2 historical core is a derived selection, not a redistribution: node ids, names, date
+    ranges and coordinates for the counties the model uses may be published with the mandatory citation and a statement
+    of what was changed, omitted and re-projected. The layer itself, and any file that could stand in for it, stays
+    local. A reader who wants the layer obtains it from CHGIS.'
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: The zip holds the five shapefile components (cpg, dbf 4,146,437 bytes, prj, shp, shx) and unpacks
+      cleanly; the Dataverse dataset lists it beside the GBK and WGS84 variants and the county README.
+    read_depth: identity-only
+  notes: 'The one CHGIS layer V2-P02 needs: county seats with begin/end dates, which is what a time-aware node table
+    requires. Fields are described by chgis-v6-data-dictionary.'
+- id: chgis-v6-county-readme
+  source_id: chgis-v6
+  title: README for the CHGIS V6 time-series county points
+  version: 6 (2017-08-21)
+  format: text
+  locator: https://doi.org/10.7910/DVN/Q9VOF5 (Dataverse file 3048161)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: academic use only, no redistribution.'
+    basis: chgis-v6-eula (clauses 3 and 5)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/3048161
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/3048161
+    bytes: 2323
+    sha256: 8f31213af43fa47e72288d771b8e03e3a49fcc68155b6e64fa6f61ba3bae1bfb
+    local_path: data/raw/private/chgis-v6/CHGIS_V6_README.txt
+  derived_output_rule: May be quoted to describe the layer variant; not republished.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: Downloaded from the county-points dataset; it is the short README shipping with that layer (2,323
+      bytes), distinct from the V6-wide README PDF.
+    read_depth: identity-only
+  notes: Kept because it describes the encodings the county layer ships in (UTF-8/GBK, WGS84/native), which decides
+    which file a rebuild should fetch.

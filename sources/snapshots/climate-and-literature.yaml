@@ -1,0 +1,192 @@
+schema_version: source-snapshot-v1
+note: 'The climate and literature snapshots V2 uses. REACHES is the documentary climate record; its licence is genuinely
+  unresolved (the digitized text belongs to the printed Compendium, and the complete database sits behind an account
+  application), so it is recorded as unknown with the question that would settle it, and no raw file is tracked.
+  The Chen et al. 2024 article is CC BY 4.0 and could be redistributed, but the file stays local like every other
+  raw snapshot: what the repository keeps is the record, the rule and the derived tables.'
+snapshots:
+- id: reaches-noaa-readme
+  source_id: reaches-noaa
+  title: REACHES Chinese Historical Climate Database, NOAA/WDS readme
+  version: Volume 3 (contribution 2023-03-13; file 2023-03-16)
+  format: text
+  locator: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/readme-reaches.txt
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: 'The readme states no licence. It requires citation: "Please cite original publication, NOAA Landing
+      Page URL, dataset and publication DOIs (where available), and date accessed." It records the study as NOAA
+      study 23410, funded by Academia Sinica (AS-105-SS-A04), digitized from Zhang (ed.), A Compendium of Chinese
+      Meteorological Records in the Last 3,000 Years.'
+    basis: readme-reaches.txt header, lines 1-20 and the Funding_Agency block
+    checked_utc: 2026-09-14
+    unresolved_question: What terms govern redistribution of the NOAA-hosted REACHES file, given that the Wang et
+      al. 2018 data descriptor says the rights in the original quoted records belong to the Compendium and that
+      the complete database is released on application at reaches.rcec.sinica.edu.tw? Ask NOAA/WDS and the Academia
+      Sinica REACHES team before republishing any part of the file.
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/readme-reaches.txt
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/readme-reaches.txt
+    bytes: 3653
+    sha256: 81eb5fe09cc77578c5cb6c0615759088300472046d440ca94d71d2e878b7e86d
+    local_path: data/raw/private/reaches/readme-reaches.txt
+  derived_output_rule: Aggregated derived series - for example events per year for Shaanxi and Henan, or a drought
+    and famine year index - may be published with the NOAA landing page and the Wang et al. 2018 citation, because
+    an aggregate is our analysis rather than the database. No transcription of individual records, and no redistribution
+    of the file, until the licence question above is answered.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: 'Opened from the NOAA directory listing of /pub/data/paleo/historical/china/reaches/, read in
+      full: study name, investigators, publication line (Wang et al., Scientific Data), funding, site bounding box
+      (18-53N, 73.5-134.5E), collection REACHES2018, 1368-1911.'
+    read_depth: full-text
+  notes: The readme points at a study-level JSON metadata file that now returns 404; the landing page is https://www.ncei.noaa.gov/access/paleo-search/study/23410.
+    Recorded rather than worked around, because the metadata file is cited by the readme as the authoritative description.
+- id: reaches-noaa-data-v31
+  source_id: reaches-noaa
+  title: REACHES volume 3.1 event records, 1368-1911
+  version: 3.1 (file dated 2023-03-16)
+  format: tab-separated text with a commented header
+  locator: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1data.txt
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: 'No licence statement ships with the file. The Wang et al. 2018 data descriptor states: "The REACHES
+      database only provides processed digits of the original records in Compendium, without their original texts.
+      All rights of the original quoted records should belong to Compendium itself."'
+    basis: Wang et al. 2018, Code availability section, read 2026-09-14; the file carries no terms
+    checked_utc: 2026-09-14
+    unresolved_question: May a third party republish this file, or extracts from it, given that the underlying text
+      rights belong to the Compendium and the Sinica release requires an account application?
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1data.txt
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1data.txt
+    bytes: 30934454
+    sha256: c2d8d131a1f597d4a0454c5115295710a4da8d5e644656283bebeda6b51327ef
+    local_path: data/raw/private/reaches/reachesv3.1data.txt
+  derived_output_rule: 'Same as the readme: aggregated, attributed derived series may be published; the record file
+    and any extract of individual records stay local until the licence question is answered. Nothing derived from
+    it may enter the model without a parameter card or a ledger claim naming this snapshot id.'
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: 148,264 lines; header begins "# REACHES Chinese Historical Climate Database" with the World
+      Data Service for Paleoclimatology template version 4.0, and data lines follow with no comment marker. The
+      NOAA directory listing gives the same byte count as the file downloaded.
+    read_depth: identity-only
+  notes: 'This is the climate input V2-P02 needs, and the largest rights question in the phase. Two things P02 must
+    check before using it: what share of the file is Ming-era (the Wang et al. data descriptor documents the digitization
+    of the Qing volume 1644-1795, while the file spans 1368-1911), and whether the Ming portion was coded and checked
+    the same way.'
+- id: reaches-sinica-full-database
+  source_id: reaches-noaa
+  title: REACHES full database and documentation (Academia Sinica RCEC release)
+  version: site version, 1368-1911
+  format: web database, CSV and TXT download
+  locator: https://reaches.rcec.sinica.edu.tw/index.html
+  rights:
+    status: restricted
+    redistribution: unknown
+    statement: The site states the database is open access but that users apply for an account for activation; the
+      Wang et al. 2018 descriptor confirms "It is open access but users need to apply for an account for activation."
+    basis: REACHES landing page, opened 2026-09-14; Wang et al. 2018, Code availability
+    checked_utc: 2026-09-14
+    unresolved_question: What do the account terms permit a research project to do with the release, and is the
+      account-holder's use compatible with publishing derived tables?
+  acquisition:
+    method: human
+    acquired: false
+    human_note: A person with an Academia Sinica account (or the account application) decides whether to request
+      the full release. No agent downloads from it or applies for an account on the project's behalf.
+  derived_output_rule: Nothing derived from this release may be published until the account terms are read; the
+    NOAA-hosted file, with its own unresolved question, is the copy acquired so far.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: 'Landing page opened: it names the database, its citation (Wang et al. 2018, Scientific Data
+      5, 180288), the NOAA download route for the complete 1368-1911 records, and the account requirement for the
+      full site.'
+    read_depth: identity-only
+  notes: Recorded as the acquisition route for the documentation the NOAA copy lacks - in particular the REACHES
+    dictionary needed to read the event codes - and as a human act rather than an agent act.
+- id: chen-2024-article-pdf
+  source_id: chen-2024-chongzhen
+  title: The spatio-temporal evolution of the Chongzhen drought (1627-1644) in China and its impact on famine (article
+    PDF)
+  version: Clim. Past 20, 2287-2307 (2024)
+  format: pdf
+  locator: 'https://doi.org/10.5194/cp-20-2287-2024 (PDF: cp-20-2287-2024.pdf)'
+  rights:
+    status: open-attribution
+    redistribution: attribution-required
+    statement: '"This work is distributed under the Creative Commons Attribution 4.0 License." Copyright remains
+      with the authors; attribution is required.'
+    basis: Article landing page, opened 2026-09-14 (copyright line and site licence footer)
+    checked_utc: 2026-09-14
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://cp.copernicus.org/articles/20/2287/2024/cp-20-2287-2024.pdf
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://cp.copernicus.org/articles/20/2287/2024/cp-20-2287-2024.pdf
+    bytes: 11177235
+    sha256: 042cc6303896566325087c193c58180dc4c9e9e6f5f83523e2717cf8b3d3b284
+    local_path: data/raw/private/chen-2024/cp-20-2287-2024.pdf
+  derived_output_rule: CC BY 4.0 permits redistribution and adaptation with attribution, so the file could be committed;
+    it is kept local by policy, because the repository publishes derived tables rather than third-party files. Derived
+    tables must cite Chen, S., Su, Y., Chen, X., and Yang, L. E., Clim. Past 20, 2287-2307 (2024).
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: The landing page confirms title, authors, volume 20, pages 2287-2307, publication date 2024-10-11
+      and the CC BY 4.0 licence, and states in its data-availability section that "All the data used in this study
+      are described in Appendix A" - so the county-level reconstruction lives in this PDF and has no separate dataset
+      DOI.
+    read_depth: abstract
+  notes: Appendix A is the data. P02 must extract it from the PDF rather than look for a dataset, and must record
+    the article's spatial resolution as a claim about the appendix, not about a county polygon layer.
+- id: broadberry-2024-working-paper
+  source_id: broadberry-gupta-wang-2024-ming
+  title: National income and agricultural yields, Ming dynasty estimates (working paper)
+  version: undated working paper as posted at pzacad.pitzer.edu (accessed 2026-09-14)
+  format: pdf
+  locator: https://pzacad.pitzer.edu/~lyamane/broadberryguanli.pdf
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: The PDF carries no licence statement on the hosting page; the published version is a chapter of the
+      Cambridge Economic History of China (Cambridge University Press), which is not open.
+    basis: HTTP response from the hosting page; no terms found to quote
+    checked_utc: 2026-09-14
+    unresolved_question: Does the working paper's own availability permit citation and derived use, and is it the
+      version the chapter's yield figures come from? The published chapter's terms govern the published figures
+      either way.
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://pzacad.pitzer.edu/~lyamane/broadberryguanli.pdf
+    acquired_utc: 2026-09-14
+    tool: curl -sSL https://pzacad.pitzer.edu/~lyamane/broadberryguanli.pdf
+    bytes: 1137598
+    sha256: 1375199da4c58f8ba5360f15d2f3b560b6894b19edd52c4660278679569d63f7
+    local_path: data/raw/private/broadberry-2024/broadberryguanli.pdf
+  derived_output_rule: No yield figure may be published as this paper's until the version question is settled; a
+    derived table may cite the chapter and the working paper as the locator of the figure, and the card that uses
+    it stays grade S or C until the table itself is read.
+  derived_committed: []
+  verification:
+    opened_utc: 2026-09-14
+    what_confirmed: The URL recorded in the registry resolves and returns a 1,137,598-byte PDF (the registry's locator
+      is live); the chapter itself remains unverified, because the Cambridge Core record for it returns 404 from
+      here.
+    read_depth: identity-only
+  notes: Acquired so that the ledger's 220 jin/mu (c. 1402) and 256 jin/mu (c. 1626) figures can be traced to a
+    table instead of to secondary citations; reading the table is a P02 task, and the chapter's own record stays
+    unverified until a library route confirms it.
