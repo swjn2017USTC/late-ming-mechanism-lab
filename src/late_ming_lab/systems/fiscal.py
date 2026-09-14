@@ -117,6 +117,16 @@ class TaxCollectionSystem:
         }
     )
 
+    def set_extraction_policy(self, policy: ExtractionPolicy) -> None:
+        """Install an extraction policy; the institutional decision layer drives this.
+
+        The policy is consulted every tick, so replacing it changes the county's assessment rate
+        and collection effort from the next tick onward without touching any other rule. It is the
+        same hook shape P04 declared for the market's disruption regime, and it exists so a runtime
+        decision can be *applied* rather than merely recorded.
+        """
+        self._policy = policy
+
     def __init__(
         self,
         *,
@@ -545,6 +555,17 @@ class OfficialReliefSystem:
             node_id: LocalGrainMarket(node_id=node_id, book=book, merchants=merchants)
             for node_id in sorted({county.node_id for county in governments})
         }
+
+    def set_relief_share(self, share: float) -> None:
+        """Install the share of measured unmet need relief releases; the decision layer drives it.
+
+        The relief rule reads the share each time it is asked, so replacing it changes what the
+        county gives from the next tick onward. The bound is checked here because the parameter is
+        replaced rather than re-validated.
+        """
+        if not 0.0 <= share <= 1.0:
+            raise ValueError(f"relief share must lie in [0, 1], got {share}")
+        self._parameters = self._parameters.model_copy(update={"relief_share_of_need": share})
 
     def step(self, ctx: TickContext) -> None:
         for county in self._governments:
