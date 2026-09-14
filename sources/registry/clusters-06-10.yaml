@@ -1,5 +1,116 @@
-schema_version: source-registry-v1
+schema_version: source-registry-v2
 sources:
+- id: brook-1998
+  layer: modern_scholarship
+  clusters:
+  - taxation_levies
+  - land_debt_elites
+  title: 'The Confusions of Pleasure: Commerce and Culture in Ming China'
+  creators:
+  - Brook, Timothy
+  year: 1999
+  container: University of California Press
+  locator: ISBN 978-0-520-22154-3
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Monograph in university libraries; not acquired by agent.
+  notes: Corrected and verified in V2-P01. P08 recorded the title as 'Commerce and Culture in Ming Dynasty' and
+    the year as 1998, from memory; the UC Press page gives 'Commerce and Culture in Ming China', hardcover 1998
+    and paperback September 1999. The record now carries the corrected title and the paperback date. No page of
+    the text was read, so the record remains identity-only.
+  verified_against: 'V2-P01: University of California Press book page (paperback ISBN 9780520221543) loaded — title,
+    author, publisher, September 1999 paperback, 345 pp.'
+  read_depth: identity-only
+- id: huang-1985
+  layer: modern_scholarship
+  clusters:
+  - land_debt_elites
+  title: The Peasant Economy and Social Change in North China
+  creators:
+  - Huang, Philip C.C.
+  year: 1985
+  container: Stanford University Press
+  locator: ISBN 978-0-8047-1220-0
+  access: library
+  language: en
+  grade: B
+  verification: verified
+  verified_against: books.google.com/books?id=KR2fAAAAIAAJ and fulcrum.org/concern/monographs/fj236225g
+  rights_note: Monograph in university libraries; not acquired by agent.
+  notes: 'Studies North China peasant economy, land tenure, elite-lender relations, and debt cycles. I verified
+    ISBN and publisher via Google Books and Fulcrum catalog. I did not read the full text. Query: ''Philip Huang
+    Peasant Economy North China Stanford ISBN''.'
+  read_depth: identity-only
+- id: liang-fangzhong-1980
+  layer: dataset
+  clusters:
+  - taxation_levies
+  - land_debt_elites
+  title: 中国历代户口、田地、田赋统计 (Statistics of Households, Population, Cultivated Land, and Land Tax throughout Chinese
+    History)
+  creators:
+  - Liang, Fangzhong
+  year: 1980
+  container: Shanghai People's Press
+  locator: bj.crntt.com/crn-webapp/cbspub/secDetail.jsp?bookid=14601
+  access: library
+  language: zh
+  grade: B
+  verification: verified
+  verified_against: bj.crntt.com/crn-webapp/cbspub/secDetail.jsp?bookid=14601 and ireader.com.cn/index.php?bid=13348834
+  rights_note: Physical book in university libraries; not acquired by agent.
+  notes: 'Over 200 statistical tables compiled from official histories and gazetteers. I verified title, compiler
+    (Liang Fangzhong, 1908-1970), publisher (Shanghai People''s Press, 1980), and selected Ming figures (Hongwu
+    26: 10,652,870 households, 60,545,812 persons) via Chinese library records. I did not read the full book. Query:
+    ''梁方仲 中国历代户口田地田赋统计''.'
+  read_depth: identity-only
+- id: local-gazetteers
+  layer: reference_work
+  clusters:
+  - land_debt_elites
+  - taxation_levies
+  - relief
+  - rebellion_armed_groups
+  title: Various local gazetteers (方志) of Ming provinces and counties
+  creators: []
+  year: null
+  container: Various local compilations across Ming provinces
+  locator: Various; Chinese local gazetteer databases and provincial libraries
+  access: institution
+  language: zh
+  grade: C
+  verification: unverified
+  rights_note: Local gazetteers held in Chinese provincial and national libraries; not acquired by agent.
+  notes: 'Ming and Qing local gazetteers contain records of land, taxation, granary institutions, elite activities,
+    and local disturbances. I cannot cite specific titles because these are scattered across thousands of volumes.
+    Query: ''Ming fangzhi local gazetteer land tax granary relief''.'
+  read_depth: identity-only
+  next_action: This record is a category rather than a titled source, so it cannot be verified as it stands. Replace
+    it with named gazetteers (title, edition, juan) as the acquisition queue is worked; unverified, no claim may
+    rest on it above grade C.
+- id: lorge-2005
+  layer: modern_scholarship
+  clusters:
+  - rebellion_armed_groups
+  - military_finance
+  title: War, Politics and Society in Early Modern China, 900-1795
+  creators:
+  - Lorge, Peter
+  year: 2005
+  container: Routledge
+  locator: ISBN 978-0-415-31690-3
+  access: library
+  language: en
+  grade: B
+  verification: verified
+  verified_against: worldcat.org/title/War-politics-and-society-in-early-modern-china-900-1795/oclc/252817920
+  rights_note: Monograph in university libraries; not acquired by agent.
+  notes: 'Survey of Chinese military history. Discusses Li Zicheng''s army size at Shanhaiguan (~60,000 per Lorge).
+    I verified ISBN and publisher via WorldCat and Routledge catalog. I did not read the full text. Query: ''Peter
+    Lorge War Politics Society Early Modern China ISBN''.'
+  read_depth: identity-only
 - id: mingshi
   layer: primary
   clusters:
@@ -18,34 +129,52 @@ sources:
   language: zh
   grade: B
   verification: verified
-  verified_against: ctext.org/wiki.pl?chapter=780491 and gushiwen.cn/guwen/bookv_d4f082694a5a.aspx (fiscal
-    treatise chapters confirmed)
-  notes: 'Qing-era compilation preserving Ming institutional records. Fiscal treatise (食貨志, juan 77-82)
-    confirmed on open digital platforms. I verified specific passages in juan 78 via search result snippets
-    from gushiwen.cn. I did not read the complete text of all relevant chapters. Query: ''Ming shi shihuo
-    zhi ctext gushiwen''.'
-- id: liang-fangzhong-1980
-  layer: dataset
+  verified_against: ctext.org/wiki.pl?chapter=780491 and gushiwen.cn/guwen/bookv_d4f082694a5a.aspx (fiscal treatise
+    chapters confirmed)
+  notes: 'Qing-era compilation preserving Ming institutional records. Fiscal treatise (食貨志, juan 77-82) confirmed
+    on open digital platforms. I verified specific passages in juan 78 via search result snippets from gushiwen.cn.
+    I did not read the complete text of all relevant chapters. Query: ''Ming shi shihuo zhi ctext gushiwen''.'
+  read_depth: identity-only
+- id: mote-1999
+  layer: reference_work
   clusters:
-  - taxation_levies
-  - land_debt_elites
-  title: 中国历代户口、田地、田赋统计 (Statistics of Households, Population, Cultivated Land, and Land Tax throughout
-    Chinese History)
+  - rebellion_armed_groups
+  title: Imperial China, 900-1800
   creators:
-  - Liang, Fangzhong
-  year: 1980
-  container: Shanghai People's Press
-  locator: bj.crntt.com/crn-webapp/cbspub/secDetail.jsp?bookid=14601
+  - Mote, Frederick W.
+  year: 1999
+  container: Harvard University Press
+  locator: ISBN 978-0-674-44515-4
   access: library
-  language: zh
+  language: en
   grade: B
   verification: verified
-  verified_against: bj.crntt.com/crn-webapp/cbspub/secDetail.jsp?bookid=14601 and ireader.com.cn/index.php?bid=13348834
-  rights_note: Physical book in university libraries; not acquired by agent.
-  notes: 'Over 200 statistical tables compiled from official histories and gazetteers. I verified title,
-    compiler (Liang Fangzhong, 1908-1970), publisher (Shanghai People''s Press, 1980), and selected Ming
-    figures (Hongwu 26: 10,652,870 households, 60,545,812 persons) via Chinese library records. I did
-    not read the full book. Query: ''梁方仲 中国历代户口田地田赋统计''.'
+  verified_against: books.google.com/books/about/Imperial_China_900_1800.html?id=SQWW7QgUH4gC and worldcat.org/title/Imperial-China-900-1800/oclc/41285114
+  rights_note: Standard reference work; not acquired by agent.
+  notes: 'Comprehensive survey of Chinese imperial history (~1,107 pages). Gives >100,000 for Li Zicheng''s forces
+    at Shanhaiguan (p. 816 per scholarly citations). I verified ISBN (paperback) and publisher via Google Books
+    and WorldCat. I did not verify the specific page reference. Query: ''Frederick Mote Imperial China 900-1800
+    Harvard ISBN''.'
+  read_depth: identity-only
+- id: ray-huang-1970
+  layer: modern_scholarship
+  clusters:
+  - military_finance
+  title: Military Expenditures in Sixteenth Century Ming China
+  creators:
+  - Huang, Ray
+  year: 1970
+  container: Oriens Extremus, vol. 17, pp. 39-62
+  locator: archiv.oriens-extremus.org/17/OE-17-04.pdf
+  access: open
+  language: en
+  grade: A
+  verification: verified
+  verified_against: archiv.oriens-extremus.org/17/OE-17-04.pdf (article available as open-access PDF)
+  notes: 'Early quantitative study of Ming military spending. I verified the article is available as an open-access
+    PDF at the journal archive URL. I did not read the full text. Query: ''Ray Huang Military Expenditures Sixteenth
+    Century Ming Oriens Extremus''.'
+  read_depth: identity-only
 - id: ray-huang-1974
   layer: modern_scholarship
   clusters:
@@ -65,8 +194,9 @@ sources:
   verified_against: cambridge.org/core/books/taxation-and-governmental-finance-in-sixteenth-century-ming-china/DA19199DB9C4A141C4185C67647D69D8
   rights_note: Standard monograph; behind publisher paywall.
   notes: 'The standard monograph on Ming fiscal administration in the 16th century. I verified the bibliographic
-    record via Cambridge University Press catalog. I did not read the full text. Query: ''Ray Huang Taxation
-    Governmental Finance Ming China Cambridge''.'
+    record via Cambridge University Press catalog. I did not read the full text. Query: ''Ray Huang Taxation Governmental
+    Finance Ming China Cambridge''.'
+  read_depth: identity-only
 - id: ray-huang-chc8
   layer: modern_scholarship
   clusters:
@@ -86,65 +216,9 @@ sources:
   verified_against: cambridge.org/core/books/abs/cambridge-history-of-china/ming-fiscal-administration/C869EC6304A631B1AE9E0F0AD1D9195E
   rights_note: Chapter in Cambridge History of China; behind publisher paywall.
   notes: 'Ch. 2 of CHC vol 8. Covers tribute-grain transport, military and civilian granaries, salt-certificate
-    system, silver substitution, fiscal pressures of frontier defense. I verified the chapter record and
-    DOI via Cambridge catalog. Query: ''Ray Huang Ming fiscal administration CHC vol 8''.'
-- id: ray-huang-1970
-  layer: modern_scholarship
-  clusters:
-  - military_finance
-  title: Military Expenditures in Sixteenth Century Ming China
-  creators:
-  - Huang, Ray
-  year: 1970
-  container: Oriens Extremus, vol. 17, pp. 39-62
-  locator: archiv.oriens-extremus.org/17/OE-17-04.pdf
-  access: open
-  language: en
-  grade: A
-  verification: verified
-  verified_against: archiv.oriens-extremus.org/17/OE-17-04.pdf (article available as open-access PDF)
-  notes: 'Early quantitative study of Ming military spending. I verified the article is available as an
-    open-access PDF at the journal archive URL. I did not read the full text. Query: ''Ray Huang Military
-    Expenditures Sixteenth Century Ming Oriens Extremus''.'
-- id: huang-1985
-  layer: modern_scholarship
-  clusters:
-  - land_debt_elites
-  title: The Peasant Economy and Social Change in North China
-  creators:
-  - Huang, Philip C.C.
-  year: 1985
-  container: Stanford University Press
-  locator: ISBN 978-0-8047-1220-0
-  access: library
-  language: en
-  grade: B
-  verification: verified
-  verified_against: books.google.com/books?id=KR2fAAAAIAAJ and fulcrum.org/concern/monographs/fj236225g
-  rights_note: Monograph in university libraries; not acquired by agent.
-  notes: 'Studies North China peasant economy, land tenure, elite-lender relations, and debt cycles. I
-    verified ISBN and publisher via Google Books and Fulcrum catalog. I did not read the full text. Query:
-    ''Philip Huang Peasant Economy North China Stanford ISBN''.'
-- id: lorge-2005
-  layer: modern_scholarship
-  clusters:
-  - rebellion_armed_groups
-  - military_finance
-  title: War, Politics and Society in Early Modern China, 900-1795
-  creators:
-  - Lorge, Peter
-  year: 2005
-  container: Routledge
-  locator: ISBN 978-0-415-31690-3
-  access: library
-  language: en
-  grade: B
-  verification: verified
-  verified_against: worldcat.org/title/War-politics-and-society-in-early-modern-china-900-1795/oclc/252817920
-  rights_note: Monograph in university libraries; not acquired by agent.
-  notes: 'Survey of Chinese military history. Discusses Li Zicheng''s army size at Shanhaiguan (~60,000
-    per Lorge). I verified ISBN and publisher via WorldCat and Routledge catalog. I did not read the full
-    text. Query: ''Peter Lorge War Politics Society Early Modern China ISBN''.'
+    system, silver substitution, fiscal pressures of frontier defense. I verified the chapter record and DOI via
+    Cambridge catalog. Query: ''Ray Huang Ming fiscal administration CHC vol 8''.'
+  read_depth: identity-only
 - id: wakeman-1985
   layer: modern_scholarship
   clusters:
@@ -161,67 +235,9 @@ sources:
   verification: verified
   verified_against: lawcat.berkeley.edu/record/222610 and ucpress.edu/books/the-great-enterprise-volume-1/hardcover
   rights_note: Standard reference work; behind publisher paywall.
-  notes: 'Major two-volume study of the Manchu conquest. The ~60,000 figure for Li Zicheng''s army at
-    Shanhaiguan is widely cited from this work. I verified ISBN and publisher via UC Press catalog and
-    lawcat.berkeley.edu. I did not verify specific page references. Query: ''Frederic Wakeman Great Enterprise
-    Manchu UC Press ISBN''.'
-- id: mote-1999
-  layer: reference_work
-  clusters:
-  - rebellion_armed_groups
-  title: Imperial China, 900-1800
-  creators:
-  - Mote, Frederick W.
-  year: 1999
-  container: Harvard University Press
-  locator: ISBN 978-0-674-44515-4
-  access: library
-  language: en
-  grade: B
-  verification: verified
-  verified_against: books.google.com/books/about/Imperial_China_900_1800.html?id=SQWW7QgUH4gC and worldcat.org/title/Imperial-China-900-1800/oclc/41285114
-  rights_note: Standard reference work; not acquired by agent.
-  notes: 'Comprehensive survey of Chinese imperial history (~1,107 pages). Gives >100,000 for Li Zicheng''s
-    forces at Shanhaiguan (p. 816 per scholarly citations). I verified ISBN (paperback) and publisher
-    via Google Books and WorldCat. I did not verify the specific page reference. Query: ''Frederick Mote
-    Imperial China 900-1800 Harvard ISBN''.'
-- id: local-gazetteers
-  layer: reference_work
-  clusters:
-  - land_debt_elites
-  - taxation_levies
-  - relief
-  - rebellion_armed_groups
-  title: Various local gazetteers (方志) of Ming provinces and counties
-  creators: []
-  year: null
-  container: Various local compilations across Ming provinces
-  locator: Various; Chinese local gazetteer databases and provincial libraries
-  access: institution
-  language: zh
-  grade: C
-  verification: unverified
-  rights_note: Local gazetteers held in Chinese provincial and national libraries; not acquired by agent.
-  notes: 'Ming and Qing local gazetteers contain records of land, taxation, granary institutions, elite
-    activities, and local disturbances. I cannot cite specific titles because these are scattered across
-    thousands of volumes. Query: ''Ming fangzhi local gazetteer land tax granary relief''.'
-- id: brook-1998
-  layer: modern_scholarship
-  clusters:
-  - taxation_levies
-  - land_debt_elites
-  title: 'The Confusions of Pleasure: Commerce and Culture in Ming Dynasty'
-  creators:
-  - Brook, Timothy
-  year: 1998
-  container: University of California Press
-  locator: ISBN 978-0-520-22154-3
-  access: library
-  language: en
-  grade: C
-  verification: unverified
-  rights_note: Monograph; not verified by this agent.
-  notes: 'Cultural and economic history of the Ming. I did not verify the ISBN or publication details
-    directly. Query: ''Timothy Brook Confusions of Pleasure Ming ISBN''.'
+  notes: 'Major two-volume study of the Manchu conquest. The ~60,000 figure for Li Zicheng''s army at Shanhaiguan
+    is widely cited from this work. I verified ISBN and publisher via UC Press catalog and lawcat.berkeley.edu.
+    I did not verify specific page references. Query: ''Frederic Wakeman Great Enterprise Manchu UC Press ISBN''.'
+  read_depth: identity-only
 note: Sources for the land/debt/elite, taxation, relief, military-finance and armed-group clusters. `ming-shilu`
   is registered once in clusters-01-05.yaml, where both editions are described.

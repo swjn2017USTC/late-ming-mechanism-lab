@@ -1,268 +1,500 @@
-schema_version: source-registry-v1
-note: >-
-  Sources for the drought/climate, famine, agriculture, population/migration and grain-price
-  clusters. `ming-shilu` is registered once, here, with both the print and the digital edition
-  described, because both halves of this phase cited the same work.
+schema_version: source-registry-v2
+note: 'Sources for the drought/climate, famine, agriculture, population/migration and grain-price clusters. `ming-shilu`
+  is registered once, here, with both the print and the digital edition described, because both halves of this phase
+  cited the same work. Read depth describes the source''s own content: a licence, a readme or a dictionary read
+  in full does not make the dataset read, and what was read of each file is recorded in sources/snapshots/.'
 sources:
-  - id: ming-shilu
-    layer: primary
-    clusters: [drought_climate, famine, grain_market_prices, land_debt_elites, taxation_levies, relief, rebellion_armed_groups]
-    title: "明實錄 (Veritable Records of the Ming), Chongzhen reign"
-    creators: []
-    year: null
-    container: "Court-compiled daily records; Zhonghua Shuju edition (1962-1984); digitized by Academia Sinica, Institute of History and Philology"
-    locator: "Zhonghua Shuju print, Chongzhen juan 1-17; digital edition at mh.sinica.edu.tw/tyml/"
-    access: institution
-    language: zh
-    grade: C
-    verification: unverified
-    rights_note: >-
-      Print edition available in major research libraries; the Academia Sinica digital edition may
-      require institutional access. No individual Chongzhen-reign entry was opened during this
-      phase, and no file was acquired.
-    notes: >-
-      The principal primary source for the period: drought memorials, famine reports, price
-      observations, relief edicts and military-pay memorials. Recorded from two independent
-      bibliographic descriptions (Zhonghua Shuju edition; Academia Sinica digital edition); no page
-      was opened. Queries: 'Ming Shilu Chongzhen drought records', '明實錄 崇禎 旱災',
-      'Ming Shilu veritable records Academia Sinica digital'.
-
-  - id: zheng-2006-precip
-    layer: dataset
-    clusters: [drought_climate]
-    title: "Precipitation Variability and Extreme Events in Eastern China during the Past 1500 Years"
-    creators: [Zheng, Jingyun, Wang, Wei-Chyung, Ge, Quansheng, Man, Zhumao, Zhang, Puyu]
-    year: 2006
-    container: "Terrestrial, Atmospheric and Oceanic Sciences"
-    locator: "10.3319/TAO.2006.17.3.579(A)"
-    access: open-access-journal
-    language: en
-    grade: B
-    verification: verified
-    verified_against: "DOI resolved via tao.cgu.org.tw; landing page confirmed title, authors, vol. 17 no. 3 pp. 579-592; abstract read"
-    rights_note: ""
-    notes: >-
-      Reconstructed dry-wet index for eastern China, 501-2000 CE. The most severe drought event in
-      the reconstruction is identified as 1634-1644. Full text not opened (403 on direct access), so
-      no numeric index value for 1628-1644 was taken.
-
-  - id: chen-2024-chongzhen
-    layer: dataset
-    clusters: [drought_climate, famine]
-    title: "The spatio-temporal evolution of the Chongzhen drought (1627-1644) in China and its impact on famine"
-    creators: [Chen, Shulong, Su, Yang, Chen, Xingcan, Yang, Lianmei E.]
-    year: 2024
-    container: "Climate of the Past"
-    locator: "10.5194/cp-20-2287-2024"
-    access: open-access-journal
-    language: en
-    grade: B
-    verification: verified
-    verified_against: "DOI resolved via Copernicus; landing page confirmed title, authors, vol. 20 pp. 2287-2307; abstract and data-availability statement read"
-    rights_note: ""
-    notes: >-
-      County-level reconstruction compiled from 6,282 merged disaster records (1,802 drought, 1,977
-      famine) drawn from 24 historical document collections; data in the article's appendix, no
-      separate dataset DOI. Full PDF not opened, so no county-level severity value was taken.
-
-  - id: brook-2017-nine-sloughs
-    layer: modern_scholarship
-    clusters: [drought_climate, famine, agriculture]
-    title: "Nine Sloughs: Profiling the Climate History of the Yuan and Ming Dynasties, 1260-1644"
-    creators: [Brook, Timothy]
-    year: 2017
-    container: "Journal of Chinese History"
-    locator: "10.1017/jch.2016.25"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Paywalled; available through a university library subscription. No page opened."
-    notes: >-
-      DOI confirmed via Cambridge Core (vol. 1 no. 1, pp. 27-58, January 2017); abstract describes
-      nine multi-year stress periods including the Chongzhen slough 1628-1644 and a corpus of 553
-      famine-price observations from about 3,000 gazetteers. Those figures come from the abstract
-      and from secondary citations, not from the pages. Query: 'Brook nine sloughs DOI Cambridge'.
-
-  - id: chen-2020-megadrought
-    layer: modern_scholarship
-    clusters: [drought_climate]
-    title: "One Drought and One Volcanic Eruption Influenced the History of China: The Late Ming Dynasty Mega-drought"
-    creators: [Chen, Feng, Li, Jinbao, Liu, Yafeng, Zhang, Xing, Huang, Rui, Huang, Chenxi, Zhang, Tongwen, Gu, Weixi, Zhang, Zhiqiang]
-    year: 2020
-    container: "Geophysical Research Letters"
-    locator: "10.1029/2020GL088124"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Paywalled; available through a university library subscription. No page opened."
-    notes: >-
-      DOI confirmed via Wiley (vol. 47, 2020). Abstract read: identifies a 1637-1643 megadrought and
-      argues for volcanic forcing via a 1641 eruption. No page of the article was opened.
-
-  - id: zheng-2014-collapse
-    layer: modern_scholarship
-    clusters: [famine, grain_market_prices]
-    title: "How climate change impacted the collapse of the Ming dynasty"
-    creators: [Zheng, Jingyun, Xiao, Lingbo, Fang, Xiuqi, Hao, Zhixin, Ge, Quansheng, Li, Beibei]
-    year: 2014
-    container: "Climatic Change"
-    locator: "10.1007/s10584-014-1244-7"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Paywalled; available through a university library subscription. No page opened."
-    notes: >-
-      DOI confirmed via Springer (vol. 127 no. 2, pp. 169-182). Abstract read: combines dry-wet and
-      temperature reconstructions with disaster records, grain production, rice prices and rebellion
-      data, and reports a per-capita production decline of roughly 20-50 per cent. No page opened.
-
-  - id: gao-2024-shaanxi-famine
-    layer: modern_scholarship
-    clusters: [famine]
-    title: "The famine of the Ming Dynasty in Shaanxi Province, China"
-    creators: [Gao, Lei]
-    year: 2024
-    container: "Regional Environmental Change"
-    locator: "NASA ADS abstract 2024REnvC..24...35G"
-    access: library
-    language: en
-    grade: D
-    verification: unverified
-    rights_note: "Located through a NASA ADS stub only; full text not accessed. Available through an institutional library."
-    notes: >-
-      The ADS record confirms an article of this title in Regional Environmental Change vol. 24
-      (2024). No abstract content beyond the stub was read and no claim from it was recorded.
-      Query: 'Gao Lei Ming famine Shaanxi 2024 Regional Environmental Change'.
-
-  - id: guo-2001-grain-yields
-    layer: modern_scholarship
-    clusters: [agriculture, famine]
-    title: "明清时期的粮食生产与农民生活水平"
-    creators: [Guo, Songyi]
-    year: 2001
-    container: "中国社会科学院历史研究所学刊 第一集, 社会科学文献出版社, pp. 373-396"
-    locator: "pp. 373-396"
-    access: institution
-    language: zh
-    grade: C
-    verification: unverified
-    rights_note: "Chapter in an edited volume; available at Chinese research libraries. No page opened and no file acquired."
-    notes: >-
-      Bibliographic details confirmed through two independent secondary citations (Renmin University
-      Qing History Institute; Peking University economics working paper), both listing 2001, Social
-      Sciences Academic Press, pp. 373-396. The yield figures attributed to this work in the ledger
-      come from secondary summaries, not from the pages.
-
-  - id: shaanxi-famine-gazetteers
-    layer: primary
-    clusters: [famine, grain_market_prices]
-    title: "Shaanxi local gazetteers (Shangzhou fu zhi, Shenmu xian zhi), Chongzhen-era entries"
-    creators: [various local compilers]
-    year: null
-    container: "Shaanxi Provincial Local Records Office digital archive"
-    locator: "dfz.shaanxi.gov.cn/zslm/fzzlk/xbsxsxz/ (published transcriptions)"
-    access: open
-    language: zh
-    grade: B
-    verification: verified
-    verified_against: "Archive loaded at dfz.shaanxi.gov.cn; the Shangzhou fu zhi and Shenmu xian zhi PDF directories are present and contain Chongzhen-era famine and price entries"
-    rights_note: ""
-    notes: >-
-      Published transcriptions of local gazetteers with Chongzhen-era entries on drought, famine and
-      prices: Shangzhou fu zhi records 4 taels per dou of rice in 1631; Shenmu xian zhi records
-      escalating prices in 1640-41. The archive was accessed; individual page numbers inside the
-      PDFs were not verified. Queries: 'Shaanxi gazetteer Chongzhen famine grain price
-      dfz.shaanxi.gov.cn', '陕西地方志 商洛 崇禎 旱災'.
-
-  - id: broadberry-gupta-wang-2024-ming
-    layer: dataset
-    clusters: [agriculture]
-    title: "National income and agricultural yields, Ming dynasty estimates"
-    creators: [Broadberry, Stephen, Guan, Hanhui, Li, David Daokui]
-    year: 2024
-    container: "Cambridge Economic History of China, vol. 1, Cambridge University Press"
-    locator: "CUP vol. 1; working paper at pzacad.pitzer.edu/~lyamane/broadberryguanli.pdf"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Chapter in a library-held volume; the working-paper PDF was located but not read. No file acquired."
-    notes: >-
-      Confirmed as a chapter of the Cambridge Economic History of China via Cambridge Core. The
-      figures used in the ledger (220 jin/mu around 1402, 256 jin/mu around 1626) come from secondary
-      citations of the working paper; no table was opened.
-
-  - id: cao-2024-population
-    layer: modern_scholarship
-    clusters: [population_migration]
-    title: "The Population History of China (1368-1953)"
-    creators: [Cao, Shuji]
-    year: 2024
-    container: "Global Economic History Series, vol. 20/7, Brill"
-    locator: "10.1163/9789004688933"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Paywalled monograph; available through a university library subscription. No page opened."
-    notes: >-
-      DOI confirmed via Brill (Leiden, 2024; ISBN 978-90-04-68265-8); chapter 6 addresses the rapid
-      population decline between Ming and Qing. No page opened, so no Shaanxi figure for 1628-1644
-      was taken. Query: 'Cao Shuji population history China 1368 Brill DOI'.
-
-  - id: ge-2024-concise-population
-    layer: reference_work
-    clusters: [population_migration]
-    title: "A Concise History of China's Population"
-    creators: [Ge, Jianxiong]
-    year: 2024
-    container: "Routledge China Perspectives series"
-    locator: "ISBN 978-1-032-60416-9"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Available through a university library subscription. No page opened."
-    notes: >-
-      ISBN confirmed via the Routledge product page (408 pages, 2024). A standard reference on
-      Chinese population history, recorded for orientation; no page opened and no figure taken.
-
-  - id: quan-1991-northern-prices
-    layer: modern_scholarship
-    clusters: [grain_market_prices]
-    title: "明代北边米粮价格的变动"
-    creators: [Quan, Hansheng]
-    year: 1991
-    container: "中国经济史研究, 稻鄉出版社, 台北, pp. 653-700"
-    locator: "pp. 653-700 (1991 Daoxiang edition)"
-    access: institution
-    language: zh
-    grade: C
-    verification: unverified
-    rights_note: "Published monograph chapter; available at Chinese research libraries. No page opened and no file acquired."
-    notes: >-
-      Bibliographic details confirmed through two independent references (Academia Sinica Institute
-      of History and Philology fellow profile; a secondary citation). The Yansui price figures used
-      in the ledger (about 0.2 tael per shi in the mid-fifteenth century; 4 taels per shi in
-      Chongzhen 4) come from secondary summaries, not from the pages.
-
-  - id: brook-2023-price-collapse
-    layer: modern_scholarship
-    clusters: [grain_market_prices]
-    title: "The Price of Collapse: The Little Ice Age and the Fall of Ming China"
-    creators: [Brook, Timothy]
-    year: 2023
-    container: "Princeton University Press"
-    locator: "10.1515/9780691253701"
-    access: library
-    language: en
-    grade: C
-    verification: unverified
-    rights_note: "Paywalled monograph; available through a university library subscription. No page opened."
-    notes: >-
-      DOI confirmed via De Gruyter/Princeton (2023; ISBN 978-0-691-25040-3). Recorded for its
-      argument connecting Little Ice Age climate deterioration, famine and grain prices; no page
-      opened and no price figure taken from it.
+- id: broadberry-gupta-wang-2024-ming
+  layer: dataset
+  clusters:
+  - agriculture
+  title: National income and agricultural yields, Ming dynasty estimates
+  creators:
+  - Broadberry
+  - Stephen
+  - Guan
+  - Hanhui
+  - Li
+  - David Daokui
+  year: 2024
+  container: Cambridge Economic History of China, vol. 1, Cambridge University Press
+  locator: CUP vol. 1; working paper at pzacad.pitzer.edu/~lyamane/broadberryguanli.pdf
+  access: library
+  language: en
+  grade: C
+  verification: unverified
+  rights_note: Chapter in a library-held volume; the working-paper PDF was located but not read. No file acquired.
+  notes: Confirmed as a chapter of the Cambridge Economic History of China via Cambridge Core. The figures used
+    in the ledger (220 jin/mu around 1402, 256 jin/mu around 1626) come from secondary citations of the working
+    paper; no table was opened.
+  read_depth: identity-only
+  next_action: The Cambridge Core chapter record 404s from this environment; a person with a library subscription
+    confirms the chapter and which table the 220 and 256 jin/mu figures come from. The working-paper PDF at the
+    recorded URL was acquired and hashed in V2-P01 (snapshot broadberry-2024-working-paper), so the figures can
+    be traced to a table once the version question is settled.
+- id: brook-2017-nine-sloughs
+  layer: modern_scholarship
+  clusters:
+  - drought_climate
+  - famine
+  - agriculture
+  title: 'Nine Sloughs: Profiling the Climate History of the Yuan and Ming Dynasties, 1260-1644'
+  creators:
+  - Brook
+  - Timothy
+  year: 2017
+  container: Journal of Chinese History
+  locator: 10.1017/jch.2016.25
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Paywalled; available through a university library subscription. No page opened.
+  notes: 'DOI confirmed via Cambridge Core (vol. 1 no. 1, pp. 27-58, January 2017); abstract describes nine multi-year
+    stress periods including the Chongzhen slough 1628-1644 and a corpus of 553 famine-price observations from about
+    3,000 gazetteers. Those figures come from the abstract and from secondary citations, not from the pages. Query:
+    ''Brook nine sloughs DOI Cambridge''.'
+  verified_against: 'V2-P01: Cambridge Core article page (doi 10.1017/jch.2016.25) loaded — title, author (Timothy
+    Brook), journal of Chinese History vol. 1 issue 1, pp. 27-58, published 2017-01'
+  read_depth: abstract
+- id: brook-2023-price-collapse
+  layer: modern_scholarship
+  clusters:
+  - grain_market_prices
+  title: 'The Price of Collapse: The Little Ice Age and the Fall of Ming China'
+  creators:
+  - Brook
+  - Timothy
+  year: 2023
+  container: Princeton University Press
+  locator: 10.1515/9780691253701
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Paywalled monograph; available through a university library subscription. No page opened.
+  notes: DOI confirmed via De Gruyter/Princeton (2023; ISBN 978-0-691-25040-3). Recorded for its argument connecting
+    Little Ice Age climate deterioration, famine and grain prices; no page opened and no price figure taken from
+    it.
+  verified_against: 'V2-P01: Princeton University Press book page (hardcover ISBN 9780691250403) loaded — title
+    The Price of Collapse, publisher, ISBN; the De Gruyter DOI page returns a bot challenge'
+  read_depth: identity-only
+- id: cao-2024-population
+  layer: modern_scholarship
+  clusters:
+  - population_migration
+  title: The Population History of China (1368-1953)
+  creators:
+  - Cao
+  - Shuji
+  year: 2024
+  container: Global Economic History Series, vol. 20/7, Brill
+  locator: 10.1163/9789004688933
+  access: library
+  language: en
+  grade: C
+  verification: unverified
+  rights_note: Paywalled monograph; available through a university library subscription. No page opened.
+  notes: 'DOI confirmed via Brill (Leiden, 2024; ISBN 978-90-04-68265-8); chapter 6 addresses the rapid population
+    decline between Ming and Qing. No page opened, so no Shaanxi figure for 1628-1644 was taken. Query: ''Cao Shuji
+    population history China 1368 Brill DOI''.'
+  read_depth: identity-only
+  next_action: Brill returns a bot challenge to automated access. A person with a library subscription opens the
+    monograph and confirms chapter 6's Ming-Qing population decline figures.
+- id: chen-2020-megadrought
+  layer: modern_scholarship
+  clusters:
+  - drought_climate
+  title: 'One Drought and One Volcanic Eruption Influenced the History of China: The Late Ming Dynasty Mega-drought'
+  creators:
+  - Chen
+  - Feng
+  - Li
+  - Jinbao
+  - Liu
+  - Yafeng
+  - Zhang
+  - Xing
+  - Huang
+  - Rui
+  - Huang
+  - Chenxi
+  - Zhang
+  - Tongwen
+  - Gu
+  - Weixi
+  - Zhang
+  - Zhiqiang
+  year: 2020
+  container: Geophysical Research Letters
+  locator: 10.1029/2020GL088124
+  access: library
+  language: en
+  grade: C
+  verification: unverified
+  rights_note: Paywalled; available through a university library subscription. No page opened.
+  notes: 'DOI confirmed via Wiley (vol. 47, 2020). Abstract read: identifies a 1637-1643 megadrought and argues
+    for volcanic forcing via a 1641 eruption. No page of the article was opened.'
+  read_depth: identity-only
+  next_action: Wiley/AGU returns HTTP 403 to this environment. A person with a library subscription opens the article
+    page and confirms the 1637-1643 megadrought claim and the 1641 eruption argument where the ledger attributes
+    them.
+- id: chen-2024-chongzhen
+  layer: dataset
+  clusters:
+  - drought_climate
+  - famine
+  title: The spatio-temporal evolution of the Chongzhen drought (1627-1644) in China and its impact on famine
+  creators:
+  - Chen
+  - Shulong
+  - Su
+  - Yang
+  - Chen
+  - Xingcan
+  - Yang
+  - Lianmei E.
+  year: 2024
+  container: Climate of the Past
+  locator: 10.5194/cp-20-2287-2024
+  access: open-access-journal
+  language: en
+  grade: B
+  verification: verified
+  verified_against: DOI resolved via Copernicus; landing page confirmed title, authors, vol. 20 pp. 2287-2307; abstract
+    and data-availability statement read
+  rights_note: ''
+  notes: County-level reconstruction compiled from 6,282 merged disaster records (1,802 drought, 1,977 famine) drawn
+    from 24 historical document collections; data in the article's appendix, no separate dataset DOI. Full PDF not
+    opened, so no county-level severity value was taken.
+  read_depth: abstract
+- id: chgis-v6
+  layer: dataset
+  clusters:
+  - population_migration
+  - taxation_levies
+  title: CHGIS Version 6 (China Historical Geographic Information System), time-series county points and supporting
+    tables
+  creators:
+  - Berman, Lex
+  - CHGIS, Fairbank Center for Chinese Studies, Harvard University
+  - Center for Historical Geographical Studies, Fudan University
+  year: 2016
+  container: Harvard Dataverse (CHGIS V6 dataverse); the CHGIS project site carries the licence summary
+  locator: https://chgis.fas.harvard.edu/data/chgis/v6/ ; distribution https://dataverse.harvard.edu/dataverse/chgis_v6
+    ; county layer doi:10.7910/DVN/Q9VOF5
+  access: open
+  language: en
+  grade: B
+  verification: verified
+  verified_against: 'V2-P01: the CHGIS V6 landing page, the V6 End User License Agreement PDF (doi:10.7910/DVN/FDLFJ3),
+    the V6 README and data-dictionary datasets, and the time-series county-points dataset metadata were all opened;
+    the EULA was read in full.'
+  read_depth: identity-only
+  next_action: ''
+  rights_note: Non-commercial academic use only; commercial use needs a separate licence; redistribution of the
+    layers, or of a work incorporating an entire layer, is prohibited, and citation of 'CHGIS Version 6' (c) Fairbank
+    Center for Chinese Studies and the Institute for Chinese Historical Geography at Fudan University, Dec 2016
+    is mandatory. Raw files are held only under data/raw/private/chgis-v6 (untracked); see the snapshot records.
+  notes: 'The administrative-geography spine for the V2 historical core: county seats with begin/end dates over
+    1625-1644, plus the period/reign-date and data-dictionary tables that say what each field means. Snapshot manifest:
+    sources/snapshots/chgis-v6.yaml (seven acquired files, all hashed). The data dictionary shipped with V6 is a
+    V4 artifact, not updated for V6 — a limitation V2-P02 must carry. CHGIS fixes place identity and date ranges;
+    it says nothing about population, yields or tax, so it cannot carry a claim in those clusters. Read depth corrected
+    in V2-P01 review: the licence, the README and the data dictionary were read, but the datasets themselves were
+    not. A document about a dataset is not the dataset, so the source is identity-only until V2-P02 reads the layers;
+    what was read of each file is recorded per snapshot.'
+- id: gao-2024-shaanxi-famine
+  layer: modern_scholarship
+  clusters:
+  - famine
+  title: The famine of the Ming Dynasty in Shaanxi Province, China
+  creators:
+  - Gao, Xing
+  - An, Ran
+  - Gao, Ge
+  - Li, Peiwei
+  year: 2024
+  container: Regional Environmental Change 24, article 35
+  locator: 10.1007/s10113-024-02196-6
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Springer, '2024 The Author(s), under exclusive licence to Springer-Verlag GmbH Germany'; paywalled,
+    available through a university library.
+  notes: 'Corrected and verified in V2-P01. The P08 record was compiled from a NASA ADS stub: its creator was wrong
+    (Gao, Lei) and its locator was a secondary index rather than the article. The published record is Gao, Xing;
+    An, Ran; Gao, Ge; Li, Peiwei, Regional Environmental Change 24 (2024), article 35, doi 10.1007/s10113-024-02196-6.
+    The abstract reports 1,251 county-level famine instances in Ming Shaanxi with spring and autumn peaks and a
+    three-stage escalation, which is a county-level famine reconstruction for exactly the province V2-P02 needs.
+    Grade raised D to C on the strength of the peer-reviewed venue and the abstract''s concrete county-level content;
+    the article body and its supplementary material still have to be read before any magnitude is used.'
+  verified_against: 'V2-P01: SpringerLink article page (doi 10.1007/s10113-024-02196-6) loaded — title, four authors,
+    Reg Environ Change vol. 24 issue 1 article 35, published 2024-03; abstract read'
+  read_depth: abstract
+- id: ge-2024-concise-population
+  layer: reference_work
+  clusters:
+  - population_migration
+  title: A Concise History of China's Population
+  creators:
+  - Ge
+  - Jianxiong
+  year: 2024
+  container: Routledge China Perspectives series
+  locator: ISBN 978-1-032-60416-9
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Available through a university library subscription. No page opened.
+  notes: ISBN confirmed via the Routledge product page (408 pages, 2024). A standard reference on Chinese population
+    history, recorded for orientation; no page opened and no figure taken.
+  verified_against: 'V2-P01: Routledge product page (ISBN 9781032604169) loaded — title, author Jianxiong Ge, 1st
+    edition, China Perspectives series, hardback/paperback/ebook ISBNs'
+  read_depth: identity-only
+- id: guo-2001-grain-yields
+  layer: modern_scholarship
+  clusters:
+  - agriculture
+  - famine
+  title: 明清时期的粮食生产与农民生活水平
+  creators:
+  - Guo
+  - Songyi
+  year: 2001
+  container: 中国社会科学院历史研究所学刊 第一集, 社会科学文献出版社, pp. 373-396
+  locator: pp. 373-396
+  access: institution
+  language: zh
+  grade: C
+  verification: unverified
+  rights_note: Chapter in an edited volume; available at Chinese research libraries. No page opened and no file
+    acquired.
+  notes: Bibliographic details confirmed through two independent secondary citations (Renmin University Qing History
+    Institute; Peking University economics working paper), both listing 2001, Social Sciences Academic Press, pp.
+    373-396. The yield figures attributed to this work in the ledger come from secondary summaries, not from the
+    pages.
+  read_depth: identity-only
+  next_action: No open locator exists for this chapter. A reader with access to Chinese research libraries confirms
+    中国社会科学院历史研究所学刊 第一集, pp. 373-396, and reads the yield table the ledger's 0.2-1.0 shi/mu band is attributed to.
+- id: ming-shilu
+  layer: primary
+  clusters:
+  - drought_climate
+  - famine
+  - grain_market_prices
+  - land_debt_elites
+  - taxation_levies
+  - relief
+  - rebellion_armed_groups
+  title: 明實錄 (Veritable Records of the Ming), Chongzhen reign
+  creators: []
+  year: null
+  container: Court-compiled daily records; Zhonghua Shuju edition (1962-1984); digitized by Academia Sinica, Institute
+    of History and Philology
+  locator: Zhonghua Shuju print, Chongzhen juan 1-17; digital edition at mh.sinica.edu.tw/tyml/
+  access: institution
+  language: zh
+  grade: C
+  verification: unverified
+  rights_note: Print edition available in major research libraries; the Academia Sinica digital edition may require
+    institutional access. No individual Chongzhen-reign entry was opened during this phase, and no file was acquired.
+  notes: 'The principal primary source for the period: drought memorials, famine reports, price observations, relief
+    edicts and military-pay memorials. Recorded from two independent bibliographic descriptions (Zhonghua Shuju
+    edition; Academia Sinica digital edition); no page was opened. Queries: ''Ming Shilu Chongzhen drought records'',
+    ''明實錄 崇禎 旱災'', ''Ming Shilu veritable records Academia Sinica digital''.'
+  read_depth: identity-only
+  next_action: Open the Academia Sinica digital edition (mh.sinica.edu.tw/tyml/) from a network that reaches it
+    — the V2-P01 environment could not connect — or a library copy of the Zhonghua Shuju print, and confirm one
+    Chongzhen-reign juan against this record.
+- id: quan-1991-northern-prices
+  layer: modern_scholarship
+  clusters:
+  - grain_market_prices
+  title: 明代北边米粮价格的变动
+  creators:
+  - Quan
+  - Hansheng
+  year: 1991
+  container: 中国经济史研究, 稻鄉出版社, 台北, pp. 653-700
+  locator: pp. 653-700 (1991 Daoxiang edition)
+  access: institution
+  language: zh
+  grade: C
+  verification: unverified
+  rights_note: Published monograph chapter; available at Chinese research libraries. No page opened and no file
+    acquired.
+  notes: Bibliographic details confirmed through two independent references (Academia Sinica Institute of History
+    and Philology fellow profile; a secondary citation). The Yansui price figures used in the ledger (about 0.2
+    tael per shi in the mid-fifteenth century; 4 taels per shi in Chongzhen 4) come from secondary summaries, not
+    from the pages.
+  read_depth: identity-only
+  next_action: A reader with access to Chinese research libraries consults the 1991 Daoxiang edition, pp. 653-700,
+    and checks the Yansui series (about 0.2 tael per shi in the mid-fifteenth century; 4 tael per shi in Chongzhen
+    4) that the grain-price ledger rests on.
+- id: reaches-noaa
+  layer: dataset
+  clusters:
+  - drought_climate
+  - famine
+  title: REACHES Chinese Historical Climate Database, complete records 1368-1911 (NOAA/WDS release)
+  creators:
+  - Wang, Pao K.
+  - Lin, Kuan-Hui Elaine
+  - Liao, Yi-Chun
+  - Liao, Hsiung-Ming
+  - Lin, Yu-Shiuan
+  - Hsu, Ching-Tzu
+  - Hsu, Shih-Ming
+  - Wan, Chih-Wei
+  - Lee, Shih-Yu
+  - Fan, I-Chun
+  - Ting, Te-Tien
+  year: 2023
+  container: World Data Service for Paleoclimatology, NOAA NCEI (study 23410); digitized from Zhang (ed.), A Compendium
+    of Chinese Meteorological Records in the Last 3,000 Years
+  locator: https://www.ncei.noaa.gov/access/paleo-search/study/23410 ; file https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1data.txt
+  access: open
+  language: en
+  grade: B
+  verification: verified
+  verified_against: 'V2-P01: the NOAA directory listing, the study readme (read in full) and the file header were
+    opened; the Wang et al. 2018 construction paper was read for method and rights.'
+  read_depth: identity-only
+  next_action: ''
+  rights_note: 'Licence unresolved: the file carries no terms, and the Wang et al. 2018 data descriptor states that
+    the rights in the quoted records belong to the Compendium, with the complete database released on application
+    at reaches.rcec.sinica.edu.tw. Raw file held only under data/raw/private/reaches (untracked).'
+  notes: 'The documentary climate record: events with converted Gregorian dates, modern coordinates and an event
+    taxonomy, digitized from the Compendium Zhang De''er compiled from official and local chronicles. Two things
+    V2-P02 must check before using it: what share of the 1368-1911 file is Ming-era, since the construction paper
+    documents the digitization of the Qing volume (1644-1795); and whether the Ming portion was coded and checked
+    the same way. Snapshot manifest: sources/snapshots/climate-and-literature.yaml. Records are event observations,
+    not a continuous series, so a monthly drought index built from them is a model of our own. Read depth corrected
+    in V2-P01 review: the readme was read in full and the data file only to its header, so the source is identity-only.
+    The snapshot records separate the two.'
+- id: shaanxi-famine-gazetteers
+  layer: primary
+  clusters:
+  - famine
+  - grain_market_prices
+  title: Shaanxi local gazetteers (Shangzhou fu zhi, Shenmu xian zhi), Chongzhen-era entries
+  creators:
+  - various local compilers
+  year: null
+  container: Shaanxi Provincial Local Records Office digital archive
+  locator: dfz.shaanxi.gov.cn/zslm/fzzlk/xbsxsxz/ (published transcriptions)
+  access: open
+  language: zh
+  grade: B
+  verification: verified
+  verified_against: Archive loaded at dfz.shaanxi.gov.cn; the Shangzhou fu zhi and Shenmu xian zhi PDF directories
+    are present and contain Chongzhen-era famine and price entries
+  rights_note: ''
+  notes: 'Published transcriptions of local gazetteers with Chongzhen-era entries on drought, famine and prices:
+    Shangzhou fu zhi records 4 taels per dou of rice in 1631; Shenmu xian zhi records escalating prices in 1640-41.
+    The archive was accessed; individual page numbers inside the PDFs were not verified. Queries: ''Shaanxi gazetteer
+    Chongzhen famine grain price dfz.shaanxi.gov.cn'', ''陕西地方志 商洛 崇禎 旱災''.'
+  read_depth: identity-only
+- id: wang-2018-reaches
+  layer: modern_scholarship
+  clusters:
+  - drought_climate
+  - famine
+  title: Construction of the REACHES climate database based on historical documents of China
+  creators:
+  - Wang, Pao K.
+  - Lin, Kuan-Hui Elaine
+  - Liao, Yi-Chun
+  - Liao, Hsiung-Ming
+  - Lin, Yu-Shiuan
+  - Hsu, Ching-Tzu
+  - Hsu, Shih-Ming
+  - Wan, Chih-Wei
+  - Lee, Shih-Yu
+  - Fan, I-Chun
+  - Tan, Pei-Hua
+  - Ting, Te-Tien
+  year: 2018
+  container: Scientific Data 5, 180288
+  locator: 10.1038/sdata.2018.288
+  access: open-access-journal
+  language: en
+  grade: B
+  verification: verified
+  verified_against: 'V2-P01: the Nature Scientific Data article page was loaded and the abstract, methods and code-availability
+    sections were read; the open-access status and the data citations were confirmed there.'
+  read_depth: abstract
+  next_action: ''
+  rights_note: Open access (2018 The Author(s)); the article's own terms are not the database's terms, which the
+    code-availability statement leaves with the Compendium.
+  notes: 'The method behind the REACHES database: record selection from 7,930 of 8,432 examined documents, digitization
+    with double proofreading, lunar-to-Gregorian conversion through the Academia Sinica calendar system, and location
+    resolution through a historical GIS. Two statements matter beyond method: the digitization reported covers the
+    Qing volume 1644-1795, and the database carries coded digits rather than the original text, whose rights stay
+    with the Compendium.'
+- id: zheng-2006-precip
+  layer: dataset
+  clusters:
+  - drought_climate
+  title: Precipitation Variability and Extreme Events in Eastern China during the Past 1500 Years
+  creators:
+  - Zheng
+  - Jingyun
+  - Wang
+  - Wei-Chyung
+  - Ge
+  - Quansheng
+  - Man
+  - Zhumao
+  - Zhang
+  - Puyu
+  year: 2006
+  container: Terrestrial, Atmospheric and Oceanic Sciences
+  locator: 10.3319/TAO.2006.17.3.579(A)
+  access: open-access-journal
+  language: en
+  grade: B
+  verification: verified
+  verified_against: DOI resolved via tao.cgu.org.tw; landing page confirmed title, authors, vol. 17 no. 3 pp. 579-592;
+    abstract read
+  rights_note: ''
+  notes: Reconstructed dry-wet index for eastern China, 501-2000 CE. The most severe drought event in the reconstruction
+    is identified as 1634-1644. Full text not opened (403 on direct access), so no numeric index value for 1628-1644
+    was taken.
+  read_depth: abstract
+- id: zheng-2014-collapse
+  layer: modern_scholarship
+  clusters:
+  - famine
+  - grain_market_prices
+  title: How climate change impacted the collapse of the Ming dynasty
+  creators:
+  - Zheng
+  - Jingyun
+  - Xiao
+  - Lingbo
+  - Fang
+  - Xiuqi
+  - Hao
+  - Zhixin
+  - Ge
+  - Quansheng
+  - Li
+  - Beibei
+  year: 2014
+  container: Climatic Change
+  locator: 10.1007/s10584-014-1244-7
+  access: library
+  language: en
+  grade: C
+  verification: verified
+  rights_note: Paywalled; available through a university library subscription. No page opened.
+  notes: 'DOI confirmed via Springer (vol. 127 no. 2, pp. 169-182). Abstract read: combines dry-wet and temperature
+    reconstructions with disaster records, grain production, rice prices and rebellion data, and reports a per-capita
+    production decline of roughly 20-50 per cent. No page opened.'
+  verified_against: 'V2-P01: SpringerLink article page (doi 10.1007/s10584-014-1244-7) loaded — title, Climatic
+    Change vol. 127 no. 2, pp. 169-182, published 2014-11; abstract read'
+  read_depth: abstract
