@@ -73,8 +73,13 @@ snapshots:
     local_path: data/raw/private/reaches/reachesv3.1data.txt
   derived_output_rule: 'Same as the readme: aggregated, attributed derived series may be published; the record file
     and any extract of individual records stay local until the licence question is answered. Nothing derived from
-    it may enter the model without a parameter card or a ledger claim naming this snapshot id.'
-  derived_committed: []
+    it may enter the model without a parameter card or a ledger claim naming this snapshot id. V2-P02 publishes
+    derived tables from this snapshot (named in derived_committed): a selection of node identities and coordinates,
+    link existence and distances, or per-node-year event counts - with the mandatory citation and a description
+    of the changes - never the layer or a transcription of the records.'
+  derived_committed:
+  - data/normalized/v2/historical-core-v1/climate-annual.parquet
+  - data/normalized/v2/historical-core-v1/manifest.json
   verification:
     opened_utc: 2026-09-14
     what_confirmed: 148,264 lines; header begins "# REACHES Chinese Historical Climate Database" with the World
@@ -190,3 +195,108 @@ snapshots:
   notes: Acquired so that the ledger's 220 jin/mu (c. 1402) and 256 jin/mu (c. 1626) figures can be traced to a
     table instead of to secondary citations; reading the table is a P02 task, and the chapter's own record stays
     unverified until a library route confirms it.
+- id: reaches-noaa-codes-haz
+  source_id: reaches-noaa
+  title: REACHES event coding guide, hazards domain
+  version: guide version 4.4
+  format: tab-separated text
+  locator: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-haz.txt
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: No licence statement ships with the guide files. The Wang et al. 2018 data descriptor states that
+      the rights in the quoted records belong to the Compendium, and the complete database is released on application.
+    basis: Wang et al. 2018, Code availability section; the files themselves carry no terms
+    checked_utc: '2026-09-14'
+    unresolved_question: May the coding guide be redistributed, and does its use carry the same condition as the
+      records it describes? Ask NOAA/WDS and the Academia Sinica team.
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-haz.txt
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-haz.txt
+    bytes: 34127
+    sha256: 6ed8dab71083c4ae59ad0522a4a5c86671b2fe7a99fc9d47cc905bfda5c7f340
+    local_path: data/raw/private/reaches/reachesv3.1codes-haz.txt
+  derived_output_rule: The coding guide may be quoted to decode event codes; it is not republished. No transcription
+    of event records.
+  derived_committed: []
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: 'Read in full: main categories with their two-digit codes (Drought 30, Flood 31, Pest/Vermin
+      32, Crops 33, Disease 34, Famine 35; Precipitation 10, Temperature 11; Socioeconomic turmoil 71), and the
+      explanation of the nine-digit code structure.'
+    read_depth: full-text
+  notes: The only place the event codes are defined. The English labels survived in these files even though the
+    Chinese text in the event file itself is replaced by '?' characters, which is why decoding is possible at all.
+- id: reaches-noaa-codes-met
+  source_id: reaches-noaa
+  title: REACHES event coding guide, meteorological domain
+  version: guide version 4.4
+  format: tab-separated text
+  locator: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-met.txt
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: No licence statement ships with the guide files. The Wang et al. 2018 data descriptor states that
+      the rights in the quoted records belong to the Compendium, and the complete database is released on application.
+    basis: Wang et al. 2018, Code availability section; the files themselves carry no terms
+    checked_utc: '2026-09-14'
+    unresolved_question: May the coding guide be redistributed, and does its use carry the same condition as the
+      records it describes? Ask NOAA/WDS and the Academia Sinica team.
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-met.txt
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-met.txt
+    bytes: 21663
+    sha256: fd76927aec34b57d52ee1621dc34e8d228d517979028b28d83593a30b7a33b8d
+    local_path: data/raw/private/reaches/reachesv3.1codes-met.txt
+  derived_output_rule: The coding guide may be quoted to decode event codes; it is not republished. No transcription
+    of event records.
+  derived_committed: []
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: 'Read in full: main categories with their two-digit codes (Drought 30, Flood 31, Pest/Vermin
+      32, Crops 33, Disease 34, Famine 35; Precipitation 10, Temperature 11; Socioeconomic turmoil 71), and the
+      explanation of the nine-digit code structure.'
+    read_depth: full-text
+  notes: The only place the event codes are defined. The English labels survived in these files even though the
+    Chinese text in the event file itself is replaced by '?' characters, which is why decoding is possible at all.
+- id: reaches-noaa-codes-other
+  source_id: reaches-noaa
+  title: REACHES event coding guide, other domains
+  version: guide version 4.4
+  format: tab-separated text
+  locator: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-other.txt
+  rights:
+    status: unknown
+    redistribution: unknown
+    statement: No licence statement ships with the guide files. The Wang et al. 2018 data descriptor states that
+      the rights in the quoted records belong to the Compendium, and the complete database is released on application.
+    basis: Wang et al. 2018, Code availability section; the files themselves carry no terms
+    checked_utc: '2026-09-14'
+    unresolved_question: May the coding guide be redistributed, and does its use carry the same condition as the
+      records it describes? Ask NOAA/WDS and the Academia Sinica team.
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-other.txt
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://www.ncei.noaa.gov/pub/data/paleo/historical/china/reaches/reachesv3.1codes-other.txt
+    bytes: 37725
+    sha256: 052f51e35f5c464adc479757a26c562c375e0f24142657e2e4774a5dd3ddf84c
+    local_path: data/raw/private/reaches/reachesv3.1codes-other.txt
+  derived_output_rule: The coding guide may be quoted to decode event codes; it is not republished. No transcription
+    of event records.
+  derived_committed: []
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: 'Read in full: main categories with their two-digit codes (Drought 30, Flood 31, Pest/Vermin
+      32, Crops 33, Disease 34, Famine 35; Precipitation 10, Temperature 11; Socioeconomic turmoil 71), and the
+      explanation of the nine-digit code structure.'
+    read_depth: full-text
+  notes: The only place the event codes are defined. The English labels survived in these files even though the
+    Chinese text in the event file itself is replaced by '?' characters, which is why decoding is possible at all.

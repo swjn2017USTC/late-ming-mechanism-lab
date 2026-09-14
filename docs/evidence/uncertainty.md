@@ -5,12 +5,12 @@ what the evidence would allow instead, and is empty where nobody has established
 Grade `S` means the value is a model assumption and nothing more. Grade `D` means the
 evidence is weak but exists. Both are sensitivity candidates by the project's rule.
 
-- cards: 102
-- with a stated range: 17
-- grade S: 93
+- cards: 111
+- with a stated range: 25
+- grade S: 101
 - grade D: 0
-- sensitivity candidates: 93
-- cards whose sources are all identity-only: 9
+- sensitivity candidates: 101
+- cards whose sources are all identity-only: 10
 
 ## Cards
 
@@ -66,6 +66,15 @@ evidence is weak but exists. Both are sensitivity candidates by the project's ru
 | receipts_below_quota_share | GovernanceIndicatorParameters | S | exploratory | 0.5 | receipts over quota (0-1) | — | — | low |
 | tax_base_contraction_share | GovernanceIndicatorParameters | S | exploratory | 0.02 | share of the opening base (0-1) | — | — | low |
 | unmet_share_of_need | GovernanceIndicatorParameters | S | exploratory | 0.25 | share of need (0-1) | — | — | low |
+| crop_saturation_events | HistoricalCoreParameters | S | theoretically-assumed | 4 | events per node-year | 2.0-8.0 | declared band around the current value | low |
+| crop_weight | HistoricalCoreParameters | S | theoretically-assumed | 0.5 | index points per event | 0.2-0.8 | declared band around the current value | medium |
+| drought_saturation_events | HistoricalCoreParameters | S | theoretically-assumed | 6 | events per node-year | 3.0-12.0 | declared band around the current value | high |
+| drought_weight | HistoricalCoreParameters | S | theoretically-assumed | 1 | index points per event | 0.5-1.0 | declared band; the ordering drought >= famine >= crop >= pest is what is argued | high |
+| famine_saturation_events | HistoricalCoreParameters | S | theoretically-assumed | 4 | events per node-year | 2.0-8.0 | declared band around the current value | medium |
+| famine_weight | HistoricalCoreParameters | S | theoretically-assumed | 0.75 | index points per event | 0.4-1.0 | declared band around the current value | high |
+| monthly_allocation_profile | HistoricalCoreParameters | C | evidence-backed | 1=0.0066, 2=0.1679, 3=0.0104, 4=0.0104, 5=0.2581, 6=0.0607, 7=0.1167, 8=0.2865, 9=0.0256, 10=0.0085, 11=0.0465, 12=0.0019 | share of the annual total, by month | — | — | high |
+| pest_saturation_events | HistoricalCoreParameters | S | theoretically-assumed | 4 | events per node-year | 2.0-8.0 | declared band around the current value | low |
+| pest_weight | HistoricalCoreParameters | S | theoretically-assumed | 0.4 | index points per event | 0.1-0.6 | declared band around the current value | medium |
 | debt_repayment_grain_ratio_of_annual_need | HouseholdParameters | S | exploratory | 1 | multiple of annual need | — | — | low |
 | debt_repayment_silver_reserve_tael_per_household | HouseholdParameters | S | exploratory | 0.5 | tael per household | — | — | low |
 | harvest_recovery_grain_ratio | HouseholdParameters | S | exploratory | 0.5 | share of the harvest (0-1) | — | — | low |
@@ -177,6 +186,15 @@ card whose sources are all identity-only is a value resting on a title.
 | receipts_below_quota_share | S | — | — |
 | tax_base_contraction_share | S | — | — |
 | unmet_share_of_need | S | — | — |
+| crop_saturation_events | S | — | — |
+| crop_weight | S | — | — |
+| drought_saturation_events | S | — | — |
+| drought_weight | S | — | — |
+| famine_saturation_events | S | — | — |
+| famine_weight | S | — | — |
+| monthly_allocation_profile | C | 1 | `reaches-noaa` verified/identity-only |
+| pest_saturation_events | S | — | — |
+| pest_weight | S | — | — |
 | debt_repayment_grain_ratio_of_annual_need | S | — | — |
 | debt_repayment_silver_reserve_tael_per_household | S | — | — |
 | harvest_recovery_grain_ratio | S | — | — |

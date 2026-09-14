@@ -6,12 +6,12 @@ is counted, not estimated.
 
 - sources: 28 (A:3, B:12, C:13, D:0, S:0)
 - ledger entries: 29
-- parameter cards: 102 (A:0, B:0, C:9, D:0, S:93)
+- parameter cards: 111 (A:0, B:0, C:10, D:0, S:101)
 - declared rules: 24 (evidence-backed:11, exploratory:6, theoretically-assumed:7)
 - historical patterns: 22 (hold-out:8, target:5, constraint:7, not-calibrated:2)
 - verification: 21 verified, 7 unverified
 - read depth: full-text:0, abstract:6, identity-only:22
-- snapshots recorded: 12 (11 acquired, 1 pending); licences: academic-only:7, open-attribution:1, restricted:1, unknown:3
+- snapshots recorded: 18 (17 acquired, 1 pending); licences: academic-only:10, open-attribution:1, restricted:1, unknown:6
 
 ## By cluster
 
@@ -37,6 +37,7 @@ is counted, not estimated.
 | EliteParameters | 9 | 0 | 5 | 4 | A:0, B:0, C:0, D:0, S:9 |
 | FiscalParameters | 9 | 0 | 4 | 5 | A:0, B:0, C:1, D:0, S:8 |
 | GovernanceIndicatorParameters | 8 | 0 | 0 | 8 | A:0, B:0, C:0, D:0, S:8 |
+| HistoricalCoreParameters | 9 | 1 | 8 | 0 | A:0, B:0, C:1, D:0, S:8 |
 | HouseholdParameters | 14 | 0 | 7 | 7 | A:0, B:0, C:0, D:0, S:14 |
 | MarketParameters | 10 | 0 | 3 | 7 | A:0, B:0, C:2, D:0, S:8 |
 | MigrationParameters | 7 | 0 | 3 | 4 | A:0, B:0, C:0, D:0, S:7 |
@@ -96,7 +97,7 @@ instead.
 
 - human-only or institution-gated: guo-2001-grain-yields, local-gazetteers, ming-shilu, quan-1991-northern-prices
 - snapshots whose bytes may be redistributed: chen-2024-article-pdf
-- snapshots held locally only (record and rule in git, file not): broadberry-2024-working-paper, chgis-v6-county-points, chgis-v6-county-readme, chgis-v6-data-dictionary, chgis-v6-dictionary-readme, chgis-v6-eula, chgis-v6-periods, chgis-v6-readme, reaches-noaa-data-v31, reaches-noaa-readme, reaches-sinica-full-database
+- snapshots held locally only (record and rule in git, file not): broadberry-2024-working-paper, chgis-v6-county-points, chgis-v6-county-readme, chgis-v6-courier-readme, chgis-v6-courier-routes, chgis-v6-courier-stations, chgis-v6-data-dictionary, chgis-v6-dictionary-readme, chgis-v6-eula, chgis-v6-periods, chgis-v6-readme, reaches-noaa-codes-haz, reaches-noaa-codes-met, reaches-noaa-codes-other, reaches-noaa-data-v31, reaches-noaa-readme, reaches-sinica-full-database
 
 | snapshot | source | version | licence | redistribution | acquired | sha256 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -104,11 +105,17 @@ instead.
 | chen-2024-article-pdf | chen-2024-chongzhen | Clim. Past 20, 2287-2307 (2024) | open-attribution | attribution-required | yes | 042cc6303896 |
 | chgis-v6-county-points | chgis-v6 | 6 (files dated 2017-08-21) | academic-only | prohibited | yes | 3b431d2e587b |
 | chgis-v6-county-readme | chgis-v6 | 6 (2017-08-21) | academic-only | prohibited | yes | 8f31213af43f |
+| chgis-v6-courier-readme | chgis-v6 | 2016 (version 2) | academic-only | prohibited | yes | 537ebf2a45ae |
+| chgis-v6-courier-routes | chgis-v6 | 2016 (version 2, 2016-11-16) | academic-only | prohibited | yes | b38160c3b7ca |
+| chgis-v6-courier-stations | chgis-v6 | 2016 (version 2, 2016-11-16) | academic-only | prohibited | yes | d0b83fbd0dc1 |
 | chgis-v6-data-dictionary | chgis-v6 | 6 (dictionary from V4, published with V6) | academic-only | prohibited | yes | 77592074e1de |
 | chgis-v6-dictionary-readme | chgis-v6 | 6 | academic-only | prohibited | yes | 629b6562c478 |
 | chgis-v6-eula | chgis-v6 | 6 (December 2016) | academic-only | prohibited | yes | feef110b1654 |
 | chgis-v6-periods | chgis-v6 | 6 (major periods 2015; China_chron 2004) | academic-only | prohibited | yes | 7452ae6cf8d7 |
 | chgis-v6-readme | chgis-v6 | 6 (December 2016) | academic-only | prohibited | yes | 6ddc7d281b6e |
+| reaches-noaa-codes-haz | reaches-noaa | guide version 4.4 | unknown | unknown | yes | 6ed8dab71083 |
+| reaches-noaa-codes-met | reaches-noaa | guide version 4.4 | unknown | unknown | yes | fd76927aec34 |
+| reaches-noaa-codes-other | reaches-noaa | guide version 4.4 | unknown | unknown | yes | 052f51e35f5c |
 | reaches-noaa-data-v31 | reaches-noaa | 3.1 (file dated 2023-03-16) | unknown | unknown | yes | c2d8d131a1f5 |
 | reaches-noaa-readme | reaches-noaa | Volume 3 (contribution 2023-03-13; file 2023-03-16) | unknown | unknown | yes | 81eb5fe09cc7 |
 | reaches-sinica-full-database | reaches-noaa | site version, 1368-1911 | restricted | unknown | human | - |

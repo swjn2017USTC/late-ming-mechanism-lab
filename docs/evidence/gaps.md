@@ -26,9 +26,9 @@ theoretically assumed:
 
 ## Parameters whose value is still ours
 
-93 of 102 parameters are grade S with no source fixing the
-value. Of those, 23 are framed by at least one ledger claim (the record
-establishes the mechanism and its order of magnitude) and 70
+101 of 111 parameters are grade S with no source fixing the
+value. Of those, 26 are framed by at least one ledger claim (the record
+establishes the mechanism and its order of magnitude) and 75
 have no claim attached at all — those are the thinnest places in the model:
 
 - BandParameters: 21 of 21 grade S (16 with no claim attached)
@@ -36,6 +36,7 @@ have no claim attached at all — those are the thinnest places in the model:
 - EliteParameters: 9 of 9 grade S (2 with no claim attached)
 - FiscalParameters: 8 of 9 grade S (4 with no claim attached)
 - GovernanceIndicatorParameters: 8 of 8 grade S (8 with no claim attached)
+- HistoricalCoreParameters: 8 of 9 grade S (5 with no claim attached)
 - HouseholdParameters: 14 of 14 grade S (12 with no claim attached)
 - MarketParameters: 8 of 10 grade S (7 with no claim attached)
 - MigrationParameters: 7 of 7 grade S (4 with no claim attached)
@@ -73,7 +74,7 @@ the registry records the condition and the locator, and a human decides what to 
 
 ## Inputs acquired, and inputs still owed
 
-12 snapshot(s) are recorded in `sources/snapshots/`: 11 acquired and hashed,
+18 snapshot(s) are recorded in `sources/snapshots/`: 17 acquired and hashed,
 1 pending. A raw file is never tracked; what the
 repository keeps is the record, the derived-output rule and the hash.
 
@@ -83,11 +84,17 @@ repository keeps is the record, the derived-output rule and the hash.
 | chen-2024-article-pdf | chen-2024-chongzhen | open-attribution | attribution-required | acquired | CC BY 4.0 permits redistribution and adaptation with attribution, so the file could be committed; it is kept local by policy, because the repository publishes derived tables rather than third-party files. |
 | chgis-v6-county-points | chgis-v6 | academic-only | prohibited | acquired | The V2 historical core is a derived selection, not a redistribution: node ids, names, date ranges and coordinates for the counties the model uses may be published with the mandatory citation and a statement of what was changed, omitted and re-projected. |
 | chgis-v6-county-readme | chgis-v6 | academic-only | prohibited | acquired | May be quoted to describe the layer variant; not republished. |
+| chgis-v6-courier-readme | chgis-v6 | academic-only | prohibited | acquired | May be quoted; not republished. |
+| chgis-v6-courier-routes | chgis-v6 | academic-only | prohibited | acquired | Derived values (link existence, distances, station counts) may be published with the mandatory citation and a description of the changes; the layer itself is not republished. |
+| chgis-v6-courier-stations | chgis-v6 | academic-only | prohibited | acquired | Derived values (link existence, distances, station counts) may be published with the mandatory citation and a description of the changes; the layer itself is not republished. |
 | chgis-v6-data-dictionary | chgis-v6 | academic-only | prohibited | acquired | Field names and their meanings may be restated in a derived schema with the mandatory citation; the dictionary tables are not republished. |
 | chgis-v6-dictionary-readme | chgis-v6 | academic-only | prohibited | acquired | May be quoted to describe the dictionary's scope; not republished. |
 | chgis-v6-eula | chgis-v6 | academic-only | prohibited | acquired | The licence terms themselves may be quoted. |
 | chgis-v6-periods | chgis-v6 | academic-only | prohibited | acquired | Period and reign boundaries may be restated as dates in a derived table with the mandatory citation; the tables are not republished. |
 | chgis-v6-readme | chgis-v6 | academic-only | prohibited | acquired | Facts about the dataset (layers, date coverage, field semantics) may be restated with the mandatory citation; the document itself is not republished. |
+| reaches-noaa-codes-haz | reaches-noaa | unknown | unknown | acquired | The coding guide may be quoted to decode event codes; it is not republished. |
+| reaches-noaa-codes-met | reaches-noaa | unknown | unknown | acquired | The coding guide may be quoted to decode event codes; it is not republished. |
+| reaches-noaa-codes-other | reaches-noaa | unknown | unknown | acquired | The coding guide may be quoted to decode event codes; it is not republished. |
 | reaches-noaa-data-v31 | reaches-noaa | unknown | unknown | acquired | Same as the readme: aggregated, attributed derived series may be published; the record file and any extract of individual records stay local until the licence question is answered. |
 | reaches-noaa-readme | reaches-noaa | unknown | unknown | acquired | Aggregated derived series - for example events per year for Shaanxi and Henan, or a drought and famine year index - may be published with the NOAA landing page and the Wang et al. |
 | reaches-sinica-full-database | reaches-noaa | restricted | unknown | human | A person with an Academia Sinica account (or the account application) decides whether to request the full release. No agent downloads from it or applies for an account on the project's behalf. |
@@ -99,6 +106,9 @@ file, the rule is: aggregated derived output may be published with attribution, 
 and any transcription of it may not.
 
 - **broadberry-2024-working-paper** (unknown): Does the working paper's own availability permit citation and derived use, and is it the version the chapter's yield figures come from? The published chapter's terms govern the published figures either way.
+- **reaches-noaa-codes-haz** (unknown): May the coding guide be redistributed, and does its use carry the same condition as the records it describes? Ask NOAA/WDS and the Academia Sinica team.
+- **reaches-noaa-codes-met** (unknown): May the coding guide be redistributed, and does its use carry the same condition as the records it describes? Ask NOAA/WDS and the Academia Sinica team.
+- **reaches-noaa-codes-other** (unknown): May the coding guide be redistributed, and does its use carry the same condition as the records it describes? Ask NOAA/WDS and the Academia Sinica team.
 - **reaches-noaa-data-v31** (unknown): May a third party republish this file, or extracts from it, given that the underlying text rights belong to the Compendium and the Sinica release requires an account application?
 - **reaches-noaa-readme** (unknown): What terms govern redistribution of the NOAA-hosted REACHES file, given that the Wang et al. 2018 data descriptor says the rights in the original quoted records belong to the Compendium and that the complete database is released on application at reaches.rcec.sinica.edu.tw? Ask NOAA/WDS and the Academia Sinica REACHES team before republishing any part of the file.
 - **reaches-sinica-full-database** (restricted): What do the account terms permit a research project to do with the release, and is the account-holder's use compatible with publishing derived tables?

@@ -189,8 +189,13 @@ snapshots:
   derived_output_rule: 'The V2 historical core is a derived selection, not a redistribution: node ids, names, date
     ranges and coordinates for the counties the model uses may be published with the mandatory citation and a statement
     of what was changed, omitted and re-projected. The layer itself, and any file that could stand in for it, stays
-    local. A reader who wants the layer obtains it from CHGIS.'
-  derived_committed: []
+    local. A reader who wants the layer obtains it from CHGIS. V2-P02 publishes derived tables from this snapshot
+    (named in derived_committed): a selection of node identities and coordinates, link existence and distances,
+    or per-node-year event counts - with the mandatory citation and a description of the changes - never the layer
+    or a transcription of the records.'
+  derived_committed:
+  - data/normalized/v2/historical-core-v1/nodes.parquet
+  - data/normalized/v2/historical-core-v1/manifest.json
   verification:
     opened_utc: 2026-09-14
     what_confirmed: The zip holds the five shapefile components (cpg, dbf 4,146,437 bytes, prj, shp, shx) and unpacks
@@ -228,3 +233,109 @@ snapshots:
     read_depth: identity-only
   notes: Kept because it describes the encodings the county layer ships in (UTF-8/GBK, WGS84/native), which decides
     which file a rebuild should fetch.
+- id: chgis-v6-courier-routes
+  source_id: chgis-v6
+  title: V6 Ming Dynasty Courier Routes
+  version: 2016 (version 2, 2016-11-16)
+  format: ESRI shapefile in zip
+  locator: https://doi.org/10.7910/DVN/SB8ZTM (Dataverse file 3005467)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: non-commercial academic use; redistribution of the layers, or of
+      a work incorporating an entire layer, is prohibited.'
+    basis: chgis-v6-eula (clauses 3, 4 and 5)
+    checked_utc: '2026-09-14'
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/3005467
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/3005467
+    bytes: 33954
+    sha256: b38160c3b7cac45c92e962d6b22a0f04e622b26216ee5e138c7cabaca632df80
+    local_path: data/raw/private/chgis-v6/Ming_Routes_2016.zip
+  derived_output_rule: 'Derived values (link existence, distances, station counts) may be published with the mandatory
+    citation and a description of the changes; the layer itself is not republished. V2-P02 publishes derived tables
+    from this snapshot (named in derived_committed): a selection of node identities and coordinates, link existence
+    and distances, or per-node-year event counts - with the mandatory citation and a description of the changes
+    - never the layer or a transcription of the records.'
+  derived_committed:
+  - data/normalized/v2/historical-core-v1/trade-edges.parquet
+  - data/normalized/v2/historical-core-v1/trade-candidates.parquet
+  - data/normalized/v2/historical-core-v1/migration-edges.parquet
+  - data/normalized/v2/historical-core-v1/migration-candidates.parquet
+  - data/normalized/v2/historical-core-v1/military-edges.parquet
+  - data/normalized/v2/historical-core-v1/military-candidates.parquet
+  - data/normalized/v2/historical-core-v1/manifest.json
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: Downloaded from the Dataverse dataset the CHGIS V6 site lists; the layer unpacks and reads as
+      1,043 line features with MAJ_MINOR and SOURCE attributes.
+    read_depth: identity-only
+  notes: 'Sources of the layer per its README: Mingdai Yizhankao (Yang Zhengtai) and the 1903 Postal Atlas. V2-P02
+    uses the route geometry as the documented long-distance movement network; route classes are MAJ_MINOR 1 and
+    2.'
+- id: chgis-v6-courier-stations
+  source_id: chgis-v6
+  title: V6 Ming Dynasty Courier Stations
+  version: 2016 (version 2, 2016-11-16)
+  format: ESRI shapefile in zip
+  locator: https://doi.org/10.7910/DVN/SB8ZTM (Dataverse file 3005465)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: non-commercial academic use; redistribution of the layers, or of
+      a work incorporating an entire layer, is prohibited.'
+    basis: chgis-v6-eula (clauses 3, 4 and 5)
+    checked_utc: '2026-09-14'
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/3005465
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/3005465
+    bytes: 109520
+    sha256: d0b83fbd0dc15e99f06fe233d8eedc8a829e3a1c4593d657706b79d4085999d5
+    local_path: data/raw/private/chgis-v6/Ming_Stations_2016.zip
+  derived_output_rule: Derived values (link existence, distances, station counts) may be published with the mandatory
+    citation and a description of the changes; the layer itself is not republished.
+  derived_committed: []
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: 1,000 point features in EPSG:4326 with YZ_ID, YZNM_PY, CHGIS_ID and modern province attributes;
+      323 fall inside the Shaanxi-Henan box, 319 of those carry a CHGIS_ID.
+    read_depth: identity-only
+  notes: 'Known defect, verified against the geometry: the attributes YZ_LAT and YZ_LONG are swapped (YZ_LAT holds
+    98-124, which is longitude; YZ_LONG holds 20-42, which is latitude) while the geometry is correct. V2-P02 therefore
+    uses the geometry and records the defect rather than silently swapping the columns.'
+- id: chgis-v6-courier-readme
+  source_id: chgis-v6
+  title: README for the Ming courier routes and stations layers
+  version: 2016 (version 2)
+  format: plain text
+  locator: https://doi.org/10.7910/DVN/SB8ZTM (Dataverse file 3005466)
+  rights:
+    status: academic-only
+    redistribution: prohibited
+    statement: 'Governed by the CHGIS V6 EULA: non-commercial academic use; redistribution of the layers, or of
+      a work incorporating an entire layer, is prohibited.'
+    basis: chgis-v6-eula (clauses 3, 4 and 5)
+    checked_utc: '2026-09-14'
+  acquisition:
+    method: http
+    acquired: true
+    fetch_url: https://dataverse.harvard.edu/api/access/datafile/3005466
+    acquired_utc: '2026-09-14'
+    tool: curl -sSL https://dataverse.harvard.edu/api/access/datafile/3005466
+    bytes: 4028
+    sha256: 537ebf2a45aec38ee2a4ead3f29ce1117f2398aa5e9727da9c5579d27365e004
+    local_path: data/raw/private/chgis-v6/README_MING_COURIER_2016.txt
+  derived_output_rule: May be quoted; not republished.
+  derived_committed: []
+  verification:
+    opened_utc: '2026-09-14'
+    what_confirmed: 'Read in full: it names the sources (Mingdai Yizhankao; 1903 Postal Atlas), the attribute dictionary
+      including CHGIS_ID and the modern province fields, and the WGS84 projection.'
+    read_depth: full-text
+  notes: The document that makes the courier layer's provenance checkable.
