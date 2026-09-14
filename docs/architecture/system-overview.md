@@ -461,9 +461,12 @@ src/late_ming_lab/
 ├── cli/ ui/
 ```
 
-Implemented so far: `late_ming_lab/__init__.py`, `cli.py` (`--version`, `smoke-run`),
-`analysis/`, `actors/`, `calibration/`, `core/`, `evidence/`, `experiments/`, `networks/`,
-`systems/`, `storage/`. Everything else is created by the phase that needs it.
+Implemented: `late_ming_lab/__init__.py`, `cli.py` (nine commands: `run`, `replay`, `experiment`,
+`calibrate`, `analyze`, `doctor`, `bench`, `batch`, `ui`), `analysis/`, `actors/`, `calibration/`,
+`core/`, `evidence/`, `experiments/`, `hpc/`, `networks/`, `policies/`, `storage/`, `synthesis/` and
+`ui/`. The `cli/` directory in the sketch above was never needed: the commands live in `cli.py`, one
+module, because a package of one function per command would be weight without a reader. Everything
+else is created by the phase that needs it.
 
 ## Phase roadmap
 
