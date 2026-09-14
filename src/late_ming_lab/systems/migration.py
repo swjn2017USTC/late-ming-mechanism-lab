@@ -24,6 +24,12 @@ is bounded by the migration edge's declared capacity, loses a declared share of 
 carry to the road (the edge's own risk, scaled), and can never take more from a cohort than it holds
 or leave it with nothing. Every movement is double-entered: the origin's loss is the destination's
 gain, and what leaves the modelled region is an outflow with a name.
+
+A tick in which nobody left writes none of those events, so the rules that refused a move would be
+invisible. Every cohort the phase considers therefore also gets one **gate row** per tick, naming
+the gate that decided its tick and the numbers that gate compared: the destination in reach, the
+road's capacity and risk, and the cohort's silver per household against the declared cost of a
+move. The rows change nothing — they are written after every rule has run, and report what it did.
 """
 
 from __future__ import annotations
@@ -33,6 +39,7 @@ from dataclasses import dataclass, replace
 from typing import Final
 
 from late_ming_lab.actors.households import (
+    CopingStage,
     HouseholdCohortAgent,
     HouseholdPopulation,
     emit_cohort_event,
@@ -71,9 +78,38 @@ EXIT_EVENT: Final[str] = "MIGRATION_EXIT"
 TEMPORARY_EVENT: Final[str] = "TEMPORARY_MIGRATION"
 RETURN_EVENT: Final[str] = "TEMPORARY_RETURN"
 MIGRANT_CONSUMPTION_EVENT: Final[str] = "MIGRANT_CONSUMPTION"
+#: One row per cohort per tick, naming the gate that decided it, moved or not.
+MIGRATION_GATE_EVENT: Final[str] = "MIGRATION_GATE"
 
 #: A cohort is never emptied by migration in this phase: the last household stays.
 MINIMUM_HOUSEHOLDS_KEPT: Final[float] = 1.0
+
+#: The gates a migration tick can name: the outcomes of :data:`MIGRATION_GATE_EVENT`, in the
+#: precedence ``MigrationSystem.step`` applies to them.
+GATE_MOVED: Final[str] = "moved"
+GATE_NO_DESTINATION: Final[str] = "no-destination"
+GATE_NO_RECEIVING_COHORT: Final[str] = "no-receiving-cohort"
+GATE_CAPACITY: Final[str] = "capacity"
+GATE_SILVER: Final[str] = "silver"
+GATE_BELOW_MINIMUM: Final[str] = "below-minimum"
+GATE_RETURNED: Final[str] = "returned"
+GATE_TEMPORARY: Final[str] = "temporary"
+GATE_NOT_ELIGIBLE: Final[str] = "not-eligible"
+
+#: Every outcome a gate row may carry, and the vocabulary the analysis layer reads by name.
+GATE_OUTCOMES: Final[frozenset[str]] = frozenset(
+    {
+        GATE_MOVED,
+        GATE_NO_DESTINATION,
+        GATE_NO_RECEIVING_COHORT,
+        GATE_CAPACITY,
+        GATE_SILVER,
+        GATE_BELOW_MINIMUM,
+        GATE_RETURNED,
+        GATE_TEMPORARY,
+        GATE_NOT_ELIGIBLE,
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +179,21 @@ class MigrantBuyer:
     cohort_id: str
 
 
+@dataclass(frozen=True, slots=True)
+class MigrationGate:
+    """What one migration tick decided for one cohort, and the road it was decided against.
+
+    ``outcome`` names the gate, from :data:`GATE_OUTCOMES`. ``destination`` is the node the rules
+    looked at, or the node a cohort's adults are already away at; it is absent when nothing was in
+    reach. ``movers_households`` is what actually left, so it is zero on every row that is not a
+    permanent move — a season away moves adults, and a refusal moves nobody.
+    """
+
+    outcome: str
+    destination: str | None = None
+    movers_households: float = 0.0
+
+
 class MigrationSystem:
     """Tick phase 09: seasonal absence first, then households that leave for good."""
 
@@ -202,10 +253,78 @@ class MigrationSystem:
         return self._migrants
 
     def step(self, ctx: TickContext) -> None:
-        self._bring_migrants_home(ctx)
-        self._permanent_migration(ctx)
-        self._temporary_migration(ctx)
+        returned = self._bring_migrants_home(ctx)
+        permanent = self._permanent_migration(ctx)
+        temporary = self._temporary_migration(ctx)
         self._population.check_invariants()
+        # Every cohort gets exactly one gate row per tick, naming the first rule that decided
+        # anything for it. The precedence, in the order the phase applies the rules:
+        #
+        #   1. moved                 the permanent rule sent households this tick
+        #   2. no-destination        ... and found no destination in reach
+        #   3. no-receiving-cohort   ... whose destination has no cohort of the movers' class
+        #   4. capacity              ... whose road capacity held the flow under the minimum
+        #   5. silver                ... whose households hold less than a move costs
+        #   6. below-minimum         ... whose declared share is under the minimum to move
+        #   7. returned              the cohort's away adults came home this tick
+        #   8. temporary             the temporary rule sent its adults away, or left them away
+        #   9. not-eligible          neither eligibility test passed, so no rule applied
+        #
+        # The permanent verdict outranks the seasonal ones because a departure is final where a
+        # season away is not, and the temporary one outranks the fallback because a cohort whose
+        # adults are away *is* being migrated by it.
+        for cohort in self._population:
+            gate = (
+                permanent.get(cohort.cohort_id)
+                or returned.get(cohort.cohort_id)
+                or temporary.get(cohort.cohort_id)
+                or MigrationGate(GATE_NOT_ELIGIBLE)
+            )
+            self._emit_gate(ctx, cohort, gate)
+
+    def _emit_gate(
+        self, ctx: TickContext, cohort: HouseholdCohortAgent, gate: MigrationGate
+    ) -> None:
+        """Write the tick's verdict for one cohort, whether or not it moved anything.
+
+        The destination is the node the deciding rule used, and the edge figures are that road's;
+        they are zero when nothing was in reach. ``migration_cost_tael`` is the declared cost of a
+        move per household, which is the number the silver gate is measured against: a refusal
+        spends nothing, so a row reporting what it spent would say nothing about why it was refused.
+        The row carries the phase's own rule version; a rule that acted names itself in its events.
+        """
+        destination = gate.destination
+        ctx.emit(
+            MIGRATION_GATE_EVENT,
+            phase=self.phase.token,
+            agent_id=cohort.cohort_id,
+            region=cohort.node_id,
+            rule_version=MIGRATION_RULE_VERSION,
+            trigger={
+                "households": cohort.households,
+                "adults": cohort.adults,
+                # A cohort with no households has no per-household figure, and cannot reach the
+                # permanent rule's own silver gate either.
+                "silver_per_household": (
+                    cohort.silver_tael / cohort.households if cohort.households > 0.0 else 0.0
+                ),
+                "eligible_permanent": 1.0 if cohort.permanent_migration_eligible else 0.0,
+                "destination_is_exit": (
+                    1.0 if destination is not None and self.is_exit(destination) else 0.0
+                ),
+                "edge_capacity_households": (
+                    self.edge_capacity(cohort.node_id, destination)
+                    if destination is not None
+                    else 0.0
+                ),
+                "edge_risk": (
+                    self.edge_risk(cohort.node_id, destination) if destination is not None else 0.0
+                ),
+                "migration_cost_tael": self._parameters.cost_tael_per_household,
+                "movers_households": gate.movers_households,
+            },
+            outcome=gate.outcome,
+        )
 
     # ------------------------------------------------------------------ destinations
 
@@ -262,75 +381,97 @@ class MigrationSystem:
 
     # ------------------------------------------------------------------ temporary
 
-    def _temporary_migration(self, ctx: TickContext) -> None:
-        """Send a share of an eligible cohort's adults away for a bounded term."""
-        parameters = self._parameters
+    def _temporary_migration(self, ctx: TickContext) -> dict[str, MigrationGate]:
+        """Send a share of an eligible cohort's adults away for a bounded term.
+
+        Returns one verdict for every cohort the rule looked at: an ineligible cohort is not its
+        to decide, and is left for the fallback in :meth:`step`.
+        """
+        gates: dict[str, MigrationGate] = {}
         for cohort in self._population:
-            if not cohort.temporary_migration_eligible or self._migrants.at(cohort.cohort_id):
-                continue
-            destination = self.destination_for(cohort.node_id)
-            if destination is None:
-                continue
-            wanted = min(
-                cohort.adults, cohort.adults * parameters.temporary_share_of_adults_per_month
-            )
-            if wanted < 1.0:
-                continue
-            cost = wanted * parameters.cost_tael_per_adult
-            if cost > cohort.silver_tael:
-                continue
-            group = MigrantGroup(
-                cohort_id=cohort.cohort_id,
-                origin_node=cohort.node_id,
-                destination_node=destination,
-                adults=wanted,
-                departed_tick=ctx.tick,
-                return_tick=ctx.tick + parameters.temporary_term_months,
-            )
+            gate = self._temporary_gate(ctx, cohort)
+            if gate is not None:
+                gates[cohort.cohort_id] = gate
+        return gates
+
+    def _temporary_gate(
+        self, ctx: TickContext, cohort: HouseholdCohortAgent
+    ) -> MigrationGate | None:
+        """The seasonal rule for one cohort, or ``None`` when the cohort may not send anybody."""
+        if not cohort.temporary_migration_eligible:
+            return None
+        parameters = self._parameters
+        away = self._migrants.at(cohort.cohort_id)
+        if away is not None:
+            # Already away on an earlier tick's term: the rule has nothing to decide, and the
+            # adults are still at the node that term sent them to.
+            return MigrationGate(GATE_TEMPORARY, destination=away.destination_node)
+        destination = self.destination_for(cohort.node_id)
+        if destination is None:
+            return MigrationGate(GATE_NO_DESTINATION)
+        wanted = min(cohort.adults, cohort.adults * parameters.temporary_share_of_adults_per_month)
+        if wanted < 1.0:
+            return MigrationGate(GATE_BELOW_MINIMUM, destination=destination)
+        cost = wanted * parameters.cost_tael_per_adult
+        if cost > cohort.silver_tael:
+            return MigrationGate(GATE_SILVER, destination=destination)
+        group = MigrantGroup(
+            cohort_id=cohort.cohort_id,
+            origin_node=cohort.node_id,
+            destination_node=destination,
+            adults=wanted,
+            departed_tick=ctx.tick,
+            return_tick=ctx.tick + parameters.temporary_term_months,
+        )
+        emit_cohort_event(
+            ctx,
+            cohort,
+            cohort.send_migrant_adults(
+                adults=wanted, destination=destination, rule_version=TEMPORARY_RULE_VERSION
+            ),
+            self.phase,
+        )
+        if cost > 0.0:
             emit_cohort_event(
                 ctx,
                 cohort,
-                cohort.send_migrant_adults(
-                    adults=wanted, destination=destination, rule_version=TEMPORARY_RULE_VERSION
+                cohort.record_migrant_subsistence(
+                    silver_tael=cost,
+                    destination=destination,
+                    rule_version=TEMPORARY_RULE_VERSION,
                 ),
                 self.phase,
             )
-            if cost > 0.0:
-                emit_cohort_event(
-                    ctx,
-                    cohort,
-                    cohort.record_migrant_subsistence(
-                        silver_tael=cost,
-                        destination=destination,
-                        rule_version=TEMPORARY_RULE_VERSION,
-                    ),
-                    self.phase,
-                )
-            self._migrants.add(replace(group, subsistence_paid_tael=cost))
-            ctx.emit(
-                TEMPORARY_EVENT,
-                phase=self.phase.token,
-                agent_id=cohort.cohort_id,
-                region=cohort.node_id,
-                rule_version=TEMPORARY_RULE_VERSION,
-                trigger={
-                    "adults_away": wanted,
-                    "travel_cost_tael": cost,
-                    "origin_price_tael_per_shi": self._book.price(cohort.node_id),
-                    "destination_price_tael_per_shi": self._book.price(destination),
-                    "return_tick": float(group.return_tick),
-                },
-                outcome=f"away-to:{destination}",
-            )
+        self._migrants.add(replace(group, subsistence_paid_tael=cost))
+        ctx.emit(
+            TEMPORARY_EVENT,
+            phase=self.phase.token,
+            agent_id=cohort.cohort_id,
+            region=cohort.node_id,
+            rule_version=TEMPORARY_RULE_VERSION,
+            trigger={
+                "adults_away": wanted,
+                "travel_cost_tael": cost,
+                "origin_price_tael_per_shi": self._book.price(cohort.node_id),
+                "destination_price_tael_per_shi": self._book.price(destination),
+                "return_tick": float(group.return_tick),
+            },
+            outcome=f"away-to:{destination}",
+        )
+        return MigrationGate(GATE_TEMPORARY, destination=destination)
 
-    def _bring_migrants_home(self, ctx: TickContext) -> None:
+    def _bring_migrants_home(self, ctx: TickContext) -> dict[str, MigrationGate]:
         """Feed the away adults where they are, and bring them home when the term or the money ends.
 
         The food is bought at the destination node's market with the origin cohort's silver, which
         is the point of the move: grain that cannot be had at home can sometimes be bought where the
         harvest was not as bad. The per-month budget is the same share of the cohort's silver as the
         share of its adults that are away, so a poor cohort sends fewer adults and for less.
+
+        Returns a verdict for each cohort whose term ended this tick, and nothing for one whose
+        adults are still away: staying away is not a decision this method made.
         """
+        returned: dict[str, MigrationGate] = {}
         for group in tuple(self._migrants):
             cohort = self._population.require(group.cohort_id)
             need = self._subsistence_need(group)
@@ -425,6 +566,10 @@ class MigrationSystem:
                     },
                     outcome="term-ended" if term_over else "out-of-money",
                 )
+                returned[cohort.cohort_id] = MigrationGate(
+                    GATE_RETURNED, destination=group.destination_node
+                )
+        return returned
 
     def _subsistence_need(self, group: MigrantGroup) -> float:
         """What a group away from home eats: its adults against the household layer's own floor."""
@@ -432,35 +577,142 @@ class MigrationSystem:
 
     # ------------------------------------------------------------------ permanent
 
-    def _permanent_migration(self, ctx: TickContext) -> None:
-        """Move eligible households for good, within the region or out of it."""
-        parameters = self._parameters
+    def _permanent_migration(self, ctx: TickContext) -> dict[str, MigrationGate]:
+        """Move households for good, within the region or out of it.
+
+        Two routes run here. The first is V1's: a cohort whose rolling unmet ratio has passed the
+        eligibility line, and which holds the cost of the move in silver. The second is V2-P04's
+        declared distress route, which is a no-op at its neutral parameter values and is what the
+        historical core's failure points at: on that run the first route produced six departures and
+        no regional exit in twenty years while four fifths of the cohorts ended destitute.
+
+        Returns one verdict per cohort the rules looked at, the distress route's verdict taking
+        precedence when it actually moved someone.
+        """
+        gates: dict[str, MigrationGate] = {}
         for cohort in self._population:
-            if not cohort.permanent_migration_eligible:
-                continue
-            destination = self.destination_for(cohort.node_id)
-            if destination is None:
-                continue
-            if (
-                not self.is_exit(destination)
-                and self._population.by_id.get(self._arrival_cohort_id(cohort, destination)) is None
-            ):
-                # Nobody there can receive this class of household. The move is refused rather
-                # than booked as a regional exit: staying is the honest outcome.
-                continue
-            share = parameters.permanent_share_of_households_per_month
-            keepable = max(0.0, cohort.households - MINIMUM_HOUSEHOLDS_KEPT)
-            # The edge's capacity is already a monthly household flow (P02 declares it in
-            # households per month), so it is a ceiling on the move, not something to scale again.
-            capacity = self.edge_capacity(cohort.node_id, destination)
-            movers = min(cohort.households * share, capacity, keepable)
-            if movers < parameters.minimum_households_to_move:
-                continue
-            # A household can only leave if it can pay its own way: movers carry their share of
-            # the cohort's silver, so the gate is silver per household against the cost of a move.
-            if cohort.silver_tael / cohort.households < parameters.cost_tael_per_household:
-                continue
-            self._move_households(ctx, cohort, destination, movers)
+            gate = self._permanent_gate(ctx, cohort)
+            distress = self._destitution_gate(ctx, cohort)
+            chosen = distress or gate
+            if chosen is not None:
+                gates[cohort.cohort_id] = chosen
+        return gates
+
+    def _destitution_gate(
+        self, ctx: TickContext, cohort: HouseholdCohortAgent
+    ) -> MigrationGate | None:
+        """The distress route: a destitute cohort may leave without eligibility or silver.
+
+        `destitution_departure_share` is the share of a destitute cohort's households that may leave
+        each month, and `destitution_exit_share` is the part of that taking the out-of-region road
+        rather than the nearest cheaper county. Both are zero in the V1 structure, and at zero this
+        method returns before touching anything: the ablation arm is then the reference run exactly,
+        which is a property of the code rather than a claim about it.
+
+        The exit leg is tried first because V1's routing sends a mover to the cheapest reachable
+        county and treats an exit as a last resort, so a famine covering every county — the case the
+        record describes — could never produce a regional outflow through such a route.
+
+        Both legs go through :meth:`_move_households`, so the destination's declared monthly
+        capacity and the edge's transit loss bound them as they bound any other move, and a cohort
+        that cannot be received stays put.
+        """
+        parameters = self._parameters
+        if parameters.destitution_departure_share <= 0.0:
+            return None
+        if cohort.coping_stage is not CopingStage.DESTITUTE:
+            return None
+        if cohort.households <= MINIMUM_HOUSEHOLDS_KEPT:
+            return None
+        moved = 0.0
+        destination: str | None = None
+        exit_destination = self._exit_destination(cohort.node_id)
+        exit_part = (
+            parameters.destitution_departure_share * parameters.destitution_exit_share
+            if exit_destination is not None
+            else 0.0
+        )
+        if exit_destination is not None and exit_part > 0.0:
+            taken = self._move_at_most(ctx, cohort, exit_destination, exit_part)
+            if taken > 0.0:
+                moved += taken
+                destination = exit_destination
+        in_region_part = parameters.destitution_departure_share - exit_part
+        if in_region_part > 0.0:
+            target = self.destination_for(cohort.node_id)
+            receivable = target is not None and (
+                self.is_exit(target)
+                or self._population.by_id.get(self._arrival_cohort_id(cohort, target)) is not None
+            )
+            if target is not None and receivable:
+                taken = self._move_at_most(ctx, cohort, target, in_region_part)
+                if taken > 0.0:
+                    moved += taken
+                    destination = destination or target
+        if destination is None:
+            return None
+        return MigrationGate(GATE_MOVED, destination=destination, movers_households=moved)
+
+    def _move_at_most(
+        self,
+        ctx: TickContext,
+        cohort: HouseholdCohortAgent,
+        destination: str,
+        share: float,
+    ) -> float:
+        """Move up to a share of a cohort, bounded by the road's capacity; 0.0 if nothing moved."""
+        keepable = max(0.0, cohort.households - MINIMUM_HOUSEHOLDS_KEPT)
+        capacity = self.edge_capacity(cohort.node_id, destination)
+        movers = min(cohort.households * share, capacity, keepable)
+        if movers < self._parameters.minimum_households_to_move:
+            return 0.0
+        self._move_households(ctx, cohort, destination, movers)
+        return movers
+
+    def _exit_destination(self, origin: str) -> str | None:
+        """The declared migration exit in reach, or None when the region has none."""
+        if origin not in self._graphs.migration:
+            return None
+        exits = [
+            node for node in sorted(self._graphs.migration.neighbors(origin)) if self.is_exit(node)
+        ]
+        return exits[0] if exits else None
+
+    def _permanent_gate(
+        self, ctx: TickContext, cohort: HouseholdCohortAgent
+    ) -> MigrationGate | None:
+        """The permanent rule for one cohort: which households left, or which gate refused them."""
+        if not cohort.permanent_migration_eligible:
+            return None
+        parameters = self._parameters
+        destination = self.destination_for(cohort.node_id)
+        if destination is None:
+            return MigrationGate(GATE_NO_DESTINATION)
+        if (
+            not self.is_exit(destination)
+            and self._population.by_id.get(self._arrival_cohort_id(cohort, destination)) is None
+        ):
+            # Nobody there can receive this class of household. The move is refused rather
+            # than booked as a regional exit: staying is the honest outcome.
+            return MigrationGate(GATE_NO_RECEIVING_COHORT, destination=destination)
+        share = parameters.permanent_share_of_households_per_month
+        keepable = max(0.0, cohort.households - MINIMUM_HOUSEHOLDS_KEPT)
+        # The edge's capacity is already a monthly household flow (P02 declares it in
+        # households per month), so it is a ceiling on the move, not something to scale again.
+        capacity = self.edge_capacity(cohort.node_id, destination)
+        movers = min(cohort.households * share, capacity, keepable)
+        if movers < parameters.minimum_households_to_move:
+            # The road's capacity refused the move only when it is the ceiling that held the flow
+            # under the minimum; when the cohort's own share did, the minimum is what refused it.
+            refused_by_capacity = capacity < min(cohort.households * share, keepable)
+            outcome = GATE_CAPACITY if refused_by_capacity else GATE_BELOW_MINIMUM
+            return MigrationGate(outcome, destination=destination)
+        # A household can only leave if it can pay its own way: movers carry their share of
+        # the cohort's silver, so the gate is silver per household against the cost of a move.
+        if cohort.silver_tael / cohort.households < parameters.cost_tael_per_household:
+            return MigrationGate(GATE_SILVER, destination=destination)
+        self._move_households(ctx, cohort, destination, movers)
+        return MigrationGate(GATE_MOVED, destination=destination, movers_households=movers)
 
     def _move_households(
         self,
@@ -578,7 +830,18 @@ __all__ = [
     "ARRIVAL_EVENT",
     "DEPARTURE_EVENT",
     "EXIT_EVENT",
+    "GATE_BELOW_MINIMUM",
+    "GATE_CAPACITY",
+    "GATE_MOVED",
+    "GATE_NOT_ELIGIBLE",
+    "GATE_NO_DESTINATION",
+    "GATE_NO_RECEIVING_COHORT",
+    "GATE_OUTCOMES",
+    "GATE_RETURNED",
+    "GATE_SILVER",
+    "GATE_TEMPORARY",
     "MIGRANT_CONSUMPTION_EVENT",
+    "MIGRATION_GATE_EVENT",
     "MIGRATION_RULE_VERSION",
     "RETURN_EVENT",
     "SETTLEMENT_EVENT",
@@ -588,5 +851,6 @@ __all__ = [
     "MigrantBuyer",
     "MigrantGroup",
     "MigrationBook",
+    "MigrationGate",
     "MigrationSystem",
 ]

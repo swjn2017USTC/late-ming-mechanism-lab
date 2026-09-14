@@ -1,0 +1,75 @@
+# V2-P04 parameter cards: the four parameters the hold-out structures introduce.
+#
+# Every one is grade S. None is drawn from the record, and the two that carry the structural
+# variants are declared so that their neutral value reproduces the V1 structure exactly — which is
+# what makes the ablation arm a no-op by construction, and what the phase's own detector checks.
+#
+# The rule this file obeys is docs/epistemics/evidence-grades.md: a parameter without a card does not
+# exist, and an invented value is graded S rather than dressed as an estimate. Each of these enters
+# the V2 sensitivity pool rather than being presented as a finding.
+schema_version: parameter-cards-v1
+parameter_set: MarketParameters
+cards:
+- id: demand_pressure_weight
+  name: demand pressure weight
+  parameter_set: MarketParameters
+  definition: how far the posted price rises above the inventory rule for demand the stock could not meet
+  unit: multiplier per unit of demand pressure
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    The V1 rule prices a node from its merchant's stock against a target cover, so hunger that has no
+    silver behind it moves nothing: on the historical-core run the twelve counties posted 1.54-2.19
+    tael per shi over the months that had local need, against a boundary price of 0.6, while four
+    fifths of the cohorts ended destitute.
+    This weight is the one number that says how strongly expressed scarcity may move the price above
+    that rule. It is a structural switch, not an estimate: at zero the model is V1 exactly, and the
+    V2-P04 ablation arm exists to show that it is.
+  uncertainty: >-
+    Nothing in the record constrains it: the gazetteer price of 1631 is a famine year observed under
+    a market this model does not reproduce, and the Yansui series is a reference level rather than a
+    response elasticity. It is grade S, it enters the V2 sensitivity pool, and any statement resting
+    on it is conditional on the weight.
+  sensitivity_priority: high
+  version: market-parameters-v1 (V2-P04)
+  range:
+    low: 0.0
+    high: 10.0
+    basis: no source; the upper end is where a doubling of hunger doubles the excess over the rule
+    conflicts: ''
+  ledger_entries: []
+- id: demand_pressure_cap
+  name: demand pressure cap
+  parameter_set: MarketParameters
+  definition: the largest multiplier the demand pressure may apply to the posted price
+  unit: multiplier
+  mechanism: market clearing and intercounty trade
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 4.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    The price rule already carries a ceiling as a ratio of the reference price; the cap bounds the
+    pressure multiplier *before* that ceiling, so a variant cannot reach the ceiling through the
+    pressure term alone and the two bounds stay separately readable in the constraint events. Its
+    value is a declared reading choice, and it only has any effect when demand_pressure_weight is
+    above zero.
+  uncertainty: >-
+    Unconstrained by any source. Recorded as an assumption because a cap that is accidentally binding
+    would silently turn the demand-pressure structure back into the inventory rule, which is exactly
+    the failure mode the constraint events are there to expose.
+  sensitivity_priority: medium
+  version: market-parameters-v1 (V2-P04)
+  range:
+    low: 1.0
+    high: 20.0
+    basis: no source; 1.0 is the neutral value at which the pressure term cannot act at all
+    conflicts: ''
+  ledger_entries: []

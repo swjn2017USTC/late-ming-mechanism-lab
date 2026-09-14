@@ -81,6 +81,17 @@ from late_ming_lab.systems.markets import LocalGrainMarket, MarketBook, emit_mer
 TAX_RULE_VERSION: Final[str] = "tax-collection-v1"
 EXTRACTION_RULE_VERSION: Final[str] = "extraction-policy-v1"
 
+#: One row per county per tick saying what held its relief release down, including the ticks that
+#: released nothing — which are the ticks a coverage ratio cannot account for. The trigger carries
+#: every candidate bound in shi and ``outcome`` names the one that bound: ``stock``, ``silver``,
+#: ``capacity``, ``eligibility`` or ``none``.
+RELIEF_CONSTRAINT_EVENT: Final[str] = "RELIEF_CONSTRAINT"
+
+#: Relative slack for "the fill spent the whole budget the rule allows it to spend": the market
+#: turns ``budget`` into ``shi = budget / price`` and back into ``cost = shi * price``, which can
+#: miss the budget by one rounding step. Only the constraint record reads this.
+FILL_BUDGET_SLACK: Final[float] = 1e-9
+
 
 class TaxCollectionSystem:
     """Tick phase 07: assess the quota, spend the effort, take what can be taken."""
@@ -572,8 +583,8 @@ class OfficialReliefSystem:
             cohorts = self._local_cohorts(county.node_id)
             if not cohorts:
                 continue
-            self._fill_granary(ctx, county)
-            released = self._release(ctx, county, cohorts)
+            silver_bound = self._fill_granary(ctx, county)
+            released = self._release(ctx, county, cohorts, silver_bound=silver_bound)
             if released > 0.0:
                 cost = self._parameters.relief_cost_tael(
                     released_shi=released, logistics_capacity=county.capacity.logistics
@@ -583,81 +594,158 @@ class OfficialReliefSystem:
                 )
         self._governments.check_invariants()
 
-    def _fill_granary(self, ctx: TickContext, county: CountyGovernment) -> None:
+    def _fill_granary(self, ctx: TickContext, county: CountyGovernment) -> bool:
+        """Fill the granary from the treasury; return whether the treasury was what stopped it.
+
+        The purchase below is where silver enters relief, so it is also the only place that can
+        say the treasury, rather than the granary, is what held this county's stock down. The
+        fill is treasury-bound when the coin set the order and the order was filled: the county
+        ends the fill still under its cover target, the budget the rule lets it spend bought less
+        than the shortfall, and that whole budget actually went out. A purchase the merchant house
+        could not fill leaves silver unspent, and that is the market's limit, not the treasury's.
+        """
         need = self._monthly_local_need(county.node_id)
         target = need * self._parameters.granary_target_cover_months
         shortfall = max(0.0, target - county.grain_shi)
-        if shortfall <= 0.0 or county.silver_tael <= 0.0:
-            return
+        if shortfall <= 0.0:
+            return False
+        if county.silver_tael <= 0.0:
+            return True
         budget = county.silver_tael * self._parameters.granary_purchase_share_of_silver
         price = self._book.price(county.node_id)
         market = self._markets[county.node_id]
         shoppable = min(shortfall, budget / price)
         if shoppable <= 0.0:
-            return
+            return True
         outcome = market.buy_grain(
             ctx, county, shi_wanted=shoppable, max_silver=budget, phase=self.phase
         )
         if outcome.quantity <= 0.0:
-            return
+            return False
         emit_government_event(
             ctx,
             county,
             county.buy_grain(grain_shi=outcome.quantity, price_tael_per_shi=price),
             self.phase,
         )
+        return shoppable < shortfall and outcome.value_tael >= budget * (1.0 - FILL_BUDGET_SLACK)
 
     def _release(
         self,
         ctx: TickContext,
         county: CountyGovernment,
         cohorts: tuple[HouseholdCohortAgent, ...],
+        *,
+        silver_bound: bool,
     ) -> float:
+        """Release the rule's share of need to the eligible; log what bounded the release.
+
+        The returns below are the same returns as before P04 — same deliverable, same eligible
+        cohorts, same weights, same order — but every one of them now passes through the
+        constraint record, so the months that released nothing are in the log too. A county with no
+        local cohort never reaches this method: ``step`` skips it, as it did before P04.
+        """
+        need = self._monthly_local_need(county.node_id)
+        grain_stock = county.grain_shi
+        demand = need * self._parameters.relief_share_of_need * county.capacity.relief
         eligible = [
             cohort
             for cohort in cohorts
             if self._population.unmet_ratio(cohort.cohort_id)
             >= self._parameters.relief_eligibility_unmet_ratio
         ]
-        if not eligible or county.grain_shi <= 0.0:
-            return 0.0
-        need = self._monthly_local_need(county.node_id)
-        deliverable = min(
-            county.grain_shi,
-            need * self._parameters.relief_share_of_need * county.capacity.relief,
-        )
-        if deliverable <= 0.0:
-            return 0.0
         weights = [
             cohort.households * self._population.unmet_ratio(cohort.cohort_id)
             for cohort in eligible
         ]
         total = sum(weights)
-        if total <= 0.0:
-            return 0.0
         released = 0.0
-        for cohort, weight in zip(eligible, weights, strict=True):
-            share = deliverable * weight / total
-            if share <= 0.0:
-                continue
-            event = county.release_relief(grain_shi=share, recipient_id=cohort.cohort_id)
-            emit_government_event(ctx, county, event, self.phase)
-            granted = event.trigger["released_shi"]
-            released += granted
-            if granted <= 0.0:
-                continue
-            emit_cohort_event(
-                ctx,
-                cohort,
-                cohort.record_relief(
-                    grain_shi=granted,
-                    donor_id=county.government_id,
-                    rule_version=RELIEF_RULE_VERSION,
-                    source="official",
-                ),
-                self.phase,
-            )
+        if eligible and grain_stock > 0.0 and demand > 0.0 and total > 0.0:
+            deliverable = min(grain_stock, demand)
+            for cohort, weight in zip(eligible, weights, strict=True):
+                share = deliverable * weight / total
+                if share <= 0.0:
+                    continue
+                event = county.release_relief(grain_shi=share, recipient_id=cohort.cohort_id)
+                emit_government_event(ctx, county, event, self.phase)
+                granted = event.trigger["released_shi"]
+                released += granted
+                if granted <= 0.0:
+                    continue
+                emit_cohort_event(
+                    ctx,
+                    cohort,
+                    cohort.record_relief(
+                        grain_shi=granted,
+                        donor_id=county.government_id,
+                        rule_version=RELIEF_RULE_VERSION,
+                        source="official",
+                    ),
+                    self.phase,
+                )
+        self._emit_constraint(
+            ctx,
+            county,
+            need_shi=need,
+            eligible=eligible,
+            eligibility_bound_shi=demand if total > 0.0 else 0.0,
+            grain_stock_shi=grain_stock,
+            demand_shi=demand,
+            released_shi=released,
+            silver_bound=silver_bound,
+        )
         return released
+
+    def _emit_constraint(
+        self,
+        ctx: TickContext,
+        county: CountyGovernment,
+        *,
+        need_shi: float,
+        eligible: list[HouseholdCohortAgent],
+        eligibility_bound_shi: float,
+        grain_stock_shi: float,
+        demand_shi: float,
+        released_shi: float,
+        silver_bound: bool,
+    ) -> None:
+        """Record what bounded this county's release, whether or not anything was released.
+
+        The four candidates are logged side by side in shi so a reader never has to infer which
+        one bit: the granary before the release, the treasury that fills it (read after the fill
+        and before the relief logistics are paid), the logistics ceiling inside ``demand_shi``,
+        and the eligible weights the distribution had to divide between. ``none`` means no cap
+        held the release below the rule's own demand: the county had no need, nothing to release,
+        or released all the demand there was.
+        """
+        ctx.emit(
+            RELIEF_CONSTRAINT_EVENT,
+            phase=self.phase.token,
+            agent_id=county.government_id,
+            region=county.node_id,
+            rule_version=RELIEF_RULE_VERSION,
+            trigger={
+                "need_shi": need_shi,
+                "eligible_households": sum(cohort.households for cohort in eligible),
+                "eligible_adults": sum(cohort.adults for cohort in eligible),
+                "grain_stock_shi": grain_stock_shi,
+                "treasury_tael": county.silver_tael,
+                "capacity_relief": county.capacity.relief,
+                "demand_shi": demand_shi,
+                "released_shi": released_shi,
+                "stock_bound_shi": min(grain_stock_shi, demand_shi),
+                "capacity_bound_shi": demand_shi,
+                "eligibility_bound_shi": eligibility_bound_shi,
+                "unmet_after_shi": need_shi - released_shi,
+            },
+            outcome=_binding_constraint(
+                need_shi=need_shi,
+                demand_shi=demand_shi,
+                grain_stock_shi=grain_stock_shi,
+                eligibility_bound_shi=eligibility_bound_shi,
+                silver_bound=silver_bound,
+            ),
+        )
 
     def _local_cohorts(self, node_id: str) -> tuple[HouseholdCohortAgent, ...]:
         return tuple(cohort for cohort in self._population if cohort.node_id == node_id)
@@ -667,6 +755,37 @@ class OfficialReliefSystem:
             self._household_parameters.subsistence_grain_per_adult_month_shi * cohort.adults
             for cohort in self._local_cohorts(node_id)
         )
+
+
+def _binding_constraint(
+    *,
+    need_shi: float,
+    demand_shi: float,
+    grain_stock_shi: float,
+    eligibility_bound_shi: float,
+    silver_bound: bool,
+) -> str:
+    """Name the one bound that held the release down; ``none`` when nothing did.
+
+    Precedence, in the order the release rule itself applies its caps:
+
+    ```text
+    none         no demand at all (no need, no share, no relief capacity), or the full demand left
+    eligibility  no eligible cohort carried weight, so nothing could be released at all
+    silver       the granary was short of the demand and the treasury is what kept it short
+    stock        the granary was short of the demand and the market, not the treasury, was full
+    capacity     the demand itself (share x logistics capacity) was below what the county needed
+    ```
+    """
+    if demand_shi <= 0.0:
+        return "none"
+    if eligibility_bound_shi <= 0.0:
+        return "eligibility"
+    if grain_stock_shi < demand_shi:
+        return "silver" if silver_bound else "stock"
+    if demand_shi < need_shi:
+        return "capacity"
+    return "none"
 
 
 def emit_elite_mediation(
@@ -752,3 +871,16 @@ def emit_government_event(
         trigger=event.trigger,
         outcome=event.outcome,
     )
+
+
+__all__ = [
+    "EXTRACTION_RULE_VERSION",
+    "FILL_BUDGET_SLACK",
+    "RELIEF_CONSTRAINT_EVENT",
+    "TAX_RULE_VERSION",
+    "CountyBookkeepingSystem",
+    "OfficialReliefSystem",
+    "TaxCollectionSystem",
+    "emit_elite_mediation",
+    "emit_government_event",
+]

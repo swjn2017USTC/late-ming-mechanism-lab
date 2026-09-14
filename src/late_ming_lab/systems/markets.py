@@ -57,6 +57,8 @@ MARKET_RULE_VERSION: Final[str] = "market-clearing-v1"
 TRADE_RULE_VERSION: Final[str] = "intercounty-trade-v1"
 MARKET_STATE_EVENT: Final[str] = "MARKET_STATE"
 MERCHANT_STATE_EVENT: Final[str] = "MERCHANT_STATE"
+#: The price chain's own constraints, one row per node and month: V2-P04.
+MARKET_CONSTRAINT_EVENT: Final[str] = "MARKET_CONSTRAINT"
 
 
 class MarketPrice(BaseModel):
@@ -68,6 +70,25 @@ class MarketPrice(BaseModel):
     price_tael_per_shi: float = Field(gt=0)
     inventory_shi: float = Field(ge=0)
     local_need_shi: float = Field(ge=0)
+
+
+@dataclass(frozen=True, slots=True)
+class DemandRecord:
+    """Grain wanted at one node since the previous pricing, and why it was not served.
+
+    ``unsold_shi`` is demand the buyer could pay for and the merchant could not supply: the stock
+    constraint. ``unaffordable_shi`` is demand with no silver behind it: hunger the price cannot see
+    unless the rule is told to look at it. Keeping them apart is the point — they are different
+    facts about a famine, and a single "unmet need" number would merge them.
+    """
+
+    wanted_shi: float = 0.0
+    unsold_shi: float = 0.0
+    unaffordable_shi: float = 0.0
+
+    @property
+    def total_shi(self) -> float:
+        return self.wanted_shi
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,6 +110,10 @@ class MarketBook:
     def __init__(self, prices: Mapping[str, float]) -> None:
         if not prices:
             raise ValueError("a market book needs at least one price")
+        # Demand is carried on the book because the book is the one market object every system
+        # holding a LocalGrainMarket already shares; a counter inside the view would see only the
+        # callers that happen to use that view.
+        self._demand: dict[str, DemandRecord] = {node_id: DemandRecord() for node_id in prices}
         self._prices = {
             node_id: MarketPrice(
                 node_id=node_id, price_tael_per_shi=price, inventory_shi=0.0, local_need_shi=0.0
@@ -116,6 +141,29 @@ class MarketBook:
 
     def states(self) -> tuple[MarketPrice, ...]:
         return tuple(self._prices[node_id] for node_id in self._prices)
+
+    def demand(self, node_id: str) -> DemandRecord:
+        """Grain wanted at a node since the last pricing."""
+        try:
+            return self._demand[node_id]
+        except KeyError as error:
+            raise KeyError(f"no demand ledger for {node_id!r}") from error
+
+    def record_demand(
+        self, node_id: str, *, wanted_shi: float, unsold_shi: float, unaffordable_shi: float
+    ) -> None:
+        """Add one purchase attempt to the node's ledger, whether or not it was served."""
+        current = self.demand(node_id)
+        self._demand[node_id] = DemandRecord(
+            wanted_shi=current.wanted_shi + max(0.0, wanted_shi),
+            unsold_shi=current.unsold_shi + max(0.0, unsold_shi),
+            unaffordable_shi=current.unaffordable_shi + max(0.0, unaffordable_shi),
+        )
+
+    def clear_demand(self) -> None:
+        """Start a new window; called once per pricing, after the price has been posted."""
+        for node_id in self._demand:
+            self._demand[node_id] = DemandRecord()
 
 
 class LocalGrainMarket:
@@ -171,10 +219,20 @@ class LocalGrainMarket:
         """
         house = self._require_local(buyer)
         price = self.price_tael_per_shi
-        cost = min(shi_wanted * price, max_silver, house.grain_shi * price)
+        wanted = max(0.0, shi_wanted)
+        affordable = min(wanted, max_silver / price) if price > 0.0 else 0.0
+        cost = min(wanted * price, max_silver, house.grain_shi * price)
+        shi = min(cost / price, house.grain_shi) if price > 0.0 else 0.0
+        # Recorded before the early return: a buyer with no silver is the demand the V1 rule never
+        # saw, and dropping that row would drop the famine it is evidence of.
+        self._book.record_demand(
+            self._node_id,
+            wanted_shi=wanted,
+            unsold_shi=max(0.0, affordable - shi),
+            unaffordable_shi=max(0.0, wanted - affordable),
+        )
         if cost <= 0.0:
             return TradeOutcome(quantity=0.0, value_tael=0.0, counterparty_id=house.merchant_id)
-        shi = min(cost / price, house.grain_shi)
         cost = shi * price
         event = house.sell_to_household(
             shi=shi,
@@ -456,11 +514,14 @@ class MarketClearingSystem:
         for node_id in self._priced_nodes:
             house = self._merchants.require(node_id)
             need = self.local_need_shi(node_id)
+            demand = self._book.demand(node_id)
+            pressure = demand.total_shi / need if need > 0.0 else 0.0
+            price = self.price_from_inventory(
+                inventory_shi=house.grain_shi, local_need_shi=need, demand_pressure=pressure
+            )
             state = MarketPrice(
                 node_id=node_id,
-                price_tael_per_shi=self.price_from_inventory(
-                    inventory_shi=house.grain_shi, local_need_shi=need
-                ),
+                price_tael_per_shi=price,
                 inventory_shi=house.grain_shi,
                 local_need_shi=need,
             )
@@ -492,12 +553,104 @@ class MarketClearingSystem:
                 ),
                 self.phase,
             )
+            self._emit_constraint(
+                ctx, node_id=node_id, state=state, demand=demand, pressure=pressure
+            )
+        self._book.clear_demand()
 
-    def price_from_inventory(self, *, inventory_shi: float, local_need_shi: float) -> float:
+    def _emit_constraint(
+        self,
+        ctx: TickContext,
+        *,
+        node_id: str,
+        state: MarketPrice,
+        demand: DemandRecord,
+        pressure: float,
+    ) -> None:
+        """Record every constraint that could have moved this node's price, and which one did.
+
+        V1 reports a price and a stock and leaves a reader to guess which of the five constraints
+        was binding — the merchant's stock, demand the stock could not meet, demand with no silver
+        behind it, the trade links' capacity and cost, or the price bounds themselves. A single
+        posted number cannot distinguish "the harvest was bad" from "nobody could pay" from "the
+        ceiling was reached", and those are different histories.
+        """
+        reference = self._parameters.reference_price_tael_per_shi
+        floor = reference * self._parameters.price_floor_ratio
+        ceiling = reference * self._parameters.price_ceiling_ratio
+        unclamped = self.price_from_inventory(
+            inventory_shi=state.inventory_shi,
+            local_need_shi=state.local_need_shi,
+            demand_pressure=0.0 if self._parameters.demand_pressure_weight == 0.0 else pressure,
+        )
+        if local_need := state.local_need_shi:
+            cover = state.inventory_shi / (local_need * self._parameters.target_cover_months)
+        else:
+            cover = 0.0
+        # Trade: the best margin any neighbour offers, and the capacity the links could carry in.
+        best_margin = 0.0
+        inbound_capacity = 0.0
+        cheapest_transport = 0.0
+        if node_id in self._graphs.trade:
+            for neighbour in self._graphs.trade.neighbors(node_id):
+                edge = self._graphs.trade[node_id][neighbour]
+                transport = self._parameters.transport_cost_tael_per_shi(float(edge["cost"]))
+                margin = self._book.price(neighbour) - state.price_tael_per_shi - transport
+                best_margin = max(best_margin, margin)
+                if cheapest_transport == 0.0:
+                    cheapest_transport = transport
+                else:
+                    cheapest_transport = min(cheapest_transport, transport)
+                inbound_capacity += float(edge["capacity"]) * (
+                    self._parameters.capacity_unit_shi_per_month
+                    * self._disruption.capacity_multiplier(node_id, neighbour)
+                )
+        if state.local_need_shi <= 0.0:
+            bound = "none"
+        elif unclamped >= ceiling:
+            bound = "ceiling"
+        elif unclamped <= floor:
+            bound = "floor"
+        else:
+            bound = "inventory"
+        ctx.emit(
+            MARKET_CONSTRAINT_EVENT,
+            phase=self.phase.token,
+            region=node_id,
+            rule_version=MARKET_RULE_VERSION,
+            trigger={
+                "price_tael_per_shi": state.price_tael_per_shi,
+                "price_unclamped_tael_per_shi": unclamped,
+                "price_floor_tael_per_shi": floor,
+                "price_ceiling_tael_per_shi": ceiling,
+                "inventory_shi": state.inventory_shi,
+                "local_need_shi": state.local_need_shi,
+                "cover_of_target": cover,
+                "wanted_shi": demand.wanted_shi,
+                "unfilled_demand_shi": demand.unsold_shi,
+                "unaffordable_demand_shi": demand.unaffordable_shi,
+                "demand_pressure": pressure,
+                "trade_inbound_capacity_shi": inbound_capacity,
+                "trade_best_margin_tael_per_shi": best_margin,
+                "transport_cost_tael_per_shi": cheapest_transport,
+                "merchant_silver_tael": self._merchants.require(node_id).silver_tael,
+            },
+            outcome=bound,
+        )
+
+    def price_from_inventory(
+        self, *, inventory_shi: float, local_need_shi: float, demand_pressure: float = 0.0
+    ) -> float:
         """The declared price rule: scarcity relative to a target cover, with bounds.
 
         A node with no modelled demand — an external boundary node — posts the reference price;
         the model has no basis for a scarcity signal there.
+
+        `demand_pressure` is the share of local need that was wanted and not served since the last
+        pricing. The V1 rule ignores it entirely, and `demand_pressure_weight` is what turns that
+        into a choice: at zero the posted price is exactly what V1 posts, so an arm that sets it to
+        zero is a no-op that the phase's own detector must catch, and an arm that raises it is a
+        different structure rather than a re-tuned number.
         """
         reference = self._parameters.reference_price_tael_per_shi
         if local_need_shi <= 0.0:
@@ -505,6 +658,12 @@ class MarketClearingSystem:
         target = max(local_need_shi * self._parameters.target_cover_months, 1e-9)
         cover_ratio = target / max(inventory_shi, 1e-9)
         raw = float(reference * cover_ratio**self._parameters.price_elasticity)
+        if self._parameters.demand_pressure_weight > 0.0 and demand_pressure > 0.0:
+            multiplier = min(
+                1.0 + self._parameters.demand_pressure_weight * demand_pressure,
+                self._parameters.demand_pressure_cap,
+            )
+            raw *= multiplier
         floor = reference * self._parameters.price_floor_ratio
         ceiling = reference * self._parameters.price_ceiling_ratio
         return float(min(max(raw, floor), ceiling))

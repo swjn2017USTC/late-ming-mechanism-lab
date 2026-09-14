@@ -1,0 +1,69 @@
+# V2-P04 parameter cards: the migration structure's two parameters.
+#
+# Both are grade S, both are no-ops at their neutral value, and both exist so the distress route
+# can be ablated against V1's eligibility-and-silver route rather than asserted to matter.
+schema_version: parameter-cards-v1
+parameter_set: MigrationParameters
+cards:
+- id: destitution_departure_share
+  name: destitution departure share
+  parameter_set: MigrationParameters
+  definition: >-
+    share of a destitute cohort's households that may leave per month through the distress route,
+    beside the eligibility route V1 has
+  unit: share of households per month
+  mechanism: household migration and its destinations
+  level: local
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    V1's single departure route needs a rolling twelve-month unmet ratio of 0.2 and the full cost of
+    the move in silver. On the historical core the run never reaches that ratio and the route
+    produced six departures in 240 ticks with no regional exit, while 192 of 240 cohorts ended
+    destitute. The record describes famine migration as what people do when they have nothing left,
+    so a distress route is the structure the failure points at. At zero it does nothing.
+  uncertainty: >-
+    Nothing constrains the share. It is the size of a channel the model did not previously have, and
+    the phase reports what it produces rather than what it should produce.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (V2-P04)
+  range:
+    low: 0.0
+    high: 0.2
+    basis: no source; the upper end is where a destitute cohort empties within a year
+    conflicts: ''
+  ledger_entries: []
+- id: destitution_exit_share
+  name: destitution exit share
+  parameter_set: MigrationParameters
+  definition: >-
+    share of the distress-route departures that takes the out-of-region route rather than the nearest
+    cheaper county
+  unit: share of destitution departures
+  mechanism: household migration and its destinations
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    V1 sends a mover to the cheapest reachable county and treats an exit as a last resort, so the
+    regional outflow the record describes cannot happen even when every county is in famine. This
+    share is the declared split between moving on within the region and leaving it. It is applied
+    through the same move as any other departure, so the destination's declared monthly capacity and
+    the edge's transit loss bound it; there is no unbounded sink.
+  uncertainty: >-
+    The split between internal and out-of-region movement is not measured for this window. The value
+    is an assumption, and the exits it produces are reported as a property of that assumption.
+  sensitivity_priority: high
+  version: migration-parameters-v1 (V2-P04)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; 0.0 keeps V1's routing and 1.0 sends every distress departure out of the region
+    conflicts: ''
+  ledger_entries: []

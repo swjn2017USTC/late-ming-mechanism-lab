@@ -181,6 +181,19 @@ class MarketParameters(BaseModel):
     price_floor_ratio: float = Field(gt=0, le=1)
     price_ceiling_ratio: float = Field(ge=1)
 
+    # V2-P04. The V1 rule prices a node from its merchant's inventory alone, so hunger with no
+    # silver behind it moves nothing. These two say how far the price may respond to demand the
+    # stock could not meet; at zero the rule is the V1 rule exactly, which is what makes the
+    # ablation arm a no-op by construction rather than by hope.
+    demand_pressure_weight: float = Field(ge=0)
+    demand_pressure_cap: float = Field(
+        ge=1,
+        description=(
+            "the largest multiplier the demand pressure may apply, so a variant cannot run the "
+            "posted price away from its declared bounds"
+        ),
+    )
+
     transport_cost_tael_per_cost_unit_per_shi: float = Field(
         gt=0,
         description=(
@@ -249,6 +262,8 @@ def core_default_market_parameters() -> MarketParameters:
         target_cover_months=6.0,
         price_floor_ratio=0.5,
         price_ceiling_ratio=6.0,
+        demand_pressure_weight=0.0,
+        demand_pressure_cap=4.0,
         transport_cost_tael_per_cost_unit_per_shi=0.35,
         capacity_unit_shi_per_month=1.0,
         risk_loss_fraction_scale=1.0,
@@ -542,6 +557,25 @@ class MigrationParameters(BaseModel):
     )
     minimum_households_to_move: float = Field(gt=0)
 
+    # V2-P04. V1 has one departure route: a cohort becomes eligible once its rolling twelve-month
+    # unmet ratio passes a line, and it pays the full cost of the move in silver before it goes. On
+    # the historical core that route produced six departures in 240 ticks and no regional exit at
+    # all. These two open a second route — a destitute cohort may leave — and at zero they do
+    # nothing, so the ablation arm reproduces the V1 structure exactly.
+    destitution_departure_share: float = Field(
+        ge=0,
+        le=1,
+        description="share of a destitute cohort's households that may leave per month, at zero",
+    )
+    destitution_exit_share: float = Field(
+        ge=0,
+        le=1,
+        description=(
+            "share of those departures that takes the out-of-region route rather than the nearest "
+            "cheaper county; zero keeps V1's routing, where an exit happens only as a last resort"
+        ),
+    )
+
     provenance: DataProvenance
 
 
@@ -555,6 +589,8 @@ def core_default_migration_parameters() -> MigrationParameters:
         cost_tael_per_adult=0.2,
         transit_loss_share=0.5,
         minimum_households_to_move=5.0,
+        destitution_departure_share=0.0,
+        destitution_exit_share=0.0,
         provenance=DataProvenance.assumption(
             "development-scale migration shares, term, cost and transit loss; grade S, to be "
             "replaced by sourced parameter cards in P08"
