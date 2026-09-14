@@ -11,7 +11,8 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P11 (USTC V4.1 Institutional Decision Layer) complete — with the live model **closed** — on top of P10
+P12 (Decision-Policy Robustness) complete, with the runtime arm refused by P11's gate, on top of P11
+(USTC V4.1 Institutional Decision Layer, live model **closed**), P10
 (Ablation / Sensitivity / Counterfactual), P09 (Calibration / Hold-out), P08 (Historical Evidence /
 Parameter Registry) and P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
 (P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with an explicit
@@ -64,6 +65,15 @@ the confirmed V4.1, so the phase fails closed: no live call was made, the live s
 currently refuses rather than skips, and the smoke scenario runs on the declared rule policy with the
 replay path proven offline.
 
+P12 compared three declared decision policies under common random numbers, and read three named
+mechanisms off every run. Armed-band consolidation is **robust** across all three (present in five of
+six replicates each); extraction inversion is **policy-dependent** (it appears under the utility rule
+and in neither of the other two); the fiscal-military ratchet in its strong form — arrears that never
+clear — is **absent** from every arm, while the arrears stock itself stays large. The tipping region
+moves with the policy, and the utility arm realises more of the assessed quota with a smaller military
+arrears stock. The runtime arm was refused by the model gate, so the phase draws no conclusion about a
+model-backed policy, and none is imputed.
+
 Everything shipped so far is an assumption, not history: both spatial fixtures and every cohort
 endowment are graded `S` throughout, the shock experiment's severity axis is a scenario parameter,
 never an estimate of a historical drought, and the governance indicators are declared reading
@@ -71,7 +81,7 @@ lines rather than evidence. Real geography enters only
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P11.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P12.md`.
 Why the military actors are declared abstractions rather than tactics:
 `docs/adr/0002-military-abstractions.md`; how the tick order and its dependencies are enforced and
 drawn: `docs/architecture/system-dependency.md`.
@@ -155,7 +165,7 @@ uv run mypy
 | `docs/epistemics/evidence-grades.md` | A/B/C/D/S grades, parameter cards, evidence ledger |
 | `docs/evidence/` | Generated: what the evidence base covers, how uncertain it is, where the gaps are |
 | `docs/calibration/` | Generated: the frozen objective, the posterior, the mismatches, the held-out predictions |
-| `docs/experiments/` | Generated: the ablations, the interactions, the sensitivity indices and the tipping grid |
+| `docs/experiments/` | Generated: the ablations, the interactions, the sensitivity indices, the tipping grid and the policy-robustness matrix |
 | `docs/phase-reports/` | One report per phase |
 
 Each phase ends with a report, logical commits, a clean tree, and a stop. Never start the next
