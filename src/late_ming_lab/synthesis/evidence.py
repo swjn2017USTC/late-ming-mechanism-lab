@@ -299,9 +299,20 @@ def _morris_runs(directory: Path) -> tuple[pl.DataFrame, dict[str, object]]:
 
 
 def _sensitivity(directory: Path) -> pl.DataFrame:
-    """The Morris elementary effects, recomputed exactly as the P10 report computes them."""
+    """The Morris elementary effects, recomputed exactly as the P10 report computes them.
+
+    The sweep is the sweep set *restricted to what the stored batch actually varied*: the P10 Morris
+    batch was run before V2-P04 added four bounded parameters, and a parameter the batch holds no
+    column for cannot have an elementary effect. Restricting is the honest reading of that batch —
+    the alternative, sweeping a parameter the runs never moved, would produce an index for a design
+    that was never run — and the parameters left out are named in the phase report that added them.
+    """
     runs, manifest = _morris_runs(directory)
-    sweep = sweep_parameters(load_cards(directory))
+    sweep = tuple(
+        parameter
+        for parameter in sweep_parameters(load_cards(directory))
+        if parameter.name in runs.columns
+    )
     design = _design_of(manifest)
     return morris_indices(
         sweep,

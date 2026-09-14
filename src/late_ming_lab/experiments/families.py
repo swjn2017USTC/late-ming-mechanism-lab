@@ -109,6 +109,29 @@ def _run_mechanisms(root: Path, *, replicates: int | None, seed: int | None) -> 
     return (*write_mechanism_docs(root, book), write_synthesis(root, book, bundle))
 
 
+def _run_p04(root: Path, *, replicates: int | None, seed: int | None) -> tuple[Path, ...]:
+    """The V2-P04 arms, the no-op check and the generated diagnosis.
+
+    `replicates` is refused rather than reinterpreted: the phase's arms are fixed to a declared set
+    of world seeds, and a different count would be a different comparison.
+    """
+    from late_ming_lab.experiments.holdout import HOLDOUT_SEEDS, load_arm_runs, protocol_scores
+    from late_ming_lab.experiments.holdout_report import write_documents
+
+    if replicates is not None:
+        raise ExperimentError(
+            "the p04 family runs its declared seeds; it has no replicate override"
+        )
+    if seed is not None and seed != HOLDOUT_SEEDS[0]:
+        raise ExperimentError(
+            "the p04 family's seeds are declared with the phase; a different base seed would be a "
+            "different comparison"
+        )
+    runs = load_arm_runs(root=root)
+    scores = protocol_scores(runs, root=root)
+    return write_documents(root, runs, scores=scores)
+
+
 #: Every family a caller may run, in the order the phases introduced them.
 FAMILIES: Final[dict[str, Family]] = {
     "ablations": Family(
@@ -125,6 +148,13 @@ FAMILIES: Final[dict[str, Family]] = {
         name="p12",
         description="three declared decision policies under common random numbers",
         runner=_run_p12,
+    ),
+    "p04": Family(
+        name="p04",
+        description=(
+            "the V2-P04 hold-out arms on the historical core, their no-op check and the diagnosis"
+        ),
+        runner=_run_p04,
     ),
     "integrated": Family(
         name="integrated",
