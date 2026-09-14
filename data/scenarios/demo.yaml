@@ -1,0 +1,22 @@
+# Declared by P14. The expected values are a reproducibility pin, not a fit target.
+schema_version: demo-scenario-v1
+id: demo-shaanxi-henan
+description: 'The reproducible demo: the medium sandbox space under the declared climate and fiscal pressure
+  for the full 1625-1644 window, with the seed and the digest recorded so the run can be reproduced exactly.
+  Synthetic fixture data, not a historical reconstruction.'
+label: demo-shaanxi-henan
+seed: 20260914
+ticks: 240
+warmup_ticks: 24
+sandbox:
+  label: demo-shaanxi-henan
+  dataset: medium
+  monthly_event_probability: 0.4
+  severity_floor: 0.6
+  nominal_pressure: 0.02
+  pay_share_of_treasury: 0.5
+  garrison_troops: 300.0
+expected:
+  simulation_digest: 75b23583d915ac9f7897b28746464f1686fe551b41371b63f5ecab971740ea4c
+  event_count: 232877
+  tick_count: 240
