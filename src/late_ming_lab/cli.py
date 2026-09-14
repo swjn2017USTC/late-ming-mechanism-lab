@@ -477,6 +477,86 @@ def _apply_overrides(
     return config.with_overrides(**changes) if changes else config
 
 
+@app.command("protocol")
+def protocol(
+    what: Annotated[
+        str,
+        typer.Argument(
+            help="What to do: 'freeze' prints the protocol's identity; 'robustness' "
+            "writes the threshold-robustness document."
+        ),
+    ],
+    root: Annotated[Path, typer.Option("--root", help="The repository root.")] = Path("."),
+    pilot_root: Annotated[
+        Path,
+        typer.Option("--pilot-root", help="Where the declared protocol pilot's runs live."),
+    ] = Path("outputs/pilot/v2-p03"),
+    rerun_pilot: Annotated[
+        bool,
+        typer.Option("--rerun-pilot", help="Run the declared pilot again instead of reading it."),
+    ] = False,
+    members: Annotated[
+        int | None,
+        typer.Option(
+            "--members", min=1, help="Ensemble members to evaluate; all of them by default."
+        ),
+    ] = None,
+    as_json: Annotated[bool, typer.Option("--json", help="Print the report as JSON.")] = False,
+) -> None:
+    """Read the frozen validation protocol: its identity, or the robustness report over it."""
+    from late_ming_lab.protocol.freeze import freeze_protocol, readable_windows
+    from late_ming_lab.protocol.report import ReportError, run_and_report, write_report
+    from late_ming_lab.protocol.schema import ProtocolError, load_protocol
+    from late_ming_lab.protocol.thresholds import ThresholdEnsembleError, load_ensemble
+
+    try:
+        if what == "freeze":
+            frozen = freeze_protocol(root)
+            typer.echo(f"protocol: {frozen.version} digest {frozen.digest}")
+            typer.echo(f"outcomes: {len(frozen.outcomes)}")
+            dependent = ", ".join(frozen.threshold_dependent_readings)
+            typer.echo(f"threshold-dependent readings: {dependent}")
+            return
+        if what != "robustness":
+            raise ReportError(f"unknown action {what!r}; expected 'freeze' or 'robustness'")
+        loaded = load_protocol(root)
+        ensemble = load_ensemble(root)
+        typer.echo(f"protocol: {loaded.version} digest {loaded.digest()[:16]}...")
+        typer.echo(f"fit may read: {', '.join(readable_windows(loaded, 'fit'))}")
+        typer.echo(f"ensemble: {ensemble.version} digest {ensemble.digest()[:16]}...")
+        summary, runs = run_and_report(
+            root=root,
+            protocol=loaded,
+            ensemble=ensemble,
+            pilot_root=pilot_root,
+            rerun_pilot=rerun_pilot,
+            members=members,
+        )
+        written = write_report(root, summary, runs=runs)
+    except (
+        ProtocolError,
+        ReportError,
+        ThresholdEnsembleError,
+        FileNotFoundError,
+        ValueError,
+    ) as error:
+        typer.echo(f"protocol failed: {error}", err=True)
+        raise typer.Exit(code=1) from error
+    if as_json:
+        typer.echo(summary.model_dump_json(indent=2))
+    else:
+        typer.echo(f"runs: {len(summary.runs)} | members: {summary.members}")
+        typer.echo(f"moved with the ensemble: {', '.join(summary.moved_criteria()) or 'nothing'}")
+        for share in summary.criteria:
+            if share.breakdown_line == summary.breakdown_lines[0]:
+                typer.echo(
+                    f"  {share.criterion}: holds {share.holds:.3f} changes {share.changes:.3f} "
+                    f"undetermined {share.undetermined:.3f}"
+                )
+    for path in written:
+        typer.echo(f"wrote: {path}")
+
+
 def main() -> None:
     """Console-script entry point."""
     app()

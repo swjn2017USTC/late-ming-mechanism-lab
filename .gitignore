@@ -16,6 +16,7 @@ htmlcov/
 .DS_Store
 
 outputs/runs/
+outputs/pilot/
 outputs/analysis/
 outputs/calibration/
 outputs/experiments/

@@ -179,7 +179,7 @@ def run_job(
     )
     economy = build_integrated_economy(
         config.scenario,
-        parameter_sets=_parameter_sets(config),
+        parameter_sets=arm_parameter_sets(config),
         disruption=config.disruption,
         extraction_policy=config.extraction_policy,
         capacity=config.capacity,
@@ -234,7 +234,12 @@ def _scenario_id(label: str) -> str:
     return cleaned[:64]
 
 
-def _parameter_sets(config: ArmConfiguration) -> dict[str, object]:
+def arm_parameter_sets(config: ArmConfiguration) -> dict[str, object]:
+    """An arm's eight parameter sets, keyed by the class name `build_integrated_economy` wants.
+
+    Public because a caller outside the batch path — a protocol pilot, say — has to build the
+    same economy the batch builds; a second copy of this mapping would be a second wiring.
+    """
     return {
         "CropParameters": config.crop,
         "HouseholdParameters": config.household,
