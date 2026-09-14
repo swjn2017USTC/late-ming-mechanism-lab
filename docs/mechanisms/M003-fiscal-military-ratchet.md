@@ -64,11 +64,11 @@ The record supports chronic arrears at a level, which the model reproduces, and 
 
 ## 14. Counterexample
 
-arrears 254 to 26,488 tael with 53 month(s) of decline, against 303,221 assessed - the replicate ends with the largest stock in the arm and still records dozens of months in which it falls. Any reading that needs the stock to be monotone is false in this model.
+arrears 254 to 26,849 tael with 37 month(s) of decline, against 287,355 assessed: the rule arm's largest end stock belongs to a replicate that still records dozens of months in which the stock falls, and the arm's largest decline count is 53. Any reading that needs the stock to be monotone is false in this model.
 
 ## 15. Falsifiable prediction
 
-An arm that removes the clears - one that refuses to pay arrears in any month - would make the stock monotone. If the stock still declines under that arm, the declines come from something other than the payment rule, and this rejection is wrong. The surviving claim keeps its own prediction: the stock ends between 4.8% and 9.3% of the assessed value, and an arm that doubles the pay rate should raise that share rather than lower it.
+An arm that removes the clearing - one that refuses to pay arrears in any month - would make the stock monotone. If the stock still declines under that arm, the declines come from something other than the payment rule, and this rejection is wrong. The surviving claim keeps its own prediction: the stock ends between 4.8% and 9.3% of the assessed value, and an arm that doubles the pay rate should raise that share rather than lower it.
 
 ## 16. Uncertainty
 

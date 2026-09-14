@@ -675,13 +675,15 @@ def _m003(bundle: EvidenceBundle) -> MechanismCard:
             "'arrears never clear', and the model rejects the inference, not the evidence."
         ),
         counterexample=(
-            f"{readings[0]} - the replicate ends with the largest stock in the arm and still "
-            f"records "
-            "dozens of months in which it falls. Any reading that needs the "
-            "stock to be monotone is false in this model."
+            f"arrears 254 to {_number(largest_end[1], digits=0)} tael with {largest_end[2]} "
+            f"month(s) of decline, against {_number(largest_end[3], digits=0)} assessed: the rule "
+            "arm's largest end stock belongs to a replicate that still records dozens of months in "
+            f"which the stock falls, and the arm's largest decline count is {declines[-1]}. Any "
+            "reading that needs the stock to be monotone is false in this model."
         ),
         falsifiable_prediction=(
-            "An arm that removes the clears - one that refuses to pay arrears in any month - would "
+            "An arm that removes the clearing - one that refuses to pay arrears in any month - "
+            "would "
             "make the stock monotone. If the stock still declines under "
             "that arm, the declines come "
             "from something other than the payment rule, and this rejection "
