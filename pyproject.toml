@@ -45,7 +45,9 @@ module-root = "src"
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-addopts = "-ra --strict-markers --strict-config"
+# The live USTC suite is opt-in: the default run excludes it, and `uv run pytest -m live_ustc`
+# overrides the marker filter. Until P11 this line was missing while the marker claimed exclusion.
+addopts = "-ra --strict-markers --strict-config -m 'not live_ustc'"
 markers = [
     "live_ustc: requires a live USTC endpoint and credentials; excluded from the default run",
 ]
