@@ -1,0 +1,361 @@
+# 本文件是英文原稿的中文译稿；英文原稿为准：机制卡英文原稿在 docs/mechanisms/，阶段综合报告英文原稿在 outputs/reports/。
+# 本中文译稿对应 tag v0.1.0-rc1 的状态，英文原稿更新后须同步本目录；对应英文原稿：docs/mechanisms/cards.yaml。
+schema_version: mechanism-cards-v1
+cards:
+- id: M001
+  name: Fiscal Extraction Inversion
+  question: 把财政机器压得更紧，是否反而收不到它本该收到的份额？
+  status: CONDITIONAL
+  micro_conditions:
+  - 课税是按某一税率对登记税基征收，而家户可以迁走、隐匿，或拖欠不缴。
+  - 土地会易主，也会退出耕作，因此税率所适用的税基在一次运行之内并不固定。
+  meso_conditions:
+  - 征收力度是一项决策：县在观察到缺口之后可以加压，而不是施加一个恒定的力度。
+  - 配额是按登记册评定的，而登记册与实际耕种的土地并不一致，因此二者可以背离。
+  causal_chain:
+  - 压力上升：每亩评估额，或所索取配额的份额，增加。
+  - 力度随之上升；在 utility 政策下，它从 3.34-4.25 移动到声明的上限 5.0。
+  - 家户迁出、隐匿或拖欠，可评估的税基收缩。
+  - 当力度停留在上限时，相对评估配额的实收下降。
+  trigger: 一条在观察到实收缺口之后提高征收力度的决策规则。P10 的消融中没有一条：P12 的 utility 政策是本项目中唯一加压到上限的实验臂。
+  macro_outcome: 长期缺口：实收低于配额、登记税基收缩，而军饷索取要靠不断缩小的实收来满足。
+  conditions:
+  - statement: 一个可以通过迁移、藏匿或拖欠对税率作出反应的税基。
+    level: micro
+    role: necessary
+  - statement: 一个征收力度出于选择而非恒定的政权机构。
+    level: meso
+    role: necessary
+  - statement: 使迁出合法且负担得起的困顿线。
+    level: micro
+    role: facilitating
+  - statement: 一个滞后于实际耕种面积的评估登记册。
+    level: meso
+    role: facilitating
+  time_lag: 未定：P12 的读数比较的是一次 240 月步（tick）运行的端点，没有任何产物记录力度序列，也没有产物记录力度与实收份额相交的月份。按月的分辨率只存在于 P10 治理时间线中的越线计数。
+  sensitivity_evidence: 在 p10-morris 批次的莫里斯筛选中，assessed_value_tael_per_mu 对 indicators_crossed_end 的 mu*
+    = 0.75（sigma = 1.06）：与土地约束并列第三，位于临时迁徙份额与参考价格之后，因此这一并列是并列，而不是排名。P09 辨识了它：后验中位数 0.240 两/亩，对照先验 0.05-0.40，收缩
+    0.401，结论为已辨识。
+  ablation_evidence: NO_EXTRACTION_ESCALATION 移除了评估税率与征收力度对欠饷存量的反应，并降低了相对配额的实收（receipts_over_quota_total
+    -0.06 [-0.10, -0.01]，下降），方向与倒转的说法相反。它对税基的影响未定（tax_base_change_mu -2,417.48 [-5,239.52, +4,228.41]，未定），因此该实验臂改变了征收到的数量，却没有表明加压会摧毁税基。
+  hold_out_evidence: quota-erosion-and-surcharge 在留出年份上于 1.00 的后验抽样中满足，在全运行上也是 1.00；receipts-shortfall-chronic
+    在校准窗口上于 1.00 的抽样中满足。该机制所论的缺口是存在的；本应导致它的加压，不在任何留出期的量中。
+  policy_robustness: 在 utility 重复中于 1.00 的比例出现，强度 0.10-0.31；在 random 重复中为 0.33；在 rule 重复中一次也没有：P12 的结论是“政策依赖”。当决策规则以加压回应缺口时它出现，当规则按兵不动时它不出现。
+  historical_support: receipts-shortfall-chronic（等级 B，目标，窗口 1600-1644）：校准窗口 1.00；quota-erosion-and-surcharge（等级
+    B，留出期，窗口 1522-1644）：留出年份 1.00，全运行 1.00
+  historical_challenge: 史料把缺口归因于征收所能触及的范围——逃亡、收成与规避——而不是归因于一条当局在实收下降时加压的反馈规则，两个史料模式也都不带被测量的征收力度。模型恰恰通过史料没有描述的这条规则产生了它的倒转，而汲取升级实验臂收得的是更多的配额，不是更少。
+  counterexample: rule 政策：6 次重复中 0 次，参数抽样与同一个世界都与显示出它的那个实验臂相同。结构性的倒转不会取决于由哪一套声明政策在决策。
+  falsifiable_prediction: 消融力度反应——把征收力度固定在其预热值——倒转就会消失：随着名义压力上升，相对配额的实收不再下降。如果它仍然下降，那么倒转就不是该反应规则造成的，这张机制卡就是错的。
+  uncertainty: 三套声明政策、三个县、三十二个家户群组。utility 政策的上限 5.0 是一个声明的边界，不是观测到的边界，而倒转对该上限的依赖尚未检验。唯一改变汲取程度的实验臂方向相反，因此这张卡依赖的是单一政策下运行之内的同向变动。
+  citations:
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: assessed_value_tael_per_mu 对 indicators_crossed_end 的 mu*=0.75 sigma=1.06
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: assessed_value_tael_per_mu 中位数 0.240，收缩 0.401，已辨识
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: receipts_over_quota_total -0.06 [-0.10, -0.01]，下降
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: quota-erosion-and-surcharge 留出期 1.00，全运行 1.00
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: 倒转在 1.00/utility、0.33/random、0.00/rule 中出现；结论为政策依赖
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: receipts-shortfall-chronic（等级 B，目标，窗口 1600-1644）：校准窗口 1.00
+- id: M002
+  name: Crisis Gating
+  question: 产生崩溃的是冲击本身，还是让冲击得以抵达税基的那个条件？
+  status: SUPPORTED
+  micro_conditions:
+  - 家户可以迁出：迁出是家户群组在困顿越过一条声明阈值线时所进入的状态，它带走自身的劳动力与消费。
+  - 迁出必须负担得起——要计收迁徙成本与途中损耗——因此落在阈值线以下的家户仍可能走不了。
+  meso_conditions:
+  - 县的税基是留下来的劳动力与土地，因此外流就是可评估价值的外流。
+  - 军饷是对同一笔实收提出的索取，因此更小的税基表现为欠饷，而不是表现为更小的索取。
+  causal_chain:
+  - 闸门打开：迁徙成本、途中损耗，以及使家户有资格迁出的困顿线都被移除。
+  - 家户以基线从未达到的数量退出。
+  - 税基收缩的幅度约为次大实验臂的七倍，按中位数对中位数计约十七倍。
+  - 实收无法覆盖军饷索取，欠饷上升，县在每个重复中都越过声明的崩溃线。
+  trigger: 是制度闸门，不是天气：闸门打开时，危机出现在基线本没有危机的地方；而移除气候冲击后崩溃没有变化。
+  macro_outcome: 县的财政与其强制触及能力发生系统性崩溃，且在每个重复中都于同一月步（tick）达到。
+  conditions:
+  - statement: 一道可开可闭的家户迁徙闸门。
+    level: meso
+    role: necessary
+  - statement: 以仍然在场的家户为内容的税基。
+    level: meso
+    role: necessary
+  - statement: 严重到足以把家户推向阈值线的气候冲击。
+    level: micro
+    role: facilitating
+  - statement: 一支对实收的索取不随实收缩小而缩小的军队。
+    level: meso
+    role: facilitating
+  time_lag: 二十四个 tick，且在每个重复中都如此：开闸实验臂在 240, 即第 48 个 tick越过声明的崩溃线，在 24 个 tick的预热之后。它是消融批次中唯一一个其重复会越线的实验臂；莫里斯与索博尔设计分别在
+    tick 24, 48 与 216 越线。
+  sensitivity_evidence: 对 indicators_crossed_end 最大的基本效应是 temporary_share_of_adults_per_month、reference_price_tael_per_shi、land_per_adult_capacity_mu（p10-morris）：一个迁徙份额、一个市场价格与一个土地约束，而土地约束与评估额并列，而不是排在其后。居首的控制项落在迁徙与市场一侧，不在气候轴上。
+  ablation_evidence: 打开闸门就是原因：breakdown +1.00 [+1.00, +1.00]，上升；tax_base_change_mu -162,553.28 [-170,826.34,
+    -161,632.75]，下降；households_exited +8,514.95 [+3,896.31, +9,732.58]，上升——对照的是一个没有任何重复崩溃的基线。移除气候冲击则不然：breakdown
+    +0.00 [+0.00, +0.00]，未定；税基未定（tax_base_change_mu +2,718.02 [-4,560.20, +3,078.74]，未定）；迁出下降（households_departed
+    -534.23 [-580.57, -20.96]，下降）。
+  hold_out_evidence: shaanxi-net-outflow 在留出年份上得分为 0.16，对照全运行的 1.00，在外推上为 0.00；chongzhen-drought-sequence
+    在留出年份上得分为 0.00。外流的方向相符；它的时点不符。
+  policy_robustness: 被闸门控制的区域随决策政策移动：在 rule 政策下有 9 个网格单元中的 7 个崩溃，random 下 6 个，utility 下 5 个，且只有 rule 政策的单元集合与参照相同——因此哪些单元崩溃是政策依赖的。至于*闸门*本身是崩溃的承载者，这一点是在
+    P10 消融中检验的，而且只在一套政策下，而非三套。
+  historical_support: shaanxi-net-outflow（等级 C，留出期，窗口 1628-1644）：留出年份 0.16，全运行 1.00；chongzhen-drought-sequence（等级
+    B，留出期，窗口 1627-1644）：留出年份 0.00
+  historical_challenge: 史料中的外流集中在饥荒发作的那些年份，而模型符合全程的方向，却错过了这些年份：留出得分为 0.16，而全运行为 1.00。一道持续渗漏的闸门与一道在危机中打开的闸门并不相同。
+  counterexample: 干旱消融：移除气候冲击保持了基线的结果——没有任何重复崩溃——因此冲击不是那道闸门。消融批次的十二个实验臂中只有闸门臂崩溃。在 P10 的其他地方，没有它也确有崩溃发生——极端参数抽样下有
+    40 次索博尔运行中的 7 次以及一个临界网格单元越线——因此这一主张说的是所声明的实验臂，而不是唯一的路径。
+  falsifiable_prediction: 在最严酷的气候设定下关闭闸门，崩溃就不应发生：一个在严酷度下限 0.9 与名义压力 0.04 下拒绝永久迁出的实验臂，在每个重复中都产生零次崩溃。在最温和的设定下强行打开闸门，则至少应有一个重复崩溃。任一个结果都能否证这张机制卡。
+  uncertainty: 被干预的只有一道闸门。赈济与贸易渠道也有实验臂，但它们对越线计数的影响在四次重复下未定，因此这张卡并不主张它们不是闸门。三个县、三十二个家户群组，以及一条其困顿线是声明的而非观测的迁徙规则。
+  citations:
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: OPEN_MIGRATION_EXIT breakdown +1.00 [+1.00, +1.00]，上升；NO_DROUGHT breakdown +0.00 [+0.00,
+      +0.00]，未定
+  - kind: counterfactual
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: NO_DROUGHT x FULL_MILITARY_PAY 对 indicators_crossed_end：联合 +0.00，对照可加值 -0.50 [+0.00, +1.00]，可加
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: 对 indicators_crossed_end 最强的参数：temporary_share_of_adults_per_month、reference_price_tael_per_shi、land_per_adult_capacity_mu
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/tipping_grid.parquet
+    reading: 崩溃的网格单元：rule 7, random 6, utility 5
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: shaanxi-net-outflow：留出期 0.16，外推 0.00，全运行 1.00
+  - kind: historical-challenge
+    source: data/historical_patterns/01-drought-climate.yaml
+    reading: chongzhen-drought-sequence（等级 B，留出期）：留出年份 0.00——一项被驳倒的检验，此处作为挑战而非支持引用
+- id: M003
+  name: Fiscal-Military Ratchet
+  question: 军队未付的索取是否会不断累积而从不结清，从而使财政负担只会上升？
+  status: REJECTED
+  micro_conditions:
+  - 士兵每月被欠一笔银饷，其数额是声明的比率，而不是谈定的结果。
+  - 军饷索取针对的是民政机构所征收的同一笔实收，因此缺口表现为一个未付的存量。
+  meso_conditions:
+  - 国库在同一月步（tick）内以实收支付索取，因此它无法以未来的实收举债。
+  - 逃亡会把士兵从名册上除名，因此一次发饷失败同时是人力损失。
+  causal_chain:
+  - 评估实收低于评估配额。
+  - 军饷索取只得到部分满足，未付的余额作为存量结转。
+  - 如果这个存量只可能上升，财政负担就会棘轮式上升；而当实收超过当月索取时，这个存量反而会被支取。
+  trigger: 实收超过当月军饷索取的那个月，这正是部分结清该存量的原因，也正是该机制的强形式断言不可能发生的事。
+  macro_outcome: 一个庞大但起伏的欠饷存量——不是单调的棘轮。在六次 rule 重复中，该存量在运行结束时为 14,355 至 26,849 两，对照评估额为 287,355 至 311,429
+    两。
+  conditions:
+  - statement: 以白银固定的军饷索取，而实收是一个残量。
+    level: meso
+    role: necessary
+  - statement: 不能以未来实收举债，因此该存量无法被抹平。
+    level: meso
+    role: necessary
+  - statement: 索取随县必须供养的士兵人数上升。
+    level: meso
+    role: facilitating
+  time_lag: 在运行之内未能解决：读数由一条月度序列计算得出，但产物只记录了多少个月下降，因此下降发生在什么时候不在证据之中。在六次 rule 重复中，该序列的端点从 254 两延伸到 14,355-26,849
+    两。
+  sensitivity_evidence: pay_tael_per_soldier_month 在 P09 中已辨识——后验中位数 0.508 两，对照先验 0.10-1.00，收缩 0.271——因此该存量的水平受到数据的约束。没有任何敏感性统计量能把棘轮与起伏的存量区分开，因为莫里斯的输出是运行末期的水平与最大值。
+  ablation_evidence: 两个结论明确的实验臂抬高了该存量，且都没有移除它的下降：把军饷索取对国库的调用加倍（military_pay_arrears_end_tael +2,299.70
+    [+1,554.58, +4,753.25]，上升），以及打开迁徙闸门（military_pay_arrears_max_tael +10,287.79 [+7,289.76, +14,415.10]，上升）。在索取加倍后仍然存在的缺口是财政结果而非政策选择，而下降在两个实验臂中都存活下来，因为没有任何实验臂被造来移除它们。
+  hold_out_evidence: 对“驻军欠饷存量是否在整个运行中累积？”这一问题，pay-monetised-and-arrears 在留出年份上于 1.00 的后验抽样中满足，在全运行上也是
+    1.00。累积是相符的。*不结清的*累积从来不是一个被评分的史料模式，这正是强形式在本项目自身的报告中存活至今的原因。
+  policy_robustness: 在三套声明政策中都不存在：3 个实验臂中有 0 个显示它，结论为“不存在”。每个 rule 重复的下降月数为 240 个 tick 中的 [11, 35, 37, 43,
+    45, 53]，在全部 18 次重复中范围为 4 至 69。rule 实验臂最大的期末存量为 26,849 两，属于一个下降月数为 37 的重复——多于该实验臂的中位数，而不是更少。
+  historical_support: pay-monetised-and-arrears（等级 A，留出期，窗口 1580-1644）：留出年份 1.00，全运行 1.00
+  historical_challenge: 史料支持某一水平上的长期欠饷，这一点模型复现了；史料并没有报告一个单调的存量：白银到手时，驻军会被成批补发。强形式是本项目作出的一个推论，从“欠饷是长期的”推到“欠饷永不结清”，而模型否证的是这个推论，不是证据。
+  counterexample: 欠饷从 254 两到 26,849 两，有 37 个月下降，对照评估额 287,355：rule 实验臂最大的期末存量属于一个仍然记录了数十个存量下降月份的重复，而该实验臂最大的下降计数是
+    53。任何需要该存量单调的读法在这个模型中都是假的。
+  falsifiable_prediction: 一个移除结清的实验臂——在任何月份都拒绝偿付欠饷——会使该存量变得单调。如果在该实验臂下存量仍然下降，那么这些下降来自发饷规则之外的某种东西，而这次否证就是错的。存活下来的主张保留它自己的预测：该存量在运行结束时介于评估价值的
+    4.8% 与 9.3% 之间，而一个把饷率加倍的实验臂应当提高而不是降低这一份额。
+  uncertainty: 被否证的只是强主张，且限于三个县与 240 个 tick。下降背后的机制并未辨识：没有任何测量能说明它们来自发饷规则、来自重新评估，还是来自汲取实验臂自身对该存量的反应。水平层面的主张依赖单一一个等级
+    A 的留出期模式。
+  citations:
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: 棘轮在 3 套声明政策中出现 0 次；每个重复的下降月数 [11, 35, 37, 43, 45, 53]
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: FULL_MILITARY_PAY military_pay_arrears_end_tael +2,299.70 [+1,554.58, +4,753.25]，上升
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: OPEN_MIGRATION_EXIT military_pay_arrears_max_tael +10,287.79 [+7,289.76, +14,415.10]，上升
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: pay_tael_per_soldier_month 中位数 0.508，收缩 0.271
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: pay-monetised-and-arrears（等级 A，留出期，窗口 1580-1644）：留出年份 1.00
+- id: M004
+  name: Elite Mediation Bifurcation
+  question: 精英要么中介家户的困顿、要么累积抵押物，而所走的那一支是否决定了县的轨迹？
+  status: WEAK
+  micro_conditions:
+  - 面对消费缺口的家户可以按月度利率以其土地借入白银，前提是它有土地可作抵押。
+  - 借贷是家户不必离开就能有饭吃的方式，因此信贷渠道位于困顿与迁出之间。
+  meso_conditions:
+  - 精英的放贷能力是作为抵押物的土地的一个份额，因此同一条让家户得以存活的规则，会在它无力偿还时把土地转移走。
+  - 精英田产有一部分是在登记册之外评估的：一个声明比例的精英土地被隐匿、不予课税。
+  causal_chain:
+  - 困顿迫使家户变卖或借贷，而贷款价值比规则决定了精英会放出多少白银。
+  - 这些白银被消费掉而非用于投资，因此即便家户熬过了这个月，其资产状况也在变弱。
+  - 土地向放贷者转移，县的可评估税基随之收缩。
+  trigger: 一个大到使家户以土地抵押来填补的消费缺口；当信贷渠道关闭时，同样的缺口只能靠迁出来应对。
+  macro_outcome: 一个收缩的可评估税基，土地集中在精英手中。其中介的那一面是被测量过的、且是承重的；而分叉——两条轨迹不同的分支——从未被测量，且运行显示这两面是一起出现的。
+  conditions:
+  - statement: 一个有能力以抵押土地放出白银的放贷者。
+    level: meso
+    role: necessary
+  - statement: 一个有土地可抵押、且有缺口无法填补的家户。
+    level: micro
+    role: necessary
+  - statement: 一个未改革的登记册，使精英土地可以躲开评估。
+    level: meso
+    role: facilitating
+  time_lag: 未解决：信贷实验臂是按运行末期的水平比较的，没有任何产物记录某个家户群组首次借贷或首次失去土地的月份。先于借贷的消费事件是按月发生的，因此时滞至多为一次运行。
+  sensitivity_evidence: elite_hidden_land_share 在 P09 中已辨识——中位数 0.359，收缩 0.277——interest_rate_monthly
+    也已辨识（中位数 0.070，收缩 0.368），因此信贷关系的两项都由证据钉住，而不是任其自由。两者都不在越线计数上三个最大的基本效应之列，因此这条渠道对水平的影响大于对崩溃边界的影响。
+  ablation_evidence: 关闭信贷渠道会加深税基收缩并把家户推出去：tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88]，下降；households_departed
+    +121.18 [+91.79, +400.50]，上升。精英放贷从每次运行 74.5 降到 0.0，而对武装人口的影响未定（largest_band_share_max +0.00 [-0.01,
+    +0.10]，未定）：在这里承重的是中介的那一支，而累积的那一支没有实验臂去移除。
+  hold_out_evidence: 没有任何留出模式对信贷渠道评分：debt-transfers-land 是一个校准目标，在 0.94 的抽样中满足；也没有任何留出期模式询问任何与精英放贷有关的事。因此分叉的第二支既在预测检验之外，也在消融集合之外。
+  policy_robustness: 未测量：P12 的机制读数只有汲取、棘轮与武装集团整合这几个读数，其中没有一个读取信贷渠道。政策实验臂确实改变水平层面的比较，但没有任何读数追踪精英放贷，因此这一机制没有结论。
+  historical_support: debt-transfers-land（等级 B，目标，窗口 1600-1644）：校准窗口 0.94；land-abandonment-in-famine（等级
+    C，目标，窗口 1630-1644）：校准窗口 1.00；模型的利率与隐匿土地参数是相对于这些目标辨识的
+  historical_challenge: 史料把中介与累积描述为不同精英作出不同选择的结果；模型只有一条放贷规则，没有掠夺性的变体，因此它无法分辨它本应在其中分叉的各支。土地转移模式以 0.94 相符，说明的是信贷关系在起作用，而不是精英发生了分化。
+  counterexample: 基线运行以 0.94 满足 debt-transfers-land，同时税基收缩了 15,476 亩，土地如该模式所描述的那样流向债权人。移除信贷渠道使这一收缩更深，而不是更浅（tax_base_change_mu
+    -9,539.98 [-12,523.40, -7,849.88]，下降）：中介与累积是一起出现的，而不是作为替代选项出现，因此所述的分叉并不是模型所显示的东西。
+  falsifiable_prediction: 两个检验，每个主张一个。造出累积的那一支——精英以最高利率放贷，并在违约时取得土地——它应当产生比关闭信贷实验臂的 -9,540 亩更大的税基收缩；如果不是这样，这个分叉就没有第二支，这张卡应当用一句话说明这一点，而不是携带一个状态。然后按哪一面占优把运行分组，比较它们的轨迹：如果两组并不分开，中介就是一个机制，而不是一对分支。
+  uncertainty: 这张卡以一个分叉命名，而证据只解决了它的一支，这就是状态为 WEAK（弱）而不是 CONDITIONAL（有条件成立）的原因：信贷是承重的，而关于精英分化为中介者与累积者、且后果不同这一主张，既未被测量，也与运行不一致——在运行中两面是一起出现的。信贷渠道还与迁徙纠缠在一起，因此看起来像信贷对税基的一部分效应，可能其实是迁徙效应；而钉住它的那个参数，是相对于该机制自身所蕴含的土地转移目标辨识的。
+  citations:
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: NO_ELITE_CREDIT tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88]，下降；households_departed
+      +121.18 [+91.79, +400.50]，上升
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: elite_hidden_land_share 中位数 0.359 收缩 0.277；interest_rate_monthly 中位数 0.070 收缩 0.368
+  - kind: counterfactual
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT 同时关闭两条渠道
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_statistics.parquet
+    reading: 没有任何留出模式对信贷渠道评分
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: debt-transfers-land（等级 B，目标，窗口 1600-1644）：校准窗口 0.94
+- id: M005
+  name: Insurgent Consolidation
+  question: 随着危机推进，武装集团是否会整合为数量更少、规模更大的组织？
+  status: SUPPORTED
+  micro_conditions:
+  - 武装集团通过吸纳县再也养不起的家户——即吸纳轨道——以及向周围人口征粮而壮大。
+  - 内聚力是一个绑定的约束：一个获得口粮少于其成员所需的武装集团会失去内聚力，并可能再次失去成员。
+  meso_conditions:
+  - 弹压是国家对武装集团的强制触及能力，移除它会改变哪些武装集团得以存续。
+  - 武装集团掠取的粮食，就是县无法评估、军队无法购买的粮食，因此武装集团的壮大与财政能力争夺同一季收成。
+  causal_chain:
+  - 从困顿人口与兵丁中的招募在危机年份持续进行。
+  - 武装集团形成的速度快于其瓦解的速度，最大武装集团在武装人口中的份额上升，而武装集团的数量随弹压变动。
+  - 武装人口变成数量更少、规模更大的组织，史料称其对粮食的需求超过了一个县所能征收的量——而本项目中没有任何产物测量过这个量。
+  trigger: 弹压消退：移除强制触及能力之后，最大武装集团的份额下降，因此使武力集中的是弹压，而不是危机本身。该实验臂中武装集团数量如何变化则未定。
+  macro_outcome: 武力集中于数量更少、规模更大的武装集团——在每一套声明政策中都出现，各为六次重复中的五次——同时县的税基无法同时满足军饷索取与赈济需求。
+  conditions:
+  - statement: 一个由困顿家户与欠饷士兵构成的招募来源。
+    level: micro
+    role: necessary
+  - statement: 可从周围人口掠取的粮食。
+    level: micro
+    role: necessary
+  - statement: 弱到足以让大型武装集团在自身扩张后仍然存续的弹压。
+    level: meso
+    role: facilitating
+  - statement: 抬高武装集团必须购买的粮食价格的贸易中断。
+    level: meso
+    role: facilitating
+  time_lag: 是在整个运行上而不是在某一月步上：P12 的读数比较的是 240 个 tick 中的起始武装集团数与最终数。没有任何产物记录最大武装集团份额见顶的月份，因此整合的速度未定。
+  sensitivity_evidence: 对最大武装集团份额最大的基本效应是 reference_price_tael_per_shi、food_shi_per_soldier_month、assessed_value_tael_per_mu——参考价格、士兵的口粮与评估额——而越线计数的首位是
+    temporary_share_of_adults_per_month、reference_price_tael_per_shi。两个排序只共享一个首位项，而不是三个，因此武装集团份额并不只是继承了崩溃边界的驱动因素，也没有任何武装集团专属参数居首。
+  ablation_evidence: 弹压是承重的，方向也被测量：LOW_REPRESSION（largest_band_share_max -0.05 [-0.10, -0.01]，下降）降低了最大武装集团的份额，同时使武装集团数量仍未定。合并规则不承重：NO_BAND_MERGER
+    产生与基线相同的合并计数（两者都是 0，期末武装集团数 5.25 对 5.25），因为整个批次中没有任何一次合并被触发。
+  hold_out_evidence: many-bands-then-consolidation 在留出年份上于 0.62 的后验抽样中满足，在全运行上为 0.94；absorption-of-deserters-and-refugees
+    为 0.75 的抽样。形状在整个运行上相符；留出年份的得分低于全运行。
+  policy_robustness: 稳健：在 rule 0.83、utility 0.83、random 0.83 的重复中出现（P12 结论为“稳健”，3 个实验臂中的 3 个）。唯一政策依赖的部分是强度：utility
+    实验臂的中位强度在三者中最高。
+  historical_support: many-bands-then-consolidation（等级 B，留出期，窗口 1630-1644）：留出年份 0.62，全运行 0.94；absorption-of-deserters-and-refugees（等级
+    B，目标，窗口 1628-1644）：校准窗口 0.75
+  historical_challenge: 史料记载 1630 年代早期有三十来个武装集团，到 1644, 只剩一个占主导的组织，整合幅度达一个数量级；模型从五个武装集团变为三个、再变为九个，最大份额从
+    0.20 升到约 0.38。方向相符，幅度则小得多，因此这张卡主张的是整合，而不是史料所描述的规模。
+  counterexample: 合并实验臂：把内聚力门槛提高到最大值什么也没有改变（0 次合并，对照基线的 0 次），而整合仍然出现。不论它由什么产生，都不是模型文档所点名的合并规则。
+  falsifiable_prediction: 降低内聚力门槛，使合并真正被触发，最大武装集团的份额就应当超过各声明政策所达到的最大值 0.382。如果合并被触发而份额并不上升，那么合并这一环节只是装饰，该机制的因果链应当围绕形成与瓦解重写。
+  uncertainty: 模型点名的因果环节——按内聚力合并——从未真正运转过：P10 批次的每个实验臂、每个水平上都是零次合并。作为结果的整合是稳健的；它在模型内部的归因则不是，而这张卡并不同时主张结果与环节。每套政策五到六次重复足以显示存在，不足以估计强度。
+  citations:
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: 在 rule 0.83、utility 0.83、random 0.83 的重复中出现；结论为稳健
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: LOW_REPRESSION largest_band_share_max -0.05 [-0.10, -0.01]，下降；NO_BAND_MERGER 合并 0 次，对照基线
+      0 次
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: many-bands-then-consolidation 留出期 0.62，全运行 0.94
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: 最大武装集团份额的首位项为 reference_price_tael_per_shi、food_shi_per_soldier_month、assessed_value_tael_per_mu
+  - kind: historical-support
+    source: lorge-2005
+    reading: many-bands-then-consolidation（等级 B，留出期，窗口 1630-1644）：留出年份 0.62
+- id: M006
+  name: Famine Mortality
+  question: 饥饿造成的超额死亡是否会把一次歉收传递为人口损失，并由此传递为劳动力稀缺与土地弃耕？
+  status: UNIDENTIFIED
+  micro_conditions:
+  - 一个消费跌破维生线的家户群组会失去成员，失去的多少取决于跌破的幅度与持续的时间。
+  - 死者离开劳动力池，因此下一季的耕种规模更小。
+  meso_conditions:
+  - 赈济与信贷决定谁能达到维生线、谁不能，因此死亡率既是收成的函数，也是制度的函数。
+  - 土地之所以被弃耕，是因为耕种它的家户不在了，而不只是因为他们逃离了。
+  causal_chain:
+  - 降水不足，继而歉收，继而价格暴涨，继而消费跌破维生线。
+  - 群组成员死亡；模型不记录此类事件，也无法记录。
+  - 每亩劳动力下降，耕种被放弃。
+  trigger: 一个持续到家产耗尽之后的消费缺口——模型会走到这种状态，因为它记录了低于维生线的消费事件，但它通过贱卖与迁出来解决，而不是通过死亡。
+  macro_outcome: 超出迁徙所能解释的人口下降，以及饥荒之后各季的劳动力短缺——这两者本项目中没有任何产物报告过。
+  conditions:
+  - statement: 一个其成员数会因死亡而减少的家户群组。
+    level: micro
+    role: necessary
+  - statement: 一条在其之下的消费会以生命为代价的维生阈值。
+    level: micro
+    role: necessary
+  - statement: 来得太晚、已无法改变结果的赈济。
+    level: meso
+    role: facilitating
+  time_lag: 在这个模型中不可测量。史料把死亡放在饥荒当年及其之后；模型根本没有死亡时钟，而它确实显示出来的弃耕是由迁出产生的，而迁出是按月发生的。
+  sensitivity_evidence: 不存在。P09 的先验表包含十三个参数，其中没有一个是死亡率或存活率；任何莫里斯轨迹与索博尔指数都无法作用于模型并不计算的量。
+  ablation_evidence: 无法造出实验臂。移除死亡率会是空操作，因为没有东西可移除；这正是 NO_BAND_MERGER 实验臂为另一条规则所展示的情形：一个干预无法生效的实验臂测量的，是这条规则的不存在，而不是它的效应。
+  hold_out_evidence: land-abandonment-in-famine——死亡率本应帮助产生的那个模式——在没有任何死亡率规则的情况下，通过迁出，于 1.00 的抽样中满足。因此这些模式得分无法区分一个有死亡的世界与一个没有死亡的世界。
+  policy_robustness: 不适用：P12 读取三个机制，其中没有一个是人口量，因此没有任何政策实验臂产生关于死亡的证据。
+  historical_support: famine-lags-harvest-failure（等级 B，约束，窗口 1628-1635）：是序列，不是水平，不予评分；land-abandonment-in-famine（等级
+    C，目标，窗口 1630-1644）：校准窗口 1.00
+  historical_challenge: 史料的因果序列是降水、收成、价格、饥饿、死亡——其中死亡是本项目从未实现的那一部分。模型通过另一个机制到达弃耕这一结果，因此关于死亡率的史料论证在这里完全无法检验。
+  counterexample: 模型在零死亡的情况下以 1.00 满足 land-abandonment-in-famine，因此任何主张死亡对弃耕是必要的说法，都在模型内部被否证——而任何主张模型的弃耕是死亡率机制之史料证据的说法，都被模型自身的结构所否证。
+  falsifiable_prediction: 加入一条在持续维生缺口下移除成员的死亡率规则，只有当模式的时点取决于劳动力稀缺时，留出期得分才应当变动：如果 famine-worst-years-1639-43
+    保持在 1.00，而人口统计量发生变化，那么在这个模型中死亡率改变的是水平，而不是时点。这个检验今天无法运行，这就是状态为 UNIDENTIFIED（无法辨识）而不是 WEAK（弱）的原因。
+  uncertainty: 这个空缺是结构性的，而不是经验性的：没有死亡事件、没有死亡参数、没有死亡输出，因此项目中没有任何东西原则上能够测量这一机制。P08 把它记录为一个覆盖缺口；这张卡把它记录为模型的机制集合与史料的因果链之间最大的一处单一错配。
+  citations:
+  - kind: historical-support
+    source: chen-2024-chongzhen
+    reading: famine-lags-harvest-failure（等级 B，约束，窗口 1628-1635）：是序列，不是水平，不予评分
+  - kind: historical-support
+    source: shaanxi-famine-gazetteers
+    reading: land-abandonment-in-famine（等级 C，目标，窗口 1630-1644）：校准窗口 1.00

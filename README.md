@@ -226,6 +226,7 @@ the reproducible demo scenario, and a full review.
 | `docs/calibration/` | Generated: the frozen objective, the posterior, the mismatches, the held-out predictions |
 | `docs/experiments/` | Generated: ablations, interactions, sensitivity indices, tipping grid, policy-robustness matrix |
 | `docs/mechanisms/` | The mechanism cards: `cards.yaml`, one Markdown card each, and the index |
+| `docs/mechanisms/zh/` | 中文译稿：六张机制卡与综述（英文原稿为准，`docs/mechanisms/` 与 `outputs/reports/` 为原始文件） |
 | `outputs/reports/mechanism-synthesis.md` | Generated: what the cards say together, and the boundary fits |
 | `docs/ui.md` | The browser: what each tab reads, and what it deliberately does not do |
 | `docs/phase-reports/` | One report per phase |
