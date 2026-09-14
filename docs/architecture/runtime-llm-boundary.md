@@ -1,7 +1,13 @@
 # Runtime LLM Boundary
 
-Status: P00. Nothing in this document is implemented yet; the runtime policy layer is P11.
-This document fixes the contract so that later phases cannot drift into it by accident.
+Status: P11. The runtime policy layer exists now: `policies/base.py` (the interface, the bounded
+action space, the anonymized observation, the trace schema), `policies/ustc_v41.py` (the confirmed
+model gate, the OpenAI-compatible transport, the retry and 429 policy, the prompt and response
+hashes), `policies/recording.py` (record → sanitize → fixture → replay), `policies/rules.py`,
+`policies/utility.py` and `policies/random_policy.py` (the declared fallbacks), and
+`policies/institutional.py` (the event-triggered seats and the levers a decision may reach). The
+live model is still off by default and the phase's smoke run reports that its configured id was not
+confirmed. This document remains the contract; where it and the code disagree, the code is wrong.
 
 Binding rules: `.omp/RULES.md` rules 7–13 and 22–23.
 
@@ -127,6 +133,12 @@ These two properties are enforced by `tests/invariants/test_runtime_llm_boundary
 
 ## Phase gating
 
-Until P11 the runtime layer does not exist: no client, no credentials read, no live call, no
-recorded fixture. Later phases may define the `InstitutionalPolicy` interface and rule-based,
-utility-based, and random policies; only P11 adds `USTCV41Policy`.
+P11 implements the layer. What the code does with this contract, in one paragraph: the model gate
+runs *before* the credential is read; the request payload carries no `tools` key; the observation is
+anonymized and audited for place, dynasty, person and date tokens; the answer is validated against
+the seat's action space; every decision records the model id, the prompt hash and the response hash;
+a decision's rationale is stored and never parsed; every action has a declared lever; and a failure
+of any kind is recorded as a refusal and changes nothing.
+
+The live suite is opt-in through the marker, and `pyproject.toml` now excludes it by default — which
+it claimed to do before P11 and did not.

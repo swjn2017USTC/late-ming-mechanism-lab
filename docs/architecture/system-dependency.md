@@ -220,6 +220,17 @@ bookkeeping           | cohort-bookkeeping    | agriculture.state, cohort.adults
 bookkeeping           | county-bookkeeping    | cohort.tax_arrears, county.arrears, county.granary, county.silver                                                                                                 | -                                                                                                                                                                
 ```
 
+## The institutional decision layer (P11)
+
+P11 adds one more system at the slot the tick order reserved for it from the beginning,
+``institutional_decisions`` (phase 15, between military finance and bookkeeping):
+``policies.institutional.InstitutionalDecisionSystem``. It is **not** part of the default wiring, so
+the tables above are unchanged: a run that wants runtime decisions builds the layer and merges it in
+by phase (`experiments/institutional_smoke.py`). It reads the fiscal, armed, distress and migration
+state of the month that just ended and writes no resource of its own tick — what it changes are
+*policy inputs* (the extraction policy, the relief share, the market's disruption regime), which the
+systems after it consult next month. The scheduler validates it like any other system.
+
 ## Regenerating
 
 ```bash

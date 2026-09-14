@@ -11,8 +11,9 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P10 (Ablation / Sensitivity / Counterfactual) complete, on top of P09 (Calibration / Hold-out), P08
-(Historical Evidence / Parameter Registry) and P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
+P11 (USTC V4.1 Institutional Decision Layer) complete — with the live model **closed** — on top of P10
+(Ablation / Sensitivity / Counterfactual), P09 (Calibration / Hold-out), P08 (Historical Evidence /
+Parameter Registry) and P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
 (P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with an explicit
 coping ladder (P03), a county grain market with merchant houses and elite lending, land purchase and
 private relief (P04), a county fiscal apparatus (P05) with state capacity kept as five separate
@@ -49,6 +50,20 @@ carry distributions rather than means — paired median differences with bootstr
 deltas, collapse probabilities with Wilson intervals, the crossed-lines distribution behind the
 breakdown line, and binned response curves with their curvature.
 
+P11 built the runtime decision layer and then refused to use it. `policies/base.py` declares the one
+interface every decision policy implements, a bounded action space scoped by role, an anonymized
+observation that is audited for place, dynasty, person and date tokens, a validated decision whose
+rationale is stored and never parsed, and the trace schema; `policies/ustc_v41.py` holds the model
+gate (one operator-confirmed id, checked exactly, no fallback), an OpenAI-compatible transport with a
+timeout, transport-only retries and explicit 429 handling, and the prompt and response hashes;
+`policies/recording.py` turns a live answer into a sanitized fixture and replays it deterministically;
+`policies/rules.py`, `utility.py` and `random_policy.py` are the declared fallbacks; and
+`policies/institutional.py` seats a handful of actors, triggers them on *crossings* rather than a
+schedule, and applies each decision through a declared lever. The configured `USTC_LLM_MODEL` is not
+the confirmed V4.1, so the phase fails closed: no live call was made, the live suite is opt-in and
+currently refuses rather than skips, and the smoke scenario runs on the declared rule policy with the
+replay path proven offline.
+
 Everything shipped so far is an assumption, not history: both spatial fixtures and every cohort
 endowment are graded `S` throughout, the shock experiment's severity axis is a scenario parameter,
 never an estimate of a historical drought, and the governance indicators are declared reading
@@ -56,7 +71,7 @@ lines rather than evidence. Real geography enters only
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P10.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P11.md`.
 Why the military actors are declared abstractions rather than tactics:
 `docs/adr/0002-military-abstractions.md`; how the tick order and its dependencies are enforced and
 drawn: `docs/architecture/system-dependency.md`.

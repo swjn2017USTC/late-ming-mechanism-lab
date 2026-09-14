@@ -19,6 +19,7 @@ outputs/runs/
 outputs/analysis/
 outputs/calibration/
 outputs/experiments/
+outputs/institutional/
 
 data/raw/private/
 sources/literature/private/
