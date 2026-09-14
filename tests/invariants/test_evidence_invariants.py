@@ -50,6 +50,7 @@ PARAMETER_SETS = {
     "BandParameters": P.core_default_band_parameters,
     "MigrationParameters": P.core_default_migration_parameters,
     "GovernanceIndicatorParameters": P.core_default_governance_indicators,
+    "HistoricalCoreParameters": P.core_default_historical_core_parameters,
 }
 
 

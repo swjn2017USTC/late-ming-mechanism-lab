@@ -27,6 +27,7 @@ import pytest
 from late_ming_lab.evidence import parameters as P
 from late_ming_lab.evidence.cards import ParameterCards, load_cards
 from late_ming_lab.experiments.sensitivity import (
+    NON_ECONOMY_PARAMETER_SETS,
     SensitivityError,
     SweepParameter,
     morris_design,
@@ -143,13 +144,25 @@ def test_sweep_parameters_are_the_bounded_scalar_cards(cards: ParameterCards) ->
         if card.range is not None and card.range.low is not None and card.range.high is not None
     ]
 
+    # The sweep set is the bounded scalar cards of the *economy* sets: a swept number has to be a
+    # field an arm can set on a parameter model, and the historical core's set is consumed by the
+    # dataset build and the climate allocator instead. The exclusion is pinned here so it cannot
+    # grow quietly.
+    economy_bounded = [
+        card for card in bounded if card.parameter_set not in NON_ECONOMY_PARAMETER_SETS
+    ]
+    excluded = [card for card in bounded if card.parameter_set in NON_ECONOMY_PARAMETER_SETS]
+    assert {card.parameter_set for card in excluded} == set(NON_ECONOMY_PARAMETER_SETS)
+    assert len(excluded) == 8
     assert len(sweeps) == 15
-    assert len(bounded) == 17
-    assert {sweep.name for sweep in sweeps} == {card.id for card in bounded} - set(DICT_VALUED)
+    assert len(economy_bounded) == 17
+    assert {sweep.name for sweep in sweeps} == {card.id for card in economy_bounded} - set(
+        DICT_VALUED
+    )
     assert set(MEDIUM_PRIORITY) <= {sweep.name for sweep in sweeps}
     # The registry's card order, which is what makes two designs comparable column by column.
     assert tuple(sweep.name for sweep in sweeps) == tuple(
-        card.id for card in bounded if card.id not in DICT_VALUED
+        card.id for card in economy_bounded if card.id not in DICT_VALUED
     )
     for sweep in sweeps:
         card = cards.require(sweep.parameter_set, sweep.name)
