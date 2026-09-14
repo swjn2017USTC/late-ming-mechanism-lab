@@ -603,3 +603,79 @@ def core_default_governance_indicators() -> GovernanceIndicatorParameters:
             "visible at the toy scale and to be moved by a reader, not to be evidence"
         ),
     )
+
+
+HISTORICAL_CORE_PARAMETERS_VERSION: Final[str] = "historical-core-parameters-v1"
+
+#: The seasonal profile the allocator uses by default: the normalised monthly distribution of the
+#: drought, famine, crop and pest events the REACHES file records inside the core window. It is a
+#: property of what was *recorded*, not of the weather - a limitation the card states.
+HISTORICAL_CORE_MONTH_PROFILE: Final[dict[int, float]] = {
+    1: 0.0066,
+    2: 0.1679,
+    3: 0.0104,
+    4: 0.0104,
+    5: 0.2581,
+    6: 0.0607,
+    7: 0.1167,
+    8: 0.2865,
+    9: 0.0256,
+    10: 0.0085,
+    11: 0.0465,
+    12: 0.0019,
+}
+
+
+class HistoricalCoreParameters(BaseModel):
+    """How an observed annual climate index becomes monthly forcing, and how gaps are handled.
+
+    The historical core records an *annual* index per node: how many drought, famine, crop and pest
+    events the record carries for that seat in that year. The model needs a monthly forcing, so a
+    declared allocator distributes the annual index across the months using the seasonal profile of
+    the recorded events. Three things are deliberate:
+
+    - the index is the **annual mean** of the monthly severity, so a seasonal and a uniform
+      allocation describe the same year and an ablation changes only the shape;
+    - the seasonal weights are *derived from the record* (grade ``C``, with the source named), not
+      invented, and the card says plainly that recording intensity is not climate intensity;
+    - an unrecorded node-year is a policy decision, not a silent zero: the builder's coverage
+      policy is ``refuse`` (fail closed and name the node-period) or ``zero`` (impute zero and count
+      it), and it is an argument of the build rather than a fitted value.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    version: str = HISTORICAL_CORE_PARAMETERS_VERSION
+
+    drought_weight: float = Field(ge=0, le=1)
+    famine_weight: float = Field(ge=0, le=1)
+    crop_weight: float = Field(ge=0, le=1)
+    pest_weight: float = Field(ge=0, le=1)
+    drought_saturation_events: float = Field(gt=0)
+    famine_saturation_events: float = Field(gt=0)
+    crop_saturation_events: float = Field(gt=0)
+    pest_saturation_events: float = Field(gt=0)
+    monthly_allocation_profile: dict[int, float] = Field(min_length=12, max_length=12)
+
+    provenance: DataProvenance
+
+
+def core_default_historical_core_parameters() -> HistoricalCoreParameters:
+    """The declared index weights and seasonal allocator the historical core runs with."""
+    return HistoricalCoreParameters(
+        drought_weight=1.0,
+        famine_weight=0.75,
+        crop_weight=0.5,
+        pest_weight=0.4,
+        drought_saturation_events=6.0,
+        famine_saturation_events=4.0,
+        crop_saturation_events=4.0,
+        pest_saturation_events=4.0,
+        monthly_allocation_profile=HISTORICAL_CORE_MONTH_PROFILE,
+        provenance=DataProvenance.assumption(
+            "index weights and saturation counts are declared: they set how many recorded events "
+            "make an annual index of 1, and no source fixes that mapping. The seasonal profile is "
+            "derived from the REACHES record and is recorded on its own card; the missing-coverage "
+            "policy is declared and counted per run."
+        ),
+    )

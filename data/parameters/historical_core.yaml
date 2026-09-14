@@ -1,0 +1,250 @@
+schema_version: parameter-cards-v1
+parameter_set: HistoricalCoreParameters
+cards:
+- id: drought_weight
+  name: drought weight in the annual index
+  parameter_set: HistoricalCoreParameters
+  definition: weight of a recorded drought event in the annual severity index, before saturation
+  unit: index points per event
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    A recorded drought is the most direct documentary signal of the agricultural condition the
+    model's climate forcing represents, so it carries full weight; the other categories are scaled
+    below it. The ordering is argued, the magnitude is not.
+  uncertainty: >-
+    Nothing in the registry says how many recorded drought events correspond to what the model calls
+    severity 1. The weight sets the units of the index, and V2-P03 must not treat the resulting
+    number as an observation of intensity.
+  sensitivity_priority: high
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 0.5
+    high: 1.0
+    basis: declared band; the ordering drought >= famine >= crop >= pest is what is argued
+    conflicts: ''
+  ledger_entries:
+  - drought-north-china-pattern
+
+- id: famine_weight
+  name: famine weight in the annual index
+  parameter_set: HistoricalCoreParameters
+  definition: weight of a recorded famine event in the annual severity index, before saturation
+  unit: index points per event
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.75
+  central_text: null
+  sources: []
+  reasoning: >-
+    Famine is a social outcome that follows crop failure, so it is weighted below drought: counting
+    a famine twice - once as its own event, once as the drought that caused it - would double-count
+    the same bad year.
+  uncertainty: >-
+    The dependency between drought and famine events in the same record is not measured, so the
+    weight is a declared discount rather than an estimated correction.
+  sensitivity_priority: high
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 0.4
+    high: 1.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - famine-drought-famine-sequence
+
+- id: crop_weight
+  name: crop-failure weight in the annual index
+  parameter_set: HistoricalCoreParameters
+  definition: weight of a recorded crop event in the annual severity index, before saturation
+  unit: index points per event
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.5
+  central_text: null
+  sources: []
+  reasoning: >-
+    A crop-failure entry is a direct statement about the harvest, but the category also collects
+    entries about particular crops rather than the whole season, so it is weighted below famine.
+  uncertainty: The category's subcategories are heterogeneous; nothing measures their severity.
+  sensitivity_priority: medium
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 0.2
+    high: 0.8
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries: []
+
+- id: pest_weight
+  name: pest weight in the annual index
+  parameter_set: HistoricalCoreParameters
+  definition: weight of a recorded pest or vermin event in the annual severity index
+  unit: index points per event
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.4
+  central_text: null
+  sources: []
+  reasoning: >-
+    Locust outbreaks are an agricultural shock in their own right and are recorded as such, but they
+    are a partial-season hazard rather than a whole-year condition.
+  uncertainty: The record does not separate locust years from other pest entries.
+  sensitivity_priority: medium
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 0.1
+    high: 0.6
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries:
+  - famine-drought-famine-sequence
+
+- id: drought_saturation_events
+  name: drought events at saturation
+  parameter_set: HistoricalCoreParameters
+  definition: number of drought events in a node-year at which the drought contribution reaches its weight
+  unit: events per node-year
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 6.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    The index has to saturate somewhere or a heavily documented node dominates the map; six events
+    in one county-year is the point chosen, and it is a declaration.
+  uncertainty: >-
+    The count of recorded events per node-year depends on how many documents happen to survive for
+    that place, so saturation mixes climate with documentation density.
+  sensitivity_priority: high
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 3.0
+    high: 12.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries: []
+
+- id: famine_saturation_events
+  name: famine events at saturation
+  parameter_set: HistoricalCoreParameters
+  definition: number of famine events in a node-year at which the famine contribution reaches its weight
+  unit: events per node-year
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 4.0
+  central_text: null
+  sources: []
+  reasoning: Famine is recorded less often than drought in the same district, so it saturates sooner.
+  uncertainty: Declared, not measured.
+  sensitivity_priority: medium
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 2.0
+    high: 8.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries: []
+
+- id: crop_saturation_events
+  name: crop events at saturation
+  parameter_set: HistoricalCoreParameters
+  definition: number of crop events in a node-year at which the crop contribution reaches its weight
+  unit: events per node-year
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 4.0
+  central_text: null
+  sources: []
+  reasoning: Declared on the same scale as famine, because both are harvest outcomes.
+  uncertainty: Declared, not measured.
+  sensitivity_priority: low
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 2.0
+    high: 8.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries: []
+
+- id: pest_saturation_events
+  name: pest events at saturation
+  parameter_set: HistoricalCoreParameters
+  definition: number of pest events in a node-year at which the pest contribution reaches its weight
+  unit: events per node-year
+  mechanism: historical core observed forcing (annual index)
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 4.0
+  central_text: null
+  sources: []
+  reasoning: Declared on the same scale as famine and crop events.
+  uncertainty: Declared, not measured.
+  sensitivity_priority: low
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: 2.0
+    high: 8.0
+    basis: declared band around the current value
+    conflicts: ''
+  ledger_entries: []
+
+- id: monthly_allocation_profile
+  name: monthly allocation profile
+  parameter_set: HistoricalCoreParameters
+  definition: >-
+    how the annual index is distributed across the twelve months, as normalised weights over the
+    recorded months of the drought, famine, crop and pest events
+  unit: share of the annual total, by month
+  mechanism: historical core annual-to-monthly allocator
+  level: meso
+  support_class: evidence-backed
+  evidence_grade: C
+  central: null
+  central_text: >-
+    1=0.0066, 2=0.1679, 3=0.0104, 4=0.0104, 5=0.2581, 6=0.0607, 7=0.1167, 8=0.2865, 9=0.0256,
+    10=0.0085, 11=0.0465, 12=0.0019
+  sources:
+  - reaches-noaa
+  reasoning: >-
+    The profile is computed, not chosen: it is the normalised monthly distribution of the 1,054
+    drought, famine, crop and pest events the REACHES file records with a Gregorian month inside the
+    core window. It is the only part of the allocator that rests on the record rather than on a
+    declaration.
+  uncertainty: >-
+    What is recorded is not what happened: documentation density varies by month and by place, and a
+    month with a harvest failure may be entered under the month the memorial was filed. The profile
+    is a documented seasonality, not a measured one, and V2-P03 must treat the allocator as an
+    explicit, ablatable construction rather than as monthly observation.
+  sensitivity_priority: high
+  version: historical-core-parameters-v1 (V2-P02)
+  range:
+    low: null
+    high: null
+    basis: >-
+      no range: the profile is a twelve-value distribution, so a scalar band would not be the value
+      the model runs; V2-P07 should sweep it as a whole, and the uniform allocation is the ablation
+      that removes it
+    conflicts: ''
+  ledger_entries:
+  - drought-north-china-pattern
+  - famine-worst-years
+

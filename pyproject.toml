@@ -70,6 +70,11 @@ files = ["src", "tests"]
 module = ["pymc", "pymc.*"]
 ignore_missing_imports = true
 
+# GeoPandas ships no py.typed marker; the historical-core builders read shapefiles with it.
+[[tool.mypy.overrides]]
+module = ["geopandas", "geopandas.*"]
+ignore_missing_imports = true
+
 [dependency-groups]
 dev = [
     "hypothesis>=6.168.0",
