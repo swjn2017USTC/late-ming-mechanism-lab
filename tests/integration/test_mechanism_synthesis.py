@@ -19,17 +19,19 @@ from late_ming_lab.synthesis.cards import build_cards
 from late_ming_lab.synthesis.evidence import EvidenceBundle, load_evidence
 from late_ming_lab.synthesis.report import (
     BRIEF_FIELDS,
-    CARDS_FILE,
-    DOCS_ROOT,
-    INDEX_FILE,
-    SYNTHESIS_FILE,
     card_slug,
-    load_book,
     render_synthesis,
     write_mechanism_docs,
     write_synthesis,
 )
-from late_ming_lab.synthesis.schema import MechanismBook
+from late_ming_lab.synthesis.schema import (
+    CARDS_FILE,
+    DOCS_ROOT,
+    INDEX_FILE,
+    SYNTHESIS_FILE,
+    MechanismBook,
+    load_book,
+)
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 

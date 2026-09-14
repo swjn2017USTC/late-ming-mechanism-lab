@@ -16,11 +16,28 @@ Machine-readable cards live in ``docs/mechanisms/cards.yaml``; the same objects 
 
 from __future__ import annotations
 
+import json
 import re
 from enum import StrEnum
+from pathlib import Path
 from typing import Final
 
+import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+#: Where the cards are written and read. They live here, beside the model they are, so that a reader
+#: - the browser, a test, a later phase - can load a card without importing the writers, which pull
+#: the experiment chain behind them.
+DOCS_ROOT: Final[str] = "docs/mechanisms"
+CARDS_FILE: Final[str] = "cards.yaml"
+INDEX_FILE: Final[str] = "index.md"
+SYNTHESIS_FILE: Final[str] = "outputs/reports/mechanism-synthesis.md"
+
+
+def load_book(path: str | Path) -> MechanismBook:
+    """Read the YAML back, so a caller proves the file and the objects agree."""
+    text = Path(path).read_text(encoding="utf-8")
+    return MechanismBook.model_validate(json.loads(json.dumps(yaml.safe_load(text))))
 
 
 class MechanismStatus(StrEnum):

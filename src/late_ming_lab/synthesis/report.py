@@ -15,7 +15,6 @@ footnote.
 
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Final
@@ -34,13 +33,14 @@ from late_ming_lab.analysis.boundary import (
 )
 from late_ming_lab.calibration.summary_stats import scalar
 from late_ming_lab.synthesis.evidence import MORRIS_BATCH, ROBUSTNESS_BATCH, EvidenceBundle
-from late_ming_lab.synthesis.schema import MechanismBook, MechanismCard
-
-#: Where the cards and the synthesis are written.
-DOCS_ROOT: Final[str] = "docs/mechanisms"
-CARDS_FILE: Final[str] = "cards.yaml"
-INDEX_FILE: Final[str] = "index.md"
-SYNTHESIS_FILE: Final[str] = "outputs/reports/mechanism-synthesis.md"
+from late_ming_lab.synthesis.schema import (
+    CARDS_FILE,
+    DOCS_ROOT,
+    INDEX_FILE,
+    SYNTHESIS_FILE,
+    MechanismBook,
+    MechanismCard,
+)
 
 #: The two scenario knobs P12 swept, the output the boundary separates, and the parameter set the
 #: Morris design moved (read from that batch's own columns).
@@ -220,12 +220,6 @@ def write_synthesis(
     directory = Path(root)
     source = Path(artifacts_root) if artifacts_root is not None else directory
     return _write(directory / SYNTHESIS_FILE, render_synthesis(book, bundle, source))
-
-
-def load_book(path: str | Path) -> MechanismBook:
-    """Read the YAML back, so a test can prove the file and the objects agree."""
-    text = Path(path).read_text(encoding="utf-8")
-    return MechanismBook.model_validate(json.loads(json.dumps(yaml.safe_load(text))))
 
 
 def card_slug(card: MechanismCard) -> str:

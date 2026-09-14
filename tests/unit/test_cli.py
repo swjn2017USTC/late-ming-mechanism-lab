@@ -1,4 +1,4 @@
-"""CLI contract: version reporting and the end-to-end ``smoke-run``."""
+"""CLI contract: version reporting and the end-to-end ``run``."""
 
 from __future__ import annotations
 
@@ -21,10 +21,10 @@ def test_version_flag_reports_package_version() -> None:
     assert result.stdout.strip() == __version__
 
 
-def test_smoke_run_writes_a_complete_run_directory(tmp_path: Path) -> None:
+def test_run_command_writes_a_complete_run_directory(tmp_path: Path) -> None:
     result = runner.invoke(
         app,
-        ["smoke-run", "--output-root", str(tmp_path), "--ticks", "6", "--warmup", "2"],
+        ["run", "--output-root", str(tmp_path), "--ticks", "6", "--warmup", "2"],
     )
 
     assert result.exit_code == 0, result.output
@@ -36,10 +36,10 @@ def test_smoke_run_writes_a_complete_run_directory(tmp_path: Path) -> None:
     assert (manifest.tick_count, manifest.llm_enabled) == (6, False)
 
 
-def test_smoke_run_reports_the_regression_seed_by_default(tmp_path: Path) -> None:
+def test_run_command_reports_the_regression_seed_by_default(tmp_path: Path) -> None:
     result = runner.invoke(
         app,
-        ["smoke-run", "--output-root", str(tmp_path), "--ticks", "3", "--warmup", "1"],
+        ["run", "--output-root", str(tmp_path), "--ticks", "3", "--warmup", "1"],
     )
 
     assert result.exit_code == 0, result.output
@@ -49,8 +49,8 @@ def test_smoke_run_reports_the_regression_seed_by_default(tmp_path: Path) -> Non
     assert manifest.git_sha is not None
 
 
-def test_smoke_run_is_reproducible_through_the_cli(tmp_path: Path) -> None:
-    arguments = ["smoke-run", "--ticks", "6", "--warmup", "2"]
+def test_run_command_is_reproducible_through_the_cli(tmp_path: Path) -> None:
+    arguments = ["run", "--ticks", "6", "--warmup", "2"]
     first_root = tmp_path / "first"
     second_root = tmp_path / "second"
 
@@ -70,8 +70,8 @@ def test_smoke_run_is_reproducible_through_the_cli(tmp_path: Path) -> None:
     )
 
 
-def test_smoke_run_label_creates_a_distinct_run(tmp_path: Path) -> None:
-    arguments = ["smoke-run", "--output-root", str(tmp_path), "--ticks", "3", "--warmup", "1"]
+def test_run_command_label_creates_a_distinct_run(tmp_path: Path) -> None:
+    arguments = ["run", "--output-root", str(tmp_path), "--ticks", "3", "--warmup", "1"]
 
     assert runner.invoke(app, arguments).exit_code == 0
     labelled = runner.invoke(app, [*arguments, "--label", "repeat-2"])
@@ -80,7 +80,7 @@ def test_smoke_run_label_creates_a_distinct_run(tmp_path: Path) -> None:
     assert len(RunStore(tmp_path).list_runs()) == 2
 
 
-def test_smoke_run_reads_a_config_file_and_snapshots_it(tmp_path: Path) -> None:
+def test_run_command_reads_a_config_file_and_snapshots_it(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         SimulationConfig(
@@ -90,7 +90,7 @@ def test_smoke_run_reads_a_config_file_and_snapshots_it(tmp_path: Path) -> None:
     )
 
     result = runner.invoke(
-        app, ["smoke-run", "--config", str(config_path), "--output-root", str(tmp_path / "runs")]
+        app, ["run", "--config", str(config_path), "--output-root", str(tmp_path / "runs")]
     )
 
     assert result.exit_code == 0, result.output
@@ -104,12 +104,12 @@ def test_smoke_run_reads_a_config_file_and_snapshots_it(tmp_path: Path) -> None:
     assert store.read_config_snapshot(manifest.run_id) == config_path.read_text(encoding="utf-8")
 
 
-def test_smoke_run_rejects_invalid_overrides(tmp_path: Path) -> None:
+def test_run_command_rejects_invalid_overrides(tmp_path: Path) -> None:
     result = runner.invoke(
         app,
-        ["smoke-run", "--output-root", str(tmp_path), "--ticks", "4", "--warmup", "9"],
+        ["run", "--output-root", str(tmp_path), "--ticks", "4", "--warmup", "9"],
     )
 
     assert result.exit_code == 1
-    assert "smoke-run failed" in result.output
+    assert "run failed" in result.output
     assert RunStore(tmp_path).list_runs() == []
