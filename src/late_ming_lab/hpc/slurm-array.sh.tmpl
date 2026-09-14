@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# The Late Ming Mechanism Lab Slurm array for one batch plan.
+#
+# HPC rules this script exists to keep:
+#   * compute nodes need no network: this script fetches nothing, resolves nothing and installs
+#     nothing, and `uv run` is pinned offline below;
+#   * no API key is ever exported: the array runs with --export=NONE, and nothing here reads .env;
+#   * the runtime LLM is never called there: USTC_LLM_ENABLED=0 is exported below, so the runtime
+#     policy arm refuses on the node exactly as it refuses on a laptop, by design;
+#   * a task may be re-run: its seed is its own (base_seed + array index) and its manifest is its
+#     own, so re-running one index reproduces that index and nothing else.
+#
+# Every number below comes from the plan: the array bounds are its task count, and the per-task
+# time limit is the declared per-task cost with the declared safety factor applied:
+# {{walltime}} = {{seconds_per_task}}s x {{safety}}, inside the declared ceiling {{declared_walltime}}.
+#
+#SBATCH --job-name=lm-{{batch_id}}
+#SBATCH --partition={{partition}}
+#SBATCH --array=0-{{last_index}}%{{concurrency}}
+#SBATCH --cpus-per-task={{cpus}}
+#SBATCH --time={{walltime}}
+#SBATCH --export=NONE
+#SBATCH --output={{plan_directory}}/logs/{{batch_id}}-%A_%a.log
+#SBATCH --error={{plan_directory}}/logs/{{batch_id}}-%A_%a.log
+
+set -euo pipefail
+
+# uv must not reach the network: the environment is the lockfile's, resolved beforehand.
+export UV_OFFLINE=1
+# The runtime decision layer stays off on a compute node. This is not a preference: a task that
+# reached a model here would put an unrecorded decision into a batch artifact.
+export USTC_LLM_ENABLED=0
+
+mkdir -p "{{plan_directory}}/logs"
+
+# One array index is one task of the plan: it reads its own seed and manifest from the plan.
+uv run late-ming-lab batch run --plan "{{plan_directory}}" \
+    --task-index "${SLURM_ARRAY_TASK_ID:?SLURM_ARRAY_TASK_ID is unset: submit this script with sbatch}"
