@@ -1,0 +1,540 @@
+schema_version: mechanism-cards-v1
+cards:
+- id: M001
+  name: Fiscal Extraction Inversion
+  question: Does pressing the fiscal apparatus harder collect less of what it is owed?
+  status: CONDITIONAL
+  micro_conditions:
+  - The assessment is a rate applied to a registered base that households can leave, conceal or default
+    on.
+  - Land can change hands or fall out of cultivation, so the base the rate is applied to is not fixed
+    within a run.
+  meso_conditions:
+  - 'Collection effort is a decision: the county can press harder after it observes a shortfall, rather
+    than applying a constant effort.'
+  - The quota is assessed against a register that is not the same as the land actually worked, so the
+    two can diverge.
+  causal_chain:
+  - 'Pressure rises: the assessed value per mu, or the share of the quota demanded, increases.'
+  - Effort rises in response; under the utility policy it moves to the declared ceiling of 5.0 from 3.34-4.25.
+  - Households leave, conceal or default, and the assessable base contracts.
+  - Receipts over the assessed quota fall while effort stays at the ceiling.
+  trigger: 'A decision rule that raises collection effort after observing a receipt shortfall. No P10
+    ablation contains one: the P12 utility policy is the only arm in the project that presses to the ceiling.'
+  macro_outcome: 'Chronic shortfall: receipts below quota, a contracting registered base, and a military
+    pay claim met from a shrinking receipt.'
+  conditions:
+  - statement: A base that can respond to the rate by moving, hiding or defaulting.
+    level: micro
+    role: necessary
+  - statement: An authority whose effort is a choice rather than a constant.
+    level: meso
+    role: necessary
+  - statement: Distress lines that make departure legal and affordable.
+    level: micro
+    role: facilitating
+  - statement: An assessed register that lags the cultivated area.
+    level: meso
+    role: facilitating
+  time_lag: 'Unresolved: the P12 reading compares the endpoints of a 240-tick run, no artifact records
+    an effort series, and none records the month at which effort and the receipt share would cross. Monthly
+    resolution exists only for the crossed-line count, in the P10 governance timelines.'
+  sensitivity_evidence: 'assessed_value_tael_per_mu has mu* = 0.75 (sigma = 1.06) on indicators_crossed_end
+    in the Morris screen of the p10-morris batch: third equal with the land constraint behind the temporary-migration
+    share and the reference price, so the tie is a tie rather than a rank. P09 identifies it: posterior
+    median 0.240 tael per mu against a prior of 0.05-0.40, contraction 0.401, verdict identified.'
+  ablation_evidence: NO_EXTRACTION_ESCALATION removes the response of the assessment rate and the collection
+    effort to the arrears stock and lowers receipts over quota (receipts_over_quota_total -0.06 [-0.10,
+    -0.01] down), the opposite direction from an inversion story. Its effect on the tax base is unresolved
+    (tax_base_change_mu -2,417.48 [-5,239.52, +4,228.41] unresolved), so the arm moves what is collected
+    without showing that pressing harder destroys the base.
+  hold_out_evidence: quota-erosion-and-surcharge is satisfied in 1.00 of posterior draws over the held-out
+    years and 1.00 over the run as a whole; receipts-shortfall-chronic is satisfied in 1.00 of draws on
+    the calibration window. The shortfall the mechanism is about is present; the pressing that is supposed
+    to cause it is not in any held-out quantity.
+  policy_robustness: 'Present in 1.00 of the utility replicates with strengths 0.10-0.31, in 0.33 of the
+    random replicates, and in none of the rule replicates: P12''s verdict is ''policy-dependent''. It
+    appears when the decision rule reacts to a shortfall by pressing, and it is absent when the rule holds.'
+  historical_support: 'receipts-shortfall-chronic (grade B, target, window 1600-1644): calibration window
+    1.00; quota-erosion-and-surcharge (grade B, hold-out, window 1522-1644): held-out years 1.00, whole
+    run 1.00'
+  historical_challenge: The record attaches the shortfall to what collection could reach - flight, harvest
+    and evasion - not to a feedback rule in which the authority presses harder as receipts fall, and neither
+    pattern carries a measured collection effort. The model produces its inversion through exactly the
+    rule the sources do not describe, and the extraction-escalation arm collects more, not less, of the
+    quota.
+  counterexample: 'The rule policy: 0 of 6 replicates, at the same parameter draws and the same world
+    as the arm that shows it. A structural inversion would not depend on which declared policy is deciding.'
+  falsifiable_prediction: 'Ablate the effort response - fix collection effort at its warm-up value - and
+    the inversion disappears: receipts over quota stops falling as nominal pressure rises. If it still
+    falls, the inversion is not the response rule''s doing and this card is wrong.'
+  uncertainty: Three declared policies, three counties, thirty-two cohorts. The utility policy's ceiling
+    of 5.0 is a declared bound, not an observed one, and the inversion's dependence on that ceiling is
+    untested. The one arm that varies extraction runs the other way, so the card rests on a within-run
+    co-movement under a single policy.
+  citations:
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: assessed_value_tael_per_mu mu*=0.75 sigma=1.06 on indicators_crossed_end
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: assessed_value_tael_per_mu median 0.240, contraction 0.401, identified
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: receipts_over_quota_total -0.06 [-0.10, -0.01] down
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: quota-erosion-and-surcharge held-out 1.00, whole run 1.00
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: inversion present in 1.00/utility, 0.33/random, 0.00/rule; verdict policy-dependent
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: 'receipts-shortfall-chronic (grade B, target, window 1600-1644): calibration window 1.00'
+- id: M002
+  name: Crisis Gating
+  question: Is it the shock that produces breakdown, or the condition that lets the shock reach the base?
+  status: SUPPORTED
+  micro_conditions:
+  - 'Households can leave: departure is a state a cohort enters when distress crosses a declared line,
+    and it takes its labour and its consumption with it.'
+  - Departure needs to be affordable - a move cost and a transit loss are charged - so a household below
+    the line may still be unable to go.
+  meso_conditions:
+  - The county's tax base is the labour and land that stayed, so an outflow is an outflow of assessable
+    value.
+  - Military pay is claimed against the same receipts, so a smaller base shows up as arrears rather than
+    as a smaller claim.
+  causal_chain:
+  - 'The gate opens: move costs, transit loss and the distress lines that qualify a household to leave
+    are removed.'
+  - Households exit in numbers the baseline never reaches.
+  - The tax base contracts roughly seven times as far as in the next largest arm, and about seventeen
+    times median to median.
+  - Receipts cannot cover the pay claim, arrears rise, and the county crosses the declared breakdown line
+    in every replicate.
+  trigger: 'The institutional gate, not the weather: with the gate open the crisis appears where the baseline
+    has none, and removing the climate shocks leaves breakdown unchanged.'
+  macro_outcome: Systemic breakdown of the county's finances and its coercive reach, reached at the same
+    tick in every replicate.
+  conditions:
+  - statement: A gate on household movement that can be open or shut.
+    level: meso
+    role: necessary
+  - statement: A tax base that is the households still present.
+    level: meso
+    role: necessary
+  - statement: A climate shock severe enough to push households toward the line.
+    level: micro
+    role: facilitating
+  - statement: An army whose claim on the receipts does not shrink with them.
+    level: meso
+    role: facilitating
+  time_lag: 'Twenty-four ticks, in every replicate: the open-gate arm crosses the declared breakdown line
+    at tick 48 of 240, after the 24-tick warm-up. It is the only arm of the ablation batch whose replicates
+    cross at all; the Morris and Sobol designs cross at ticks 24, 48 and 216.'
+  sensitivity_evidence: 'The largest elementary effects on indicators_crossed_end are temporary_share_of_adults_per_month,
+    reference_price_tael_per_shi, land_per_adult_capacity_mu (p10-morris): a migration share, a market
+    price and a land constraint, with the land constraint tied with the assessed value rather than ranked
+    behind it. The controls that lead sit on the movement and market side, not on the climate axis.'
+  ablation_evidence: 'Opening the gate does it: breakdown +1.00 [+1.00, +1.00] up, tax_base_change_mu
+    -162,553.28 [-170,826.34, -161,632.75] down, households_exited +8,514.95 [+3,896.31, +9,732.58] up,
+    against a baseline in which no replicate breaks down. Removing the climate shocks does not: breakdown
+    +0.00 [+0.00, +0.00] unresolved, with the tax base unresolved (tax_base_change_mu +2,718.02 [-4,560.20,
+    +3,078.74] unresolved) and departures down (households_departed -534.23 [-580.57, -20.96] down).'
+  hold_out_evidence: shaanxi-net-outflow scores 0.16 over the held-out years against 1.00 over the run
+    as a whole, and 0.00 over the extrapolation; chongzhen-drought-sequence scores 0.00 over the held-out
+    years. The direction of the outflow is matched; its timing is not.
+  policy_robustness: 'The gated region moves with the decision policy: 7 of 9 grid cells break down under
+    the rule policy, 6 under random and 5 under utility, and only the rule policy''s cell set is the reference''s
+    - so which cells break down is policy-dependent. That the *gate* is what carries the breakdown was
+    tested in the P10 ablation, under one policy rather than three.'
+  historical_support: 'shaanxi-net-outflow (grade C, hold-out, window 1628-1644): held-out years 0.16,
+    whole run 1.00; chongzhen-drought-sequence (grade B, hold-out, window 1627-1644): held-out years 0.00'
+  historical_challenge: 'The record''s outflow is concentrated in the years the famine bites, and the
+    model matches the run-long direction while missing those years: the held-out score is 0.16 against
+    1.00 for the run as a whole. A gate that leaks continuously is not the same as one that opens in a
+    crisis.'
+  counterexample: 'The drought ablation: removing the climate shock keeps the baseline outcome - no breakdown
+    in any replicate - so the shock is not the gate. Of the twelve arms in the ablation batch only the
+    gate arm breaks down. Elsewhere in P10 breakdown does occur without it - 7 of the 40 Sobol runs and
+    one tipping cell cross the line under extreme parameter draws - so the claim is about the declared
+    arms, not the only route.'
+  falsifiable_prediction: 'Shut the gate under the worst climate setting and breakdown should not occur:
+    an arm that refuses permanent departure at severity floor 0.9 and nominal pressure 0.04 produces zero
+    breakdowns in every replicate. Force the gate open under the mildest setting and at least one replicate
+    should break down. Either result falsifies this card.'
+  uncertainty: One gate was intervened on. The relief and trade channels have arms whose effects on the
+    crossed-line count are unresolved at four replicates, so the card does not claim they are not gates.
+    Three counties, thirty-two cohorts, and a movement rule whose distress lines are declared rather than
+    observed.
+  citations:
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: OPEN_MIGRATION_EXIT breakdown +1.00 [+1.00, +1.00] up; NO_DROUGHT breakdown +0.00 [+0.00,
+      +0.00] unresolved
+  - kind: counterfactual
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: 'NO_DROUGHT x FULL_MILITARY_PAY on indicators_crossed_end: joint +0.00 against -0.50 additive
+      [+0.00, +1.00], additive'
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: 'strongest parameters on indicators_crossed_end: temporary_share_of_adults_per_month, reference_price_tael_per_shi,
+      land_per_adult_capacity_mu'
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/tipping_grid.parquet
+    reading: 'cells with breakdown: rule 7, random 6, utility 5'
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: 'shaanxi-net-outflow: held-out 0.16, extrapolation 0.00, whole run 1.00'
+  - kind: historical-challenge
+    source: data/historical_patterns/01-drought-climate.yaml
+    reading: 'chongzhen-drought-sequence (grade B, hold-out): held-out years 0.00 - a refuted check, cited
+      here as a challenge rather than as support'
+- id: M003
+  name: Fiscal-Military Ratchet
+  question: Does the army's unpaid claim accumulate without ever clearing, so the fiscal burden only ever
+    rises?
+  status: REJECTED
+  micro_conditions:
+  - Soldiers are owed a monthly silver pay whose level is a declared rate rather than a negotiated outcome.
+  - The pay claim is made against the same receipts the civil administration collects, so a shortfall
+    appears as an unpaid stock.
+  meso_conditions:
+  - The treasury pays the claim from receipts in the same tick, so it cannot borrow against a future receipt.
+  - Desertion removes soldiers from the roster, so a pay failure is also a manpower loss.
+  causal_chain:
+  - Assessed receipts fall short of the assessed quota.
+  - The pay claim is met only in part, and the unpaid remainder is carried forward as a stock.
+  - If the stock could only ever rise, the fiscal burden would ratchet; the stock is instead drawn down
+    whenever receipts exceed the month's claim.
+  trigger: A month in which receipts exceed that month's pay claim, which is what clears part of the stock
+    and what the strong form of the mechanism says cannot happen.
+  macro_outcome: A large but fluctuating arrears stock - not a monotone ratchet. The stock ends the run
+    at 14,355 to 26,849 tael against 287,355 to 311,429 tael assessed in the six rule replicates.
+  conditions:
+  - statement: A pay claim fixed in silver while receipts are a residual.
+    level: meso
+    role: necessary
+  - statement: No borrowing against future receipts, so the stock cannot be smoothed away.
+    level: meso
+    role: necessary
+  - statement: The claim rising with the number of soldiers the county must support.
+    level: meso
+    role: facilitating
+  time_lag: 'Not resolved within the run: the reading is computed from a monthly series, but the artifact
+    records only how many months declined, so when the declines fall is not in the evidence. The series''
+    endpoints run from 254 tael to 14,355-26,849 tael over the six rule replicates.'
+  sensitivity_evidence: pay_tael_per_soldier_month is identified in P09 - posterior median 0.508 tael
+    against a prior of 0.10-1.00, contraction 0.271 - so the stock's level is constrained by the data.
+    No sensitivity statistic distinguishes a ratchet from a fluctuating stock, because the Morris outputs
+    are end-of-run levels and maxima.
+  ablation_evidence: 'Two resolved arms raise the stock and neither removes its declines: doubling the
+    pay claim''s call on the treasury (military_pay_arrears_end_tael +2,299.70 [+1,554.58, +4,753.25]
+    up) and opening the mobility gate (military_pay_arrears_max_tael +10,287.79 [+7,289.76, +14,415.10]
+    up). A shortfall that remains when the claim is doubled is a fiscal result rather than a policy choice,
+    and the declines survive both arms because no arm was built to remove them.'
+  hold_out_evidence: pay-monetised-and-arrears is satisfied in 1.00 of posterior draws over the held-out
+    years, 1.00 over the run as a whole, on the question 'does the garrison arrears stock accumulate over
+    the run?'. Accumulation is matched. Accumulation *without clearing* was never a scored pattern, which
+    is why the strong form survived this long in the project's own reporting.
+  policy_robustness: 'Absent in all three declared policies: 0 of 3 arms show it, verdict ''absent''.
+    Decline months per rule replicate are [11, 35, 37, 43, 45, 53] of 240 ticks, and over all 18 replicates
+    the range is 4 to 69. The rule arm''s largest end stock, 26,849 tael, is a replicate with 37 decline
+    months - more than the arm''s median, not fewer.'
+  historical_support: 'pay-monetised-and-arrears (grade A, hold-out, window 1580-1644): held-out years
+    1.00, whole run 1.00'
+  historical_challenge: 'The record supports chronic arrears at a level, which the model reproduces, and
+    it does not report a monotone stock: garrisons were paid in bursts when silver arrived. The strong
+    form was an inference the project made from ''arrears are chronic'' to ''arrears never clear'', and
+    the model rejects the inference, not the evidence.'
+  counterexample: arrears 254 to 26,488 tael with 53 month(s) of decline, against 303,221 assessed - the
+    replicate ends with the largest stock in the arm and still records dozens of months in which it falls.
+    Any reading that needs the stock to be monotone is false in this model.
+  falsifiable_prediction: 'An arm that removes the clears - one that refuses to pay arrears in any month
+    - would make the stock monotone. If the stock still declines under that arm, the declines come from
+    something other than the payment rule, and this rejection is wrong. The surviving claim keeps its
+    own prediction: the stock ends between 4.8% and 9.3% of the assessed value, and an arm that doubles
+    the pay rate should raise that share rather than lower it.'
+  uncertainty: 'The rejection is of the strong claim only, at three counties and 240 ticks. The mechanism
+    behind the declines is not identified: nothing measures whether they come from the payment rule, from
+    re-assessment, or from the extraction arm''s own response to the stock. The level claim rests on a
+    single held-out pattern at grade A.'
+  citations:
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: ratchet present in 0 of 3 declared policies; decline months per replicate [11, 35, 37, 43,
+      45, 53]
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: FULL_MILITARY_PAY military_pay_arrears_end_tael +2,299.70 [+1,554.58, +4,753.25] up
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: OPEN_MIGRATION_EXIT military_pay_arrears_max_tael +10,287.79 [+7,289.76, +14,415.10] up
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: pay_tael_per_soldier_month median 0.508, contraction 0.271
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: 'pay-monetised-and-arrears (grade A, hold-out, window 1580-1644): held-out years 1.00'
+- id: M004
+  name: Elite Mediation Bifurcation
+  question: Do elites either mediate household distress or accumulate the collateral, and does the branch
+    taken decide the county's trajectory?
+  status: WEAK
+  micro_conditions:
+  - A household facing a consumption shortfall can borrow silver against its land at a monthly rate, if
+    it has land to pledge.
+  - The loan is the household's way to stay fed without leaving, so the credit channel stands between
+    distress and departure.
+  meso_conditions:
+  - The elite's lending capacity is a share of the land pledged as collateral, so the same rule that lets
+    the household survive transfers the land if it cannot repay.
+  - 'Elite holdings are assessed partly off the register: a declared hidden share of elite land is not
+    taxed.'
+  causal_chain:
+  - Distress forces sales or loans, and the loan-to-value rule decides how much silver an elite will advance.
+  - The silver is consumed rather than invested, so the household's asset position weakens even when it
+    survives the month.
+  - Land moves toward the lender, and the county's assessable base contracts with it.
+  trigger: A consumption shortfall large enough that a household pledges land to close it; with the credit
+    channel closed the same shortfall has to be met by departure instead.
+  macro_outcome: A contracting assessable base with land concentrated in elite hands. The mediation side
+    of that is measured and load-bearing; the bifurcation - two branches with different trajectories -
+    was never measured, and the runs show the two sides occurring together.
+  conditions:
+  - statement: A lender with capacity to advance silver against pledged land.
+    level: meso
+    role: necessary
+  - statement: A household with land to pledge and a shortfall it cannot cover.
+    level: micro
+    role: necessary
+  - statement: An unreformed register, so elite land can be hidden from assessment.
+    level: meso
+    role: facilitating
+  time_lag: 'Not resolved: the credit arms are compared on end-of-run levels, and no artifact records
+    the month in which a cohort first borrows or first loses land. The consumption events that precede
+    borrowing are monthly, so the lag is at most the run.'
+  sensitivity_evidence: elite_hidden_land_share is identified in P09 - median 0.359, contraction 0.277
+    - and interest_rate_monthly is identified too (median 0.070, contraction 0.368), so both terms of
+    the credit relation are pinned by the evidence rather than left free. Neither appears among the three
+    largest elementary effects on the crossed-line count, so the channel matters more to levels than to
+    the breakdown boundary.
+  ablation_evidence: 'Closing the credit channel deepens the base contraction and pushes households out:
+    tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88] down and households_departed +121.18 [+91.79,
+    +400.50] up. Elite lending falls from 74.5 to 0.0 per run, while the effect on the armed population
+    is unresolved (largest_band_share_max +0.00 [-0.01, +0.10] unresolved): the mediating branch is load-bearing
+    here, and the accumulating branch has no arm to remove.'
+  hold_out_evidence: 'No reserved pattern scores the credit channel: debt-transfers-land is a calibration
+    target satisfied in 0.94 of draws, and no held-out pattern asks anything about elite lending. The
+    bifurcation''s second branch is therefore outside the predictive check as well as outside the ablation
+    set.'
+  policy_robustness: 'Not measured: P12''s mechanism readings are the extraction, ratchet and band consolidation
+    readings, and none of them reads the credit channel. The policy arms do change the level comparison,
+    but no reading tracks elite lending, so no verdict exists for this mechanism.'
+  historical_support: 'debt-transfers-land (grade B, target, window 1600-1644): calibration window 0.94;
+    land-abandonment-in-famine (grade C, target, window 1630-1644): calibration window 1.00; the model''s
+    interest and hidden-land parameters are identified against these targets'
+  historical_challenge: The record describes mediation and accumulation as a choice made differently by
+    different elites; the model has a single lending rule and no predatory variant, so it cannot distinguish
+    the branches it is supposed to bifurcate between. The land-transfer pattern being matched at 0.94
+    says the credit relation works, not that elites diverge.
+  counterexample: 'The baseline runs satisfy debt-transfers-land at 0.94 while the tax base contracts
+    by 15,476 mu, with land moving to creditors as the pattern describes. Removing the credit channel
+    makes that contraction deeper, not shallower (tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88]
+    down): mediation and accumulation appear together rather than as alternatives, so the bifurcation
+    as stated is not what the model shows.'
+  falsifiable_prediction: 'Two tests, one per claim. Build the accumulating branch - elites lending at
+    the maximum rate with land taken on default - and it should produce a larger base contraction than
+    the closed-credit arm''s -9,540 mu; if it does not, the bifurcation has no second branch and the card
+    should say so in one sentence rather than carry a status. Then split the runs by which side dominates
+    and compare their trajectories: if the two groups do not separate, mediation is one mechanism rather
+    than a pair of branches.'
+  uncertainty: 'The card is named for a bifurcation and the evidence resolves one branch of it, which
+    is why the status is WEAK rather than CONDITIONAL: credit is load-bearing, and the claim that elites
+    divide into mediators and accumulators with different consequences is neither measured nor consistent
+    with the runs, where both sides appear together. The credit channel is also entangled with migration,
+    so part of what looks like a credit effect on the base may be a movement effect, and the parameter
+    that pins it is identified against the land-transfer target the mechanism itself implies.'
+  citations:
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: NO_ELITE_CREDIT tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88] down; households_departed
+      +121.18 [+91.79, +400.50] up
+  - kind: calibration
+    source: outputs/calibration/p09-*/ensemble.parquet
+    reading: elite_hidden_land_share median 0.359 contraction 0.277; interest_rate_monthly median 0.070
+      contraction 0.368
+  - kind: counterfactual
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT closes both channels at once
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_statistics.parquet
+    reading: no reserved pattern scores the credit channel
+  - kind: historical-support
+    source: ray-huang-1974
+    reading: 'debt-transfers-land (grade B, target, window 1600-1644): calibration window 0.94'
+- id: M005
+  name: Insurgent Consolidation
+  question: Do armed groups consolidate into fewer, larger organisations as the crisis proceeds?
+  status: SUPPORTED
+  micro_conditions:
+  - Bands grow by taking in the households that the county can no longer feed - the intake track - and
+    by levying grain from the population around them.
+  - 'Cohesion is a binding constraint: a band fed less than its members need loses cohesion and can lose
+    members again.'
+  meso_conditions:
+  - Suppression is the state's coercive reach against the bands, and its removal changes which bands survive.
+  - Grain seized by a band is grain the county cannot assess or the army cannot buy, so band growth and
+    fiscal capacity compete for the same harvest.
+  causal_chain:
+  - Recruitment from distress and from the soldiery continues through the crisis years.
+  - Bands form faster than they dissolve, and the largest band's share of the armed population rises while
+    the number of bands moves with suppression.
+  - The armed population becomes a smaller number of larger organisations, whose grain demands the record
+    describes as exceeding what a county can collect - a quantity no artifact in this project measures.
+  trigger: 'Suppression falling away: with the coercive reach removed the largest band''s share falls,
+    so it is suppression that concentrates the force rather than the crisis alone. What happens to the
+    number of bands in that arm is unresolved.'
+  macro_outcome: Armed force concentrated in fewer, larger bands - present in every declared policy, at
+    five of six replicates in each - alongside a county base that cannot meet both the pay claim and the
+    relief demand.
+  conditions:
+  - statement: A recruitment pool of distressed households and unpaid soldiers.
+    level: micro
+    role: necessary
+  - statement: Grain that can be seized from the surrounding population.
+    level: micro
+    role: necessary
+  - statement: Suppression weak enough that large bands survive their own expansion.
+    level: meso
+    role: facilitating
+  - statement: Trade disruption that raises the price of the food a band must buy.
+    level: meso
+    role: facilitating
+  time_lag: 'Over the run rather than at a tick: the P12 reading compares the opening band count with
+    the final one over 240 ticks. No artifact records the month in which the largest band''s share peaks,
+    so the consolidation''s pace is unresolved.'
+  sensitivity_evidence: The largest elementary effects on the largest band share are reference_price_tael_per_shi,
+    food_shi_per_soldier_month, assessed_value_tael_per_mu - the reference price, the soldier's food ration
+    and the assessed value - while the crossed-line count leads with temporary_share_of_adults_per_month,
+    reference_price_tael_per_shi. The two rankings share one leader, not three, so the band share does
+    not simply inherit the breakdown boundary's drivers, and no band-specific parameter leads either.
+  ablation_evidence: 'Suppression is load-bearing and the direction is measured: LOW_REPRESSION (largest_band_share_max
+    -0.05 [-0.10, -0.01] down) lowers the largest band''s share, while leaving the number of bands unresolved.
+    The merger rule is not load-bearing: NO_BAND_MERGER produces the same merge count as the baseline
+    (0 in both, bands at end 5.25 against 5.25), because no merge fires anywhere in the batch.'
+  hold_out_evidence: many-bands-then-consolidation is satisfied in 0.62 of posterior draws over the held-out
+    years and 0.94 over the run as a whole, and absorption-of-deserters-and-refugees in 0.75 of draws.
+    The shape is matched over the run; the held-out years score lower than the run as a whole.
+  policy_robustness: 'Robust: present in rule 0.83, utility 0.83, random 0.83 of replicates (P12 verdict
+    ''robust'' at 3 of 3 arms). The only policy-dependent part is the intensity: the utility arm''s median
+    strength is the highest of the three.'
+  historical_support: 'many-bands-then-consolidation (grade B, hold-out, window 1630-1644): held-out years
+    0.62, whole run 0.94; absorption-of-deserters-and-refugees (grade B, target, window 1628-1644): calibration
+    window 0.75'
+  historical_challenge: The record has thirty-odd bands in the early 1630s and one dominant organisation
+    by 1644, an order of magnitude of consolidation; the model moves from five bands to three to nine
+    with the largest share rising from 0.20 to about 0.38. The direction is matched and the magnitude
+    is far smaller, so the card claims consolidation, not the scale the record describes.
+  counterexample: 'The merger arm: raising the cohesion bar to its maximum changes nothing (0 merges against
+    the baseline''s 0), and consolidation still appears. Whatever produces it, it is not the merger rule
+    the model''s documentation names.'
+  falsifiable_prediction: Lower the cohesion bar so that merges actually fire, and the largest band's
+    share should exceed the 0.382 maximum the declared policies reach. If merges fire and the share does
+    not rise, the merger link is decorative and the mechanism's chain should be rewritten around formation
+    and dissolution.
+  uncertainty: 'The causal link the model names - merging on cohesion - was never exercised: zero merges
+    in every arm of the P10 batch, at every level. Consolidation as an outcome is robust; its attribution
+    inside the model is not, and this card does not claim the outcome and the link together. Five or six
+    replicates per policy is enough to show presence, not to estimate the strength.'
+  citations:
+  - kind: policy-robustness
+    source: outputs/experiments/p12-robustness/mechanism_readings.parquet
+    reading: present in rule 0.83, utility 0.83, random 0.83 of replicates; verdict robust
+  - kind: ablation
+    source: outputs/experiments/p10-ablations/runs.parquet
+    reading: LOW_REPRESSION largest_band_share_max -0.05 [-0.10, -0.01] down; NO_BAND_MERGER merges 0
+      against baseline 0
+  - kind: hold-out
+    source: outputs/calibration/p09-*/predictive_checks.parquet
+    reading: many-bands-then-consolidation held-out 0.62, whole run 0.94
+  - kind: sensitivity
+    source: outputs/experiments/p10-morris/runs.parquet
+    reading: largest band share leads with reference_price_tael_per_shi, food_shi_per_soldier_month, assessed_value_tael_per_mu
+  - kind: historical-support
+    source: lorge-2005
+    reading: 'many-bands-then-consolidation (grade B, hold-out, window 1630-1644): held-out years 0.62'
+- id: M006
+  name: Famine Mortality
+  question: Does excess death from hunger carry a harvest failure into population loss, and from there
+    into labour scarcity and abandoned land?
+  status: UNIDENTIFIED
+  micro_conditions:
+  - A cohort whose consumption falls below subsistence loses members, in proportion to how far below it
+    falls and for how long.
+  - The dead leave the labour pool, so the next season's cultivation is smaller.
+  meso_conditions:
+  - Relief and credit determine who reaches subsistence and who does not, so the mortality rate is a function
+    of institutions as well as of the harvest.
+  - Land is abandoned when the households that worked it are gone, not only when they flee.
+  causal_chain:
+  - Precipitation deficit, then harvest failure, then price spike, then consumption below subsistence.
+  - Members of the cohort die; the model records no such event and cannot.
+  - Labour per mu falls and cultivation is abandoned.
+  trigger: A consumption shortfall persisting past the point where assets are exhausted - a state the
+    model reaches, since it records consumption events below the subsistence line, but which it resolves
+    by distress sales and departure rather than by death.
+  macro_outcome: Population decline beyond what migration explains, and a labour shortage in the seasons
+    after a famine - neither of which any artifact in this project reports.
+  conditions:
+  - statement: A household cohort with a member count that death can reduce.
+    level: micro
+    role: necessary
+  - statement: A subsistence threshold below which consumption costs lives.
+    level: micro
+    role: necessary
+  - statement: Relief that arrives too late to change the outcome.
+    level: meso
+    role: facilitating
+  time_lag: Not measurable in this model. The record puts deaths within the famine year and its aftermath;
+    the model has no mortality clock at all, and the abandonment it does show is produced by departure,
+    which is monthly.
+  sensitivity_evidence: None exists. The P09 prior table carries thirteen parameters and none of them
+    is a mortality or survival rate; no Morris trajectory and no Sobol index can bear on a quantity the
+    model does not compute.
+  ablation_evidence: 'No arm can be built. Removing mortality would be a no-op because there is nothing
+    to remove, which is exactly the situation the NO_BAND_MERGER arm demonstrates for a different rule:
+    an arm whose intervention cannot bind measures the rule''s absence, not its effect.'
+  hold_out_evidence: land-abandonment-in-famine - the pattern mortality is supposed to help produce -
+    is satisfied in 1.00 of draws without any mortality rule, through departure. The pattern scores therefore
+    cannot distinguish a world with deaths from one without.
+  policy_robustness: 'Not applicable: P12 reads three mechanisms and none of them is a population quantity,
+    so no policy arm produces evidence about mortality.'
+  historical_support: 'famine-lags-harvest-failure (grade B, constraint, window 1628-1635): sequence,
+    not a level not scored; land-abandonment-in-famine (grade C, target, window 1630-1644): calibration
+    window 1.00'
+  historical_challenge: The record's causal sequence is precipitation, harvest, price, hunger, death -
+    and the mortality is the part of it the project has never implemented. The model reaches the abandonment
+    outcome through a different mechanism, so the historical case for mortality cannot be tested here
+    at all.
+  counterexample: The model satisfies land-abandonment-in-famine at 1.00 with zero deaths, so any claim
+    that mortality is necessary for abandonment is contradicted inside the model - and any claim that
+    the model's abandonment is historical evidence for a mortality mechanism is contradicted by the model's
+    own structure.
+  falsifiable_prediction: 'Add a mortality rule that removes members on a sustained subsistence shortfall
+    and the held-out scores should move only if the pattern''s timing depends on labour scarcity: if famine-worst-years-1639-43
+    stays at 1.00 and the population statistics shift, mortality changes levels rather than timing in
+    this model. That test cannot be run today, which is why the status is UNIDENTIFIED rather than WEAK.'
+  uncertainty: 'The gap is structural rather than empirical: no mortality event, no mortality parameter,
+    no mortality output, so nothing in the project could have measured this mechanism even in principle.
+    P08 recorded it as a coverage gap; this card records it as the largest single mismatch between the
+    model''s mechanism set and the record''s causal chain.'
+  citations:
+  - kind: historical-support
+    source: chen-2024-chongzhen
+    reading: 'famine-lags-harvest-failure (grade B, constraint, window 1628-1635): sequence, not a level
+      not scored'
+  - kind: historical-support
+    source: shaanxi-famine-gazetteers
+    reading: 'land-abandonment-in-famine (grade C, target, window 1630-1644): calibration window 1.00'

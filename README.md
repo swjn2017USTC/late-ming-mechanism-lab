@@ -11,8 +11,9 @@ cards with explicit assumptions, parameter regions, ablation and sensitivity evi
 
 ## Status
 
-P12 (Decision-Policy Robustness) complete, with the runtime arm refused by P11's gate, on top of P11
-(USTC V4.1 Institutional Decision Layer, live model **closed**), P10
+P13 (Mechanism Discovery / Mechanism Cards) complete, on top of P12 (Decision-Policy Robustness,
+runtime arm refused by P11's gate), P11 (USTC V4.1 Institutional Decision Layer, live model
+**closed**), P10
 (Ablation / Sensitivity / Counterfactual), P09 (Calibration / Hold-out), P08 (Historical Evidence /
 Parameter Registry) and P07 (Integrated Crisis Engine). The repository holds a history-free deterministic kernel
 (P01), a spatial–temporal–environmental skeleton (P02), weighted household cohorts with an explicit
@@ -74,6 +75,18 @@ moves with the policy, and the utility arm realises more of the assessed quota w
 arrears stock. The runtime arm was refused by the model gate, so the phase draws no conclusion about a
 model-backed policy, and none is imputed.
 
+P13 read that evidence back and wrote one **mechanism card** per candidate: micro and meso conditions,
+chain, trigger, macro outcome, necessary versus facilitating conditions, lag, and the sensitivity,
+ablation, hold-out, policy-robustness and historical evidence behind each — with a status from a
+five-word vocabulary and the counterexample and falsifiable prediction that would overturn it.
+Two mechanisms come out **SUPPORTED** (crisis gating by the mobility valve; insurgent consolidation,
+robust across every declared policy), one **CONDITIONAL** (extraction inversion — a policy that
+presses, not the apparatus), one **WEAK** (elite mediation — credit is load-bearing, but the
+bifurcation it is named for was never measured and the runs show both sides together), one
+**REJECTED** (the ratchet's monotone form) and one **UNIDENTIFIED** (famine mortality, which the
+model does not implement at all). Cards are in `docs/mechanisms/`, the synthesis in
+`outputs/reports/mechanism-synthesis.md`.
+
 Everything shipped so far is an assumption, not history: both spatial fixtures and every cohort
 endowment are graded `S` throughout, the shock experiment's severity axis is a scenario parameter,
 never an estimate of a historical drought, and the governance indicators are declared reading
@@ -81,7 +94,7 @@ lines rather than evidence. Real geography enters only
 through `networks/adapter.py` with provenance columns. Why space is nodes and catchments rather
 than polygons: `docs/adr/0001-node-and-catchment-geography.md`.
 
-Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P12.md`.
+Phase plan: `docs/OMP_ENGINEERING_PLAN.md`; current phase report: `docs/phase-reports/P13.md`.
 Why the military actors are declared abstractions rather than tactics:
 `docs/adr/0002-military-abstractions.md`; how the tick order and its dependencies are enforced and
 drawn: `docs/architecture/system-dependency.md`.
@@ -166,6 +179,7 @@ uv run mypy
 | `docs/evidence/` | Generated: what the evidence base covers, how uncertain it is, where the gaps are |
 | `docs/calibration/` | Generated: the frozen objective, the posterior, the mismatches, the held-out predictions |
 | `docs/experiments/` | Generated: the ablations, the interactions, the sensitivity indices, the tipping grid and the policy-robustness matrix |
+| `docs/mechanisms/` | The mechanism cards: `cards.yaml` (machine-readable), one Markdown card each, and the index |
 | `docs/phase-reports/` | One report per phase |
 
 Each phase ends with a report, logical commits, a clean tree, and a stop. Never start the next
