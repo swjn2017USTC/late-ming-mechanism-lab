@@ -35,9 +35,9 @@ from typing import Final
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from late_ming_lab.evidence.grades import SOURCE_ID_PATTERN, EvidenceGrade
+from late_ming_lab.evidence.grades import SOURCE_ID_PATTERN, EvidenceGrade, ReadDepth
 
-REGISTRY_SCHEMA_VERSION: Final[str] = "source-registry-v1"
+REGISTRY_SCHEMA_VERSION: Final[str] = "source-registry-v2"
 REGISTRY_GLOB: Final[str] = "sources/registry/*.yaml"
 
 #: Evidence clusters the phase requires; every cluster must be served by the registry.
@@ -115,6 +115,21 @@ class SourceRecord(BaseModel):
         max_length=512,
         description="what was opened to confirm the record; required when verified",
     )
+    read_depth: ReadDepth = Field(
+        default=ReadDepth.IDENTITY_ONLY,
+        description=(
+            "how much of the source was read, as opposed to identified: a verified record may "
+            "still be one nobody opened"
+        ),
+    )
+    next_action: str = Field(
+        default="",
+        max_length=512,
+        description=(
+            "for a record that is not verified: what would verify or acquire it, and who has to "
+            "do it. The acquisition queue is this field, not a separate list."
+        ),
+    )
     rights_note: str = Field(default="", max_length=512)
     notes: str = Field(default="", max_length=2000)
 
@@ -128,6 +143,17 @@ class SourceRecord(BaseModel):
                 f"{self.id}: a verified record must say what was opened to verify it "
                 "(verified_against)"
             )
+        if self.verification is Verification.UNVERIFIED:
+            if self.read_depth is not ReadDepth.IDENTITY_ONLY:
+                raise ValueError(
+                    f"{self.id}: an unverified record cannot have read its own content; "
+                    "read_depth must be identity-only"
+                )
+            if not self.next_action.strip():
+                raise ValueError(
+                    f"{self.id}: an unverified record must say what would verify or acquire it "
+                    "(next_action), so the queue is machine-readable rather than a paragraph"
+                )
         if self.verification is Verification.UNVERIFIED and self.grade in {
             EvidenceGrade.A,
             EvidenceGrade.B,

@@ -39,6 +39,20 @@ SOURCED_GRADES: Final[frozenset[EvidenceGrade]] = frozenset(
 )
 
 
+class ReadDepth(StrEnum):
+    """How much of a source was actually read, as distinct from how well it was identified.
+
+    ``verified`` in the registry means the *record* was confirmed against a page that was loaded.
+    That is a weaker statement than it sounds: a bibliographic identity can be confirmed without
+    one line of the source being read. This says which of the two happened, so a claim leaning on a
+    canonical monograph nobody opened is visible as exactly that.
+    """
+
+    FULL_TEXT = "full-text"
+    ABSTRACT = "abstract"
+    IDENTITY_ONLY = "identity-only"
+
+
 class DataProvenance(BaseModel):
     """Where a value comes from, and how strong the evidence is."""
 
