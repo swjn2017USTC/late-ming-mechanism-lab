@@ -1,0 +1,824 @@
+{
+  "generator": "late-ming-lab protocol robustness",
+  "pilot": {
+    "arms": [
+      "BASELINE",
+      "OPEN_MIGRATION_EXIT",
+      "NO_ELITE_CREDIT"
+    ],
+    "base_seed": 20260915,
+    "replicates": 4,
+    "runs": [
+      {
+        "arm": "BASELINE",
+        "root_seed": 20260915,
+        "run_id": "baseline-20260915-23c377900615-baseline",
+        "simulation_digest": "e293558b38d3f8e36b9eee00cb802654d2d3f9b95c2dd1970959e83a926cfeac"
+      },
+      {
+        "arm": "BASELINE",
+        "root_seed": 20260916,
+        "run_id": "baseline-20260916-2623f3d309dd-baseline",
+        "simulation_digest": "858717f856e90fe2859f9d5869e0cb5d67aaf345d567ec2d06e6b5887ece574d"
+      },
+      {
+        "arm": "BASELINE",
+        "root_seed": 20260917,
+        "run_id": "baseline-20260917-3e0ebda947bb-baseline",
+        "simulation_digest": "a686ab4edeee3120157b3d319de05f837bf10d063a2b850f789aa230ae0b1adb"
+      },
+      {
+        "arm": "BASELINE",
+        "root_seed": 20260918,
+        "run_id": "baseline-20260918-bc213bb0a34f-baseline",
+        "simulation_digest": "62c652985a1e8f3105ed68cb47c371ce556f2f5c7f626e93cb3153a55ae1cb18"
+      },
+      {
+        "arm": "NO_ELITE_CREDIT",
+        "root_seed": 20260915,
+        "run_id": "no-elite-credit-20260915-c97749fe4c77-no-elite-credit",
+        "simulation_digest": "e2a33d8e8af2bea9b9dcd27bb583d8e071d3d545d58bd541e0a8e42c95351ba8"
+      },
+      {
+        "arm": "NO_ELITE_CREDIT",
+        "root_seed": 20260916,
+        "run_id": "no-elite-credit-20260916-4ddc46d4c59b-no-elite-credit",
+        "simulation_digest": "589fdaec70629c72189ec76f28b20529850250ed013556c35b56a0ef72bcfd6c"
+      },
+      {
+        "arm": "NO_ELITE_CREDIT",
+        "root_seed": 20260917,
+        "run_id": "no-elite-credit-20260917-d5e7263b74b9-no-elite-credit",
+        "simulation_digest": "a3e5736293da3865f94a59aa8232c595f57852e063296a7a6c5fd9643c957c4b"
+      },
+      {
+        "arm": "NO_ELITE_CREDIT",
+        "root_seed": 20260918,
+        "run_id": "no-elite-credit-20260918-c0c765156728-no-elite-credit",
+        "simulation_digest": "a7966d486fa4102ec27586fceed23a28429bdf2b932b566cf9214eae13ac67d3"
+      },
+      {
+        "arm": "OPEN_MIGRATION_EXIT",
+        "root_seed": 20260915,
+        "run_id": "open-migration-exit-20260915-cbafa9f55ec0-open-migration-exit",
+        "simulation_digest": "e882046bed97ead583d4a2e7e3e9ea9130d6c9edab1d09ebe950b413dbd1508d"
+      },
+      {
+        "arm": "OPEN_MIGRATION_EXIT",
+        "root_seed": 20260916,
+        "run_id": "open-migration-exit-20260916-15c0bca2ea18-open-migration-exit",
+        "simulation_digest": "c1ab9e07676317b67a555aec7420c7b6d5d49d2f378d64a29e5ed89cbd46bb61"
+      },
+      {
+        "arm": "OPEN_MIGRATION_EXIT",
+        "root_seed": 20260917,
+        "run_id": "open-migration-exit-20260917-c2c0a157ce06-open-migration-exit",
+        "simulation_digest": "994d25f75a1eaf02c2a474a225c5265a6ac1b5cd36d4c6282f58df18375d9623"
+      },
+      {
+        "arm": "OPEN_MIGRATION_EXIT",
+        "root_seed": 20260918,
+        "run_id": "open-migration-exit-20260918-7f77a9eb9bb2-open-migration-exit",
+        "simulation_digest": "2b3a86f54c3cab02e090df2baee474c132f86ade8e4d0ae3b0a17c53e8bcb8d0"
+      }
+    ]
+  },
+  "report": {
+    "breakdown_lines": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "breakdown_shares": {
+      "baseline-20260915-23c377900615-baseline": {
+        "4": 1.0,
+        "5": 0.744,
+        "6": 0.232,
+        "7": 0.024,
+        "8": 0.0
+      },
+      "baseline-20260916-2623f3d309dd-baseline": {
+        "4": 1.0,
+        "5": 0.712,
+        "6": 0.256,
+        "7": 0.032,
+        "8": 0.0
+      },
+      "baseline-20260917-3e0ebda947bb-baseline": {
+        "4": 1.0,
+        "5": 0.808,
+        "6": 0.344,
+        "7": 0.048,
+        "8": 0.0
+      },
+      "baseline-20260918-bc213bb0a34f-baseline": {
+        "4": 1.0,
+        "5": 0.744,
+        "6": 0.232,
+        "7": 0.024,
+        "8": 0.0
+      },
+      "no-elite-credit-20260915-c97749fe4c77-no-elite-credit": {
+        "4": 1.0,
+        "5": 0.616,
+        "6": 0.168,
+        "7": 0.016,
+        "8": 0.0
+      },
+      "no-elite-credit-20260916-4ddc46d4c59b-no-elite-credit": {
+        "4": 1.0,
+        "5": 0.712,
+        "6": 0.256,
+        "7": 0.032,
+        "8": 0.0
+      },
+      "no-elite-credit-20260917-d5e7263b74b9-no-elite-credit": {
+        "4": 1.0,
+        "5": 0.808,
+        "6": 0.344,
+        "7": 0.048,
+        "8": 0.0
+      },
+      "no-elite-credit-20260918-c0c765156728-no-elite-credit": {
+        "4": 1.0,
+        "5": 0.744,
+        "6": 0.232,
+        "7": 0.024,
+        "8": 0.0
+      },
+      "open-migration-exit-20260915-cbafa9f55ec0-open-migration-exit": {
+        "4": 1.0,
+        "5": 1.0,
+        "6": 0.904,
+        "7": 0.432,
+        "8": 0.064
+      },
+      "open-migration-exit-20260916-15c0bca2ea18-open-migration-exit": {
+        "4": 1.0,
+        "5": 0.9808,
+        "6": 0.8096,
+        "7": 0.3584,
+        "8": 0.0512
+      },
+      "open-migration-exit-20260917-c2c0a157ce06-open-migration-exit": {
+        "4": 1.0,
+        "5": 1.0,
+        "6": 0.872,
+        "7": 0.296,
+        "8": 0.032
+      },
+      "open-migration-exit-20260918-7f77a9eb9bb2-open-migration-exit": {
+        "4": 1.0,
+        "5": 1.0,
+        "6": 0.872,
+        "7": 0.296,
+        "8": 0.032
+      }
+    },
+    "criteria": [
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M001.policy-dependent-inversion",
+        "holds": 0.0,
+        "mechanism": "M001",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the CONDITIONAL status is a contrast across decision policies: the inversion present under one and absent under another",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 1.0,
+        "criterion": "M002.breakdown-in-every-arm-replicate",
+        "holds": 0.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "every replicate of the gate arm crosses the breakdown line and no replicate of thebaseline does",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M002.base-contraction-separates-arms",
+        "holds": 1.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the gate arm's measured tax-base contraction exceeds the baseline's in every replicate, which reads no line at all",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-absent-in-the-reference-arm",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the REJECTED status, as the card states it: the ratchet reading is absent in the reference arm's replicates, because arrears rise and then come down",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-present-with-the-gate-open",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the card's own counterexample direction: the ratchet reading is present in the gate arm's replicates, where the tax base is leaving and arrears only accumulate",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M004.lending-fires-and-stops-firing",
+        "holds": 1.0,
+        "mechanism": "M004",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the WEAK status rests on elite lending firing where the mechanism is present and not firing where it is removed",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M005.consolidation-reading",
+        "holds": 1.0,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the SUPPORTED status rests on the consolidation reading being present: fewer bands, with the largest holding a growing share",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.6,
+        "criterion": "M005.above-declared-share-line",
+        "holds": 0.4,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "the largest band's share exceeds the declared line, which is the part of that carda threshold can move",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 4,
+        "changes": 0.0,
+        "criterion": "M006.famine-mortality",
+        "holds": 0.0,
+        "mechanism": "M006",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "no threshold and no run decides the famine-mortality chain: the model has no mortality channel, so the reading is undetermined rather than merely unstable",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M001.policy-dependent-inversion",
+        "holds": 0.0,
+        "mechanism": "M001",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the CONDITIONAL status is a contrast across decision policies: the inversion present under one and absent under another",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.8224,
+        "criterion": "M002.breakdown-in-every-arm-replicate",
+        "holds": 0.1776,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "every replicate of the gate arm crosses the breakdown line and no replicate of thebaseline does",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M002.base-contraction-separates-arms",
+        "holds": 1.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the gate arm's measured tax-base contraction exceeds the baseline's in every replicate, which reads no line at all",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-absent-in-the-reference-arm",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the REJECTED status, as the card states it: the ratchet reading is absent in the reference arm's replicates, because arrears rise and then come down",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-present-with-the-gate-open",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the card's own counterexample direction: the ratchet reading is present in the gate arm's replicates, where the tax base is leaving and arrears only accumulate",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M004.lending-fires-and-stops-firing",
+        "holds": 1.0,
+        "mechanism": "M004",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the WEAK status rests on elite lending firing where the mechanism is present and not firing where it is removed",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M005.consolidation-reading",
+        "holds": 1.0,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the SUPPORTED status rests on the consolidation reading being present: fewer bands, with the largest holding a growing share",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.6,
+        "criterion": "M005.above-declared-share-line",
+        "holds": 0.4,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "the largest band's share exceeds the declared line, which is the part of that carda threshold can move",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 5,
+        "changes": 0.0,
+        "criterion": "M006.famine-mortality",
+        "holds": 0.0,
+        "mechanism": "M006",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "no threshold and no run decides the famine-mortality chain: the model has no mortality channel, so the reading is undetermined rather than merely unstable",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M001.policy-dependent-inversion",
+        "holds": 0.0,
+        "mechanism": "M001",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the CONDITIONAL status is a contrast across decision policies: the inversion present under one and absent under another",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.5392,
+        "criterion": "M002.breakdown-in-every-arm-replicate",
+        "holds": 0.4608,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "every replicate of the gate arm crosses the breakdown line and no replicate of thebaseline does",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M002.base-contraction-separates-arms",
+        "holds": 1.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the gate arm's measured tax-base contraction exceeds the baseline's in every replicate, which reads no line at all",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-absent-in-the-reference-arm",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the REJECTED status, as the card states it: the ratchet reading is absent in the reference arm's replicates, because arrears rise and then come down",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-present-with-the-gate-open",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the card's own counterexample direction: the ratchet reading is present in the gate arm's replicates, where the tax base is leaving and arrears only accumulate",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M004.lending-fires-and-stops-firing",
+        "holds": 1.0,
+        "mechanism": "M004",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the WEAK status rests on elite lending firing where the mechanism is present and not firing where it is removed",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M005.consolidation-reading",
+        "holds": 1.0,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the SUPPORTED status rests on the consolidation reading being present: fewer bands, with the largest holding a growing share",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.6,
+        "criterion": "M005.above-declared-share-line",
+        "holds": 0.4,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "the largest band's share exceeds the declared line, which is the part of that carda threshold can move",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 6,
+        "changes": 0.0,
+        "criterion": "M006.famine-mortality",
+        "holds": 0.0,
+        "mechanism": "M006",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "no threshold and no run decides the famine-mortality chain: the model has no mortality channel, so the reading is undetermined rather than merely unstable",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M001.policy-dependent-inversion",
+        "holds": 0.0,
+        "mechanism": "M001",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the CONDITIONAL status is a contrast across decision policies: the inversion present under one and absent under another",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.7936,
+        "criterion": "M002.breakdown-in-every-arm-replicate",
+        "holds": 0.2064,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "every replicate of the gate arm crosses the breakdown line and no replicate of thebaseline does",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M002.base-contraction-separates-arms",
+        "holds": 1.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the gate arm's measured tax-base contraction exceeds the baseline's in every replicate, which reads no line at all",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-absent-in-the-reference-arm",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the REJECTED status, as the card states it: the ratchet reading is absent in the reference arm's replicates, because arrears rise and then come down",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-present-with-the-gate-open",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the card's own counterexample direction: the ratchet reading is present in the gate arm's replicates, where the tax base is leaving and arrears only accumulate",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M004.lending-fires-and-stops-firing",
+        "holds": 1.0,
+        "mechanism": "M004",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the WEAK status rests on elite lending firing where the mechanism is present and not firing where it is removed",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M005.consolidation-reading",
+        "holds": 1.0,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the SUPPORTED status rests on the consolidation reading being present: fewer bands, with the largest holding a growing share",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.6,
+        "criterion": "M005.above-declared-share-line",
+        "holds": 0.4,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "the largest band's share exceeds the declared line, which is the part of that carda threshold can move",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 7,
+        "changes": 0.0,
+        "criterion": "M006.famine-mortality",
+        "holds": 0.0,
+        "mechanism": "M006",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "no threshold and no run decides the famine-mortality chain: the model has no mortality channel, so the reading is undetermined rather than merely unstable",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M001.policy-dependent-inversion",
+        "holds": 0.0,
+        "mechanism": "M001",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the CONDITIONAL status is a contrast across decision policies: the inversion present under one and absent under another",
+        "undetermined": 1.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.9744,
+        "criterion": "M002.breakdown-in-every-arm-replicate",
+        "holds": 0.0256,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "every replicate of the gate arm crosses the breakdown line and no replicate of thebaseline does",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M002.base-contraction-separates-arms",
+        "holds": 1.0,
+        "mechanism": "M002",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the gate arm's measured tax-base contraction exceeds the baseline's in every replicate, which reads no line at all",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-absent-in-the-reference-arm",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the REJECTED status, as the card states it: the ratchet reading is absent in the reference arm's replicates, because arrears rise and then come down",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M003.ratchet-present-with-the-gate-open",
+        "holds": 1.0,
+        "mechanism": "M003",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the card's own counterexample direction: the ratchet reading is present in the gate arm's replicates, where the tax base is leaving and arrears only accumulate",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M004.lending-fires-and-stops-firing",
+        "holds": 1.0,
+        "mechanism": "M004",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the WEAK status rests on elite lending firing where the mechanism is present and not firing where it is removed",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M005.consolidation-reading",
+        "holds": 1.0,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "the SUPPORTED status rests on the consolidation reading being present: fewer bands, with the largest holding a growing share",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.6,
+        "criterion": "M005.above-declared-share-line",
+        "holds": 0.4,
+        "mechanism": "M005",
+        "members": 50625,
+        "reads_thresholds": true,
+        "runs": 12,
+        "statement": "the largest band's share exceeds the declared line, which is the part of that carda threshold can move",
+        "undetermined": 0.0
+      },
+      {
+        "breakdown_line": 8,
+        "changes": 0.0,
+        "criterion": "M006.famine-mortality",
+        "holds": 0.0,
+        "mechanism": "M006",
+        "members": 50625,
+        "reads_thresholds": false,
+        "runs": 12,
+        "statement": "no threshold and no run decides the famine-mortality chain: the model has no mortality channel, so the reading is undetermined rather than merely unstable",
+        "undetermined": 1.0
+      }
+    ],
+    "crossed_count_share": {
+      "4": 0.1776,
+      "5": 0.3622666666666667,
+      "6": 0.32426666666666665,
+      "7": 0.12093333333333334,
+      "8": 0.014933333333333333
+    },
+    "ensemble_digest": "f67d2aa4b8f532e08a90aa3caf50a84fecc0e8930fc1c300dfa123bf0092ca14",
+    "ensemble_version": "2.0.0",
+    "indicators": [
+      {
+        "crossed_share": 1.0,
+        "direction": "above-is-failure",
+        "indicator": "armed_share_of_adults",
+        "line_max": 0.015580393537621692,
+        "line_min": 0.00855053632827636,
+        "measured_max": 0.11100535576480659,
+        "measured_min": 0.06863346060534997
+      },
+      {
+        "crossed_share": 0.9333333333333333,
+        "direction": "below-is-failure",
+        "indicator": "fiscal_receipts",
+        "line_max": 0.7,
+        "line_min": 0.3,
+        "measured_max": 0.3919338011330098,
+        "measured_min": 0.2558420954080586
+      },
+      {
+        "crossed_share": 0.23333333333333334,
+        "direction": "above-is-failure",
+        "indicator": "largest_band_share",
+        "line_max": 0.8,
+        "line_min": 0.2,
+        "measured_max": 0.4369456515727004,
+        "measured_min": 0.250107187884431
+      },
+      {
+        "crossed_share": 0.6666666666666666,
+        "direction": "above-is-failure",
+        "indicator": "military_pay_shortfall",
+        "line_max": 0.7,
+        "line_min": 0.3,
+        "measured_max": 0.8929662710496449,
+        "measured_min": 0.4451306313530124
+      },
+      {
+        "crossed_share": 0.3333333333333333,
+        "direction": "above-is-failure",
+        "indicator": "out_migration",
+        "line_max": 0.03836491027317228,
+        "line_min": 0.005888680940178868,
+        "measured_max": 0.4634560634199775,
+        "measured_min": 0.0
+      },
+      {
+        "crossed_share": 0.26666666666666666,
+        "direction": "above-is-failure",
+        "indicator": "subsistence_shortfall",
+        "line_max": 0.45,
+        "line_min": 0.05,
+        "measured_max": 0.23137677729351572,
+        "measured_min": 0.08870124989369484
+      },
+      {
+        "crossed_share": 1.0,
+        "direction": "above-is-failure",
+        "indicator": "tax_arrears_growth",
+        "line_max": 2.5883596739917976,
+        "line_min": 0.9844055845611193,
+        "measured_max": 1043.9768784347698,
+        "measured_min": 39.85260956007583
+      },
+      {
+        "crossed_share": 1.0,
+        "direction": "above-is-failure",
+        "indicator": "tax_base_contraction",
+        "line_max": 0.027303885947136633,
+        "line_min": 0.010751463606853227,
+        "measured_max": 0.9904518281587206,
+        "measured_min": 0.045354507246010915
+      }
+    ],
+    "members": 50625,
+    "note": "50625 ensemble members over 12 run(s); the breakdown reading is reported at every crossed count the protocol declares (4 to 8), so no single value of it carries a conclusion.",
+    "protocol_digest": "788458c441a8ce9fbe51405a4134877a9c4b01c4f6d8fccda7c26ea04c11b801",
+    "protocol_version": "2.0.0",
+    "runs": [
+      "baseline-20260915-23c377900615-baseline",
+      "baseline-20260916-2623f3d309dd-baseline",
+      "baseline-20260917-3e0ebda947bb-baseline",
+      "baseline-20260918-bc213bb0a34f-baseline",
+      "no-elite-credit-20260915-c97749fe4c77-no-elite-credit",
+      "no-elite-credit-20260916-4ddc46d4c59b-no-elite-credit",
+      "no-elite-credit-20260917-d5e7263b74b9-no-elite-credit",
+      "no-elite-credit-20260918-c0c765156728-no-elite-credit",
+      "open-migration-exit-20260915-cbafa9f55ec0-open-migration-exit",
+      "open-migration-exit-20260916-15c0bca2ea18-open-migration-exit",
+      "open-migration-exit-20260917-c2c0a157ce06-open-migration-exit",
+      "open-migration-exit-20260918-7f77a9eb9bb2-open-migration-exit"
+    ]
+  }
+}
