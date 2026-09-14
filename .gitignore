@@ -20,6 +20,8 @@ outputs/analysis/
 outputs/calibration/
 outputs/experiments/
 outputs/institutional/
+# V2 historical runs: artifacts are reproduced from the core, not committed, as for V1 runs.
+outputs/v2/
 
 data/raw/private/
 sources/literature/private/

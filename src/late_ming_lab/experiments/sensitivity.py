@@ -37,6 +37,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import Final
 
 import numpy as np
 import polars as pl
@@ -80,6 +81,19 @@ class SweepParameter:
     """The card's unit, carried so a report can label what a moved value means."""
 
 
+#: Parameter sets a sandbox sweep does not touch, with the reason. A swept number has to be set on
+#: a parameter model the *economy* holds, because that is what an arm copies into a run; the
+#: historical core's set is consumed by the dataset build and by the climate allocator, so a sweep
+#: here would set a value no arm reads. V2-P07 owns sensitivity for that allocator, where the
+#: ablation is the allocation mode rather than a single number.
+NON_ECONOMY_PARAMETER_SETS: Final[dict[str, str]] = {
+    "HistoricalCoreParameters": (
+        "consumed by the historical core's dataset build and climate allocator, not by the sandbox "
+        "economy; V2-P07 sweeps the allocator as a mode ablation instead"
+    ),
+}
+
+
 def _is_scalar_field(parameter_set: str, name: str) -> bool:
     """Whether the live parameter set declares ``name`` as a single-number float field.
 
@@ -112,6 +126,8 @@ def sweep_parameters(cards: ParameterCards) -> tuple[SweepParameter, ...]:
     for card in cards:
         card_range = card.range
         if card_range is None or card_range.low is None or card_range.high is None:
+            continue
+        if card.parameter_set in NON_ECONOMY_PARAMETER_SETS:
             continue
         if not _is_scalar_field(card.parameter_set, card.id):
             continue

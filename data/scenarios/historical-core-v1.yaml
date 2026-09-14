@@ -1,0 +1,27 @@
+# Declared by V2-P02. The expected values are a reproducibility pin, not a fit target.
+schema_version: demo-scenario-v1
+id: historical-core-v1
+description: >-
+  The historical core: twelve selected Shaanxi-Henan county seats and two boundary exits on the
+  CHGIS V6 administrative geography, the observed annual climate index built from REACHES events
+  for 1625-1644, allocated across months by the declared seasonal profile, over the full 240-tick
+  window. This is a run of the model on sourced inputs; it is not a historical reconstruction, and
+  it is not a synthetic run.
+label: historical-core-v1
+seed: 20260912
+ticks: 240
+warmup_ticks: 24
+sandbox:
+  label: historical-core-v1
+  dataset: historical-core-v1
+  climate_mode: observed-historical
+  allocation_mode: seasonal
+  monthly_event_probability: 0.0
+  severity_floor: 0.0
+  nominal_pressure: 0.02
+  pay_share_of_treasury: 0.5
+  garrison_troops: 300.0
+expected:
+  simulation_digest: c75cbc96e54ff53ee8953a4bb6a8c6d4ff79a33296d8bbc7b0f5921f651f31a9
+  event_count: 226470
+  tick_count: 240

@@ -117,7 +117,10 @@ def load_scenario(path: str | Path = SCENARIO_PATH) -> DemoScenario:
 
 
 def run_demo(
-    path: str | Path = SCENARIO_PATH, *, output_root: str | Path | None = DEMO_OUTPUT_ROOT
+    path: str | Path = SCENARIO_PATH,
+    *,
+    output_root: str | Path | None = DEMO_OUTPUT_ROOT,
+    root: str | Path = ".",
 ) -> DemoOutcome:
     """Run the declared scenario and compare it with what the file says it produces.
 
@@ -125,7 +128,7 @@ def run_demo(
     uses: the point of the test is the digest, not another batch on disk.
     """
     scenario = load_scenario(path)
-    run = run_integrated_scenario(scenario.sandbox, config=scenario.config())
+    run = run_integrated_scenario(scenario.sandbox, config=scenario.config(), root=root)
     summary = run.result.summary
     digest = summary.simulation_digest
     details: list[str] = []

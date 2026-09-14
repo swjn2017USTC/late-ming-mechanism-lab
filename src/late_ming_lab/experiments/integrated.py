@@ -87,16 +87,26 @@ FRAME_KEYS: Final[dict[str, str]] = {
 }
 
 #: The window every integrated scenario runs: 1625-01 to 1644-12.
+#: The dataset id the historical core registers under, so a scenario names it rather than a path.
+HISTORICAL_CORE_DATASET: Final[str] = "historical-core-v1"
+
 INTEGRATED_TICK_COUNT: Final[int] = 240
 INTEGRATED_WARMUP_TICKS: Final[int] = 24
 
 
 @dataclass(frozen=True, slots=True)
 class IntegratedScenario:
-    """One point of the sandbox's surface: a space, a climate and a fiscal pressure."""
+    """One point of the sandbox's surface: a space, a climate and a fiscal pressure.
+
+    ``climate_mode`` selects the forcing: ``synthetic`` (the declared default, unchanged from
+    P07-P14), ``baseline`` (no adverse anomaly) or ``observed-historical`` (the historical core's
+    annual index allocated across months by the declared allocator).
+    """
 
     label: str
     dataset: str = "toy"
+    climate_mode: str = "synthetic"
+    allocation_mode: str = "seasonal"
     monthly_event_probability: float = 0.4
     severity_floor: float = 0.6
     nominal_pressure: float = 0.02
@@ -156,15 +166,58 @@ def default_scenarios() -> tuple[IntegratedScenario, ...]:
     )
 
 
-def dataset_for(scenario: IntegratedScenario) -> SpatialDataset:
+def dataset_for(scenario: IntegratedScenario, root: str | Path = ".") -> SpatialDataset:
+    """The space for a scenario: a fixture in code, or the built historical core on disk."""
     if scenario.dataset == "toy":
         return toy_spatial_dataset()
     if scenario.dataset == "medium":
         return medium_spatial_dataset()
-    raise ValueError(f"unknown dataset {scenario.dataset!r}; expected 'toy' or 'medium'")
+    if scenario.dataset == HISTORICAL_CORE_DATASET:
+        from late_ming_lab.historical.build import core_dataset, load_core
+
+        return core_dataset(load_core(root))
+    raise ValueError(
+        f"unknown dataset {scenario.dataset!r}; expected 'toy', 'medium' or "
+        f"{HISTORICAL_CORE_DATASET!r}"
+    )
 
 
-def climate_for(scenario: IntegratedScenario) -> ClimateModel:
+def climate_for(
+    scenario: IntegratedScenario,
+    root: str | Path = ".",
+    parameters: object | None = None,
+) -> ClimateModel:
+    """The forcing for a scenario: synthetic, baseline, or the observed historical allocation.
+
+    The observed path reads the annual index the historical core stores and allocates it to months
+    with a declared profile. It is deliberately *not* a monthly observation series: what the record
+    gives is an annual index per node, and the allocator is a parameter-carded model construction
+    that V2-P07 can ablate by switching to uniform allocation.
+    """
+    if scenario.climate_mode == "baseline":
+        return BaselineClimate()
+    if scenario.climate_mode == "observed-historical":
+        from late_ming_lab.evidence.parameters import (
+            HistoricalCoreParameters,
+            core_default_historical_core_parameters,
+        )
+        from late_ming_lab.historical.build import load_core
+        from late_ming_lab.historical.forcing import AllocatedObservedClimate, AllocationMode
+
+        core = load_core(root)
+        chosen = parameters if isinstance(parameters, HistoricalCoreParameters) else None
+        settings = chosen or core_default_historical_core_parameters()
+        mode = (
+            AllocationMode.UNIFORM
+            if scenario.allocation_mode == AllocationMode.UNIFORM.value
+            else AllocationMode.SEASONAL
+        )
+        return AllocatedObservedClimate(
+            core.annual,
+            settings,
+            allocation_mode=mode,
+            series_id=core.manifest.dataset_id,
+        )
     if scenario.monthly_event_probability <= 0.0:
         return BaselineClimate()
     return SyntheticClimate(
@@ -180,6 +233,7 @@ def build_integrated_economy(
     disruption: TradeDisruption | None = None,
     extraction_policy: ExtractionPolicy | None = None,
     capacity: StateCapacity | None = None,
+    root: str | Path = ".",
 ) -> Economy:
     """Build the sandbox's economy for one scenario, with declared overrides applied.
 
@@ -199,8 +253,8 @@ def build_integrated_economy(
         }
     )
     return build_toy_economy(
-        dataset=dataset_for(scenario),
-        climate_model=climate_for(scenario),
+        dataset=dataset_for(scenario, root),
+        climate_model=climate_for(scenario, root, overrides.get("HistoricalCoreParameters")),
         with_fiscal=True,
         with_military=True,
         with_migration=True,
@@ -239,10 +293,11 @@ def run_integrated_scenario(
     *,
     config: SimulationConfig | None = None,
     parameter_sets: Mapping[str, object] | None = None,
+    root: str | Path = ".",
 ) -> IntegratedRun:
     """Build the whole sandbox for one scenario and run the window to its end."""
     thresholds = core_default_governance_indicators()
-    economy = build_integrated_economy(scenario, parameter_sets=parameter_sets)
+    economy = build_integrated_economy(scenario, parameter_sets=parameter_sets, root=root)
     starting_households = sum(cohort.households for cohort in economy.population)
     starting_adults = sum(cohort.adults for cohort in economy.population)
     run_config = config or SimulationConfig.model_validate(
