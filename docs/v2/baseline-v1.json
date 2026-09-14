@@ -1,0 +1,2713 @@
+{
+  "artifact_count": 10,
+  "artifact_file_count": 50,
+  "artifacts": [
+    {
+      "directory": "outputs/runs/kernel-smoke-20260912-9153567ed602-p05-pressure-0.16",
+      "facts": {
+        "root_seed": "20260912",
+        "tick_count": "240"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "agent_events.parquet",
+          "sha256": "bb693f2e348a9e0d1ea54551326c5c730495230709c0f5aaa69f21014f3b841a",
+          "size_bytes": 848007
+        },
+        {
+          "path": "config.snapshot.yaml",
+          "sha256": "61a71d30de44fbec3472f89993beb04ad005be8723a459e338f41f9e2e49096e",
+          "size_bytes": 230
+        },
+        {
+          "path": "macro_timeseries.parquet",
+          "sha256": "4a089fe9fa928e74e5c63c756a71105094cda7933403b5a62d5abba7e8d2e2a3",
+          "size_bytes": 2813
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "c38859200176c35db05816005efcb3e650ca070ead7caeea8b587a3d81f000f4",
+          "size_bytes": 1022
+        },
+        {
+          "path": "summary.json",
+          "sha256": "b125386959fb439caaf98db7927847dee3bb832c2d5dc3a06eb90fc221d39fb9",
+          "size_bytes": 355
+        }
+      ],
+      "generated_at_utc": "2026-09-12T15:06:42.381381Z",
+      "generation_commit": "70f062af62aec66db38943e7cb15b3f430e94518",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": false,
+      "kind": "run",
+      "label": "kernel-smoke-20260912-9153567ed602-p05-pressure-0.16",
+      "schema_version": "run-manifest-v1",
+      "tables": [
+        {
+          "name": "agent_events.parquet",
+          "rows": 55663,
+          "sha256": "bb693f2e348a9e0d1ea54551326c5c730495230709c0f5aaa69f21014f3b841a"
+        },
+        {
+          "name": "macro_timeseries.parquet",
+          "rows": 240,
+          "sha256": "4a089fe9fa928e74e5c63c756a71105094cda7933403b5a62d5abba7e8d2e2a3"
+        }
+      ],
+      "tree_sha256": "2a4c05d9577a70ed061fcb7cc608398c3f8c430ff48fe13909a1bb8001ad5872"
+    },
+    {
+      "directory": "outputs/experiments/p10-ablations",
+      "facts": {
+        "base_seed": "20260914",
+        "design_kind": "ablation",
+        "design_replicates": "4",
+        "jobs": "52",
+        "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+        "run_count": "52",
+        "ticks": "240",
+        "warmup_ticks": "24"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "governance_timeline.parquet",
+          "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327",
+          "size_bytes": 2034
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "e77117b66d1c92cea5800b8641742174494c880a7d60f07c1c3ad6ae4610e066",
+          "size_bytes": 11103
+        },
+        {
+          "path": "migration_nodes.parquet",
+          "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb",
+          "size_bytes": 5657
+        },
+        {
+          "path": "runs.parquet",
+          "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c",
+          "size_bytes": 17467
+        },
+        {
+          "path": "tax_base.parquet",
+          "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada",
+          "size_bytes": 17287
+        }
+      ],
+      "generated_at_utc": "2026-09-13T18:51:57+00:00",
+      "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "experiment",
+      "label": "p10-ablations",
+      "schema_version": "experiment-batch-v1",
+      "tables": [
+        {
+          "name": "governance_timeline.parquet",
+          "rows": 520,
+          "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+        },
+        {
+          "name": "migration_nodes.parquet",
+          "rows": 132,
+          "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+        },
+        {
+          "name": "runs.parquet",
+          "rows": 52,
+          "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+        },
+        {
+          "name": "tax_base.parquet",
+          "rows": 1040,
+          "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+        }
+      ],
+      "tree_sha256": "147347c4705fe38ec06f9e3de82bd2903db15125883b2751a0f094ec088001d5"
+    },
+    {
+      "directory": "outputs/experiments/p10-morris",
+      "facts": {
+        "base_seed": "20260914",
+        "design_kind": "morris",
+        "jobs": "32",
+        "labels": "MORRIS-00000,MORRIS-00001,MORRIS-00002,MORRIS-00003,MORRIS-00004,MORRIS-00005,MORRIS-00006,MORRIS-00007,MORRIS-00008,MORRIS-00009,MORRIS-00010,MORRIS-00011,MORRIS-00012,MORRIS-00013,MORRIS-00014,MORRIS-00015,MORRIS-00016,MORRIS-00017,MORRIS-00018,MORRIS-00019,MORRIS-00020,MORRIS-00021,MORRIS-00022,MORRIS-00023,MORRIS-00024,MORRIS-00025,MORRIS-00026,MORRIS-00027,MORRIS-00028,MORRIS-00029,MORRIS-00030,MORRIS-00031",
+        "run_count": "32",
+        "ticks": "240",
+        "warmup_ticks": "24"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "governance_timeline.parquet",
+          "sha256": "7a37e7c0831aa327ce4c8fc80df895e29ddf1f18602322f527ee74ec215ffa43",
+          "size_bytes": 1894
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "82e6200d953d887be30588f79de70427cbb61de9bb3094b859770e90ea8f19dd",
+          "size_bytes": 11373
+        },
+        {
+          "path": "migration_nodes.parquet",
+          "sha256": "01d42be24fbe4a45f28d14abe014bebe973b490bc130165bf09e27a2a71c7fba",
+          "size_bytes": 6841
+        },
+        {
+          "path": "runs.parquet",
+          "sha256": "423b116ba3d12ee77752a4fe7ac27f53a3f5433085ba8ee92b83b3e32be9a53a",
+          "size_bytes": 22043
+        },
+        {
+          "path": "tax_base.parquet",
+          "sha256": "b5fb7044902b104b16698b493108800b64ff4e8b7fc07dcc7c21fae39a924068",
+          "size_bytes": 14419
+        }
+      ],
+      "generated_at_utc": "2026-09-13T18:54:00+00:00",
+      "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "experiment",
+      "label": "p10-morris",
+      "schema_version": "experiment-batch-v1",
+      "tables": [
+        {
+          "name": "governance_timeline.parquet",
+          "rows": 320,
+          "sha256": "7a37e7c0831aa327ce4c8fc80df895e29ddf1f18602322f527ee74ec215ffa43"
+        },
+        {
+          "name": "migration_nodes.parquet",
+          "rows": 155,
+          "sha256": "01d42be24fbe4a45f28d14abe014bebe973b490bc130165bf09e27a2a71c7fba"
+        },
+        {
+          "name": "runs.parquet",
+          "rows": 32,
+          "sha256": "423b116ba3d12ee77752a4fe7ac27f53a3f5433085ba8ee92b83b3e32be9a53a"
+        },
+        {
+          "name": "tax_base.parquet",
+          "rows": 640,
+          "sha256": "b5fb7044902b104b16698b493108800b64ff4e8b7fc07dcc7c21fae39a924068"
+        }
+      ],
+      "tree_sha256": "5348bee4da2414ddc27cdcc1606695b3a53b89a3ba9f379b54076912648d0e56"
+    },
+    {
+      "directory": "outputs/experiments/p10-sobol",
+      "facts": {
+        "base_seed": "20260914",
+        "design_kind": "sobol",
+        "jobs": "40",
+        "labels": "SOBOL-00000,SOBOL-00001,SOBOL-00002,SOBOL-00003,SOBOL-00004,SOBOL-00005,SOBOL-00006,SOBOL-00007,SOBOL-00008,SOBOL-00009,SOBOL-00010,SOBOL-00011,SOBOL-00012,SOBOL-00013,SOBOL-00014,SOBOL-00015,SOBOL-00016,SOBOL-00017,SOBOL-00018,SOBOL-00019,SOBOL-00020,SOBOL-00021,SOBOL-00022,SOBOL-00023,SOBOL-00024,SOBOL-00025,SOBOL-00026,SOBOL-00027,SOBOL-00028,SOBOL-00029,SOBOL-00030,SOBOL-00031,SOBOL-00032,SOBOL-00033,SOBOL-00034,SOBOL-00035,SOBOL-00036,SOBOL-00037,SOBOL-00038,SOBOL-00039",
+        "run_count": "40",
+        "ticks": "240",
+        "warmup_ticks": "24"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "governance_timeline.parquet",
+          "sha256": "a60558b168c8731845c2adab0fb8b47ae553348d07428bb311b13e4200d3e025",
+          "size_bytes": 1934
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "1b4266385cbdb1c9f62ca1eccd271b0804b41f779d3e4f20576e296891675db9",
+          "size_bytes": 11671
+        },
+        {
+          "path": "migration_nodes.parquet",
+          "sha256": "9d570991ff7b457eb446e00e6e2d47a13a70445a94d46823bd722c6e23b57e96",
+          "size_bytes": 5238
+        },
+        {
+          "path": "runs.parquet",
+          "sha256": "b2f952fcc91890cbc9353ec5243a9c6371c90d6983d2390ca02e46c08a126a20",
+          "size_bytes": 18731
+        },
+        {
+          "path": "tax_base.parquet",
+          "sha256": "297f00af1118962cdede4490bf7f0a9393dafc8b31221eac54e8c77e4971375e",
+          "size_bytes": 16605
+        }
+      ],
+      "generated_at_utc": "2026-09-13T19:09:09+00:00",
+      "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "experiment",
+      "label": "p10-sobol",
+      "schema_version": "experiment-batch-v1",
+      "tables": [
+        {
+          "name": "governance_timeline.parquet",
+          "rows": 400,
+          "sha256": "a60558b168c8731845c2adab0fb8b47ae553348d07428bb311b13e4200d3e025"
+        },
+        {
+          "name": "migration_nodes.parquet",
+          "rows": 92,
+          "sha256": "9d570991ff7b457eb446e00e6e2d47a13a70445a94d46823bd722c6e23b57e96"
+        },
+        {
+          "name": "runs.parquet",
+          "rows": 40,
+          "sha256": "b2f952fcc91890cbc9353ec5243a9c6371c90d6983d2390ca02e46c08a126a20"
+        },
+        {
+          "name": "tax_base.parquet",
+          "rows": 800,
+          "sha256": "297f00af1118962cdede4490bf7f0a9393dafc8b31221eac54e8c77e4971375e"
+        }
+      ],
+      "tree_sha256": "0b4e69a76dbdffa4d44d3cf44cd0f8c5ba2f5edc746654dee9dadb99167ecb8f"
+    },
+    {
+      "directory": "outputs/experiments/p10-tipping",
+      "facts": {
+        "base_seed": "20260914",
+        "design_kind": "grid",
+        "design_replicates": "1",
+        "jobs": "9",
+        "labels": "GRID-0.05-0.2,GRID-0.05-1.1,GRID-0.05-2,GRID-0.225-0.2,GRID-0.225-1.1,GRID-0.225-2,GRID-0.4-0.2,GRID-0.4-1.1,GRID-0.4-2",
+        "run_count": "9",
+        "ticks": "240",
+        "warmup_ticks": "24"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "governance_timeline.parquet",
+          "sha256": "145a3c97e31cd248fecbc3da6c813324366e5f3c66cc7dd339c3e0e3381d39df",
+          "size_bytes": 1748
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "1fb796fc96649256ec5b1b38a21a2e4866ec0826a413f6e7623b9f4140afe476",
+          "size_bytes": 11020
+        },
+        {
+          "path": "migration_nodes.parquet",
+          "sha256": "fcedca70a3e1d5211a6fff023fa9143c93a2f1d2e5059a3e38831eaf38c5cc32",
+          "size_bytes": 3611
+        },
+        {
+          "path": "runs.parquet",
+          "sha256": "309490c3212aecfec270db431bd2e67d3591536d677e6a0d8165c76f17cc3577",
+          "size_bytes": 13071
+        },
+        {
+          "path": "tax_base.parquet",
+          "sha256": "f2d601fb312d96bc89c578aaa1a56563f8ff1c6bcb8841d8742addcd8d057d1c",
+          "size_bytes": 5274
+        }
+      ],
+      "generated_at_utc": "2026-09-13T19:08:34+00:00",
+      "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "experiment",
+      "label": "p10-tipping",
+      "schema_version": "experiment-batch-v1",
+      "tables": [
+        {
+          "name": "governance_timeline.parquet",
+          "rows": 90,
+          "sha256": "145a3c97e31cd248fecbc3da6c813324366e5f3c66cc7dd339c3e0e3381d39df"
+        },
+        {
+          "name": "migration_nodes.parquet",
+          "rows": 22,
+          "sha256": "fcedca70a3e1d5211a6fff023fa9143c93a2f1d2e5059a3e38831eaf38c5cc32"
+        },
+        {
+          "name": "runs.parquet",
+          "rows": 9,
+          "sha256": "309490c3212aecfec270db431bd2e67d3591536d677e6a0d8165c76f17cc3577"
+        },
+        {
+          "name": "tax_base.parquet",
+          "rows": 180,
+          "sha256": "f2d601fb312d96bc89c578aaa1a56563f8ff1c6bcb8841d8742addcd8d057d1c"
+        }
+      ],
+      "tree_sha256": "9391f649f09f948d45dc10f63d67abb4d0caa9563124e9cd30095c58d5df3e45"
+    },
+    {
+      "directory": "outputs/experiments/p12-robustness",
+      "facts": {
+        "arm_status": "random=ran;rule=ran;ustc=refused;utility=ran",
+        "base_seed": "20260916",
+        "grid_replicates": "2",
+        "policies": "rule,utility,random,ustc",
+        "replicates": "6",
+        "ticks": "240",
+        "warmup_ticks": "24"
+      },
+      "file_count": 6,
+      "files": [
+        {
+          "path": "decisions.parquet",
+          "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6",
+          "size_bytes": 10021
+        },
+        {
+          "path": "levels.parquet",
+          "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8",
+          "size_bytes": 10333
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "4dd5283df5e0c37e594553ad6595a4831ba99ada7cc0ed47b918e4e746f77b26",
+          "size_bytes": 1318
+        },
+        {
+          "path": "mechanism_readings.parquet",
+          "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee",
+          "size_bytes": 3929
+        },
+        {
+          "path": "tipping_grid.parquet",
+          "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff",
+          "size_bytes": 3913
+        },
+        {
+          "path": "tipping_summary.parquet",
+          "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7",
+          "size_bytes": 2927
+        }
+      ],
+      "generated_at_utc": "2026-09-14T01:17:58+00:00",
+      "generation_commit": "c1497d39a771abb84d1f5bff8fb35efb9e78c2f6",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": null,
+      "kind": "experiment",
+      "label": null,
+      "schema_version": "policy-robustness-v1",
+      "tables": [
+        {
+          "name": "decisions.parquet",
+          "rows": 190,
+          "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6"
+        },
+        {
+          "name": "levels.parquet",
+          "rows": 18,
+          "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8"
+        },
+        {
+          "name": "mechanism_readings.parquet",
+          "rows": 54,
+          "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee"
+        },
+        {
+          "name": "tipping_grid.parquet",
+          "rows": 54,
+          "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff"
+        },
+        {
+          "name": "tipping_summary.parquet",
+          "rows": 27,
+          "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7"
+        }
+      ],
+      "tree_sha256": "6d659c6e2ce45d16722772c5ea1974d7fda337a6cfc0d44a87462a4bdd27523f"
+    },
+    {
+      "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+      "facts": {
+        "chains": "1",
+        "root_seed": "20260912"
+      },
+      "file_count": 5,
+      "files": [
+        {
+          "path": "ensemble.parquet",
+          "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae",
+          "size_bytes": 13702
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "17a81128f3a1d801c1bd15a4db5df52316e1e3b0b7b11c9cc5e276c71342cd71",
+          "size_bytes": 5435
+        },
+        {
+          "path": "predictive_checks.parquet",
+          "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19",
+          "size_bytes": 10478
+        },
+        {
+          "path": "predictive_statistics.parquet",
+          "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d",
+          "size_bytes": 25748
+        },
+        {
+          "path": "smc_diagnostics.json",
+          "sha256": "e319685754a521e7405e2f95d3607ee12d57d778940efd760533946a25677fd3",
+          "size_bytes": 429
+        }
+      ],
+      "generated_at_utc": "2026-09-13T16:26:57+00:00",
+      "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "calibration",
+      "label": "p09-cards87a14e9d-32p-ch1-s20260913",
+      "schema_version": "calibration-manifest-v1",
+      "tables": [
+        {
+          "name": "ensemble.parquet",
+          "rows": 32,
+          "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+        },
+        {
+          "name": "predictive_checks.parquet",
+          "rows": 1280,
+          "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+        },
+        {
+          "name": "predictive_statistics.parquet",
+          "rows": 128,
+          "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+        }
+      ],
+      "tree_sha256": "c02b09e706f69bfc2e865bb1ddaa166b18cce663e08d23b42d3c7a2f0e5d3e60"
+    },
+    {
+      "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+      "facts": {
+        "chains": "1",
+        "root_seed": "20260912"
+      },
+      "file_count": 3,
+      "files": [
+        {
+          "path": "ensemble.parquet",
+          "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3",
+          "size_bytes": 13724
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "dc3b5f76ec7051d0dba748d57685559c8279ab05afce1344aa1c5fc7ec817c66",
+          "size_bytes": 5431
+        },
+        {
+          "path": "smc_diagnostics.json",
+          "sha256": "68a03d2ccfc9fe3d5e1807ee4af693ceb2494a155066967244b7df9ac73e8ed0",
+          "size_bytes": 369
+        }
+      ],
+      "generated_at_utc": "2026-09-13T16:50:49+00:00",
+      "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "calibration",
+      "label": "p09-cards87a14e9d-32p-ch1-s991753",
+      "schema_version": "calibration-manifest-v1",
+      "tables": [
+        {
+          "name": "ensemble.parquet",
+          "rows": 32,
+          "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+        }
+      ],
+      "tree_sha256": "66d5f2ddf4fd3a69534cf9fa6288e89122000a8f32c21d71adae8b804a84debb"
+    },
+    {
+      "directory": "outputs/institutional/institutional-smoke-20260915-d7f738698fbc-institutional-smoke",
+      "facts": {
+        "decisions": "2",
+        "refusals": "0",
+        "seed": "20260915",
+        "ticks": "96",
+        "warmup_ticks": "12"
+      },
+      "file_count": 2,
+      "files": [
+        {
+          "path": "decision_trace.parquet",
+          "sha256": "2210a34002a49e3358d223b8893c3c8f60792f4080defc1147edda8f47bf91ea",
+          "size_bytes": 6170
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "dd852edd432f6dc3157dc70ff8cb85096a7af80bb9f44868b7453cda61e595e3",
+          "size_bytes": 1131
+        }
+      ],
+      "generated_at_utc": "2026-09-14T00:54:19+00:00",
+      "generation_commit": "ad3f847e3b4fb8ac1907a3ed0a51ba65ec55860f",
+      "generation_commit_ancestor_of_freeze": true,
+      "generation_commit_source": "artifact-manifest",
+      "git_dirty_at_generation": true,
+      "kind": "institutional",
+      "label": "rule-v1",
+      "schema_version": "institutional-smoke-v1",
+      "tables": [
+        {
+          "name": "decision_trace.parquet",
+          "rows": 2,
+          "sha256": "2210a34002a49e3358d223b8893c3c8f60792f4080defc1147edda8f47bf91ea"
+        }
+      ],
+      "tree_sha256": "d8459d99ed5f6770858a852989526c924795dba8a0fe002ec5e4828b820863df"
+    },
+    {
+      "directory": "outputs/analysis",
+      "facts": {},
+      "file_count": 9,
+      "files": [
+        {
+          "path": "p03_cohort_distress.parquet",
+          "sha256": "4962405e03da3cf58ac8c5d6450574c6d7b992814745fe977df3c33c5c82326e",
+          "size_bytes": 17674
+        },
+        {
+          "path": "p03_shock_distribution.parquet",
+          "sha256": "4ddc0afe6e09940c9dc35478b78b5471be04fbdff08856af03229d505e16b18f",
+          "size_bytes": 7233
+        },
+        {
+          "path": "p04_debt_distribution.parquet",
+          "sha256": "d679d1996a290efa00fd36bf74de63b203f474c3fe33f2cca1324de7230110ee",
+          "size_bytes": 3911
+        },
+        {
+          "path": "p04_land_distribution.parquet",
+          "sha256": "16bf63500f0a2b18df6b238993e27fc767a8545fcbe9dafbc2eb6eb015317d79",
+          "size_bytes": 3524
+        },
+        {
+          "path": "p04_mechanism_results.parquet",
+          "sha256": "5f11751aa4ce91c0870c4c4f17d429aeda1c6f695eb2ff73fa0efd5b24642a55",
+          "size_bytes": 8438
+        },
+        {
+          "path": "p04_price_dispersion.parquet",
+          "sha256": "64faa6e2d4f35cdda71411841de1dd8ea77198a842c52df679db8ce785e952e0",
+          "size_bytes": 6819
+        },
+        {
+          "path": "p05_extraction_curve.parquet",
+          "sha256": "a33ce7503867082ea9527e5d120dffc36cbce782144fd270bbbdb1451cefe32f",
+          "size_bytes": 11638
+        },
+        {
+          "path": "p05_fiscal_totals.parquet",
+          "sha256": "05029395455a145e1ae9dd1a1e2d767d03a13ac85886befaf3bfebd2becc462c",
+          "size_bytes": 6378
+        },
+        {
+          "path": "p05_tax_burden.parquet",
+          "sha256": "7661f8172b6ba18cba9cbbdb1db1fa546b85cee6a9ad89c86aab4966a04bbec8",
+          "size_bytes": 5400
+        }
+      ],
+      "generated_at_utc": null,
+      "generation_commit": null,
+      "generation_commit_ancestor_of_freeze": null,
+      "generation_commit_source": "unrecorded",
+      "git_dirty_at_generation": null,
+      "kind": "analysis",
+      "label": null,
+      "schema_version": null,
+      "tables": [
+        {
+          "name": "p03_cohort_distress.parquet",
+          "rows": 125,
+          "sha256": "4962405e03da3cf58ac8c5d6450574c6d7b992814745fe977df3c33c5c82326e"
+        },
+        {
+          "name": "p03_shock_distribution.parquet",
+          "rows": 25,
+          "sha256": "4ddc0afe6e09940c9dc35478b78b5471be04fbdff08856af03229d505e16b18f"
+        },
+        {
+          "name": "p04_debt_distribution.parquet",
+          "rows": 25,
+          "sha256": "d679d1996a290efa00fd36bf74de63b203f474c3fe33f2cca1324de7230110ee"
+        },
+        {
+          "name": "p04_land_distribution.parquet",
+          "rows": 30,
+          "sha256": "16bf63500f0a2b18df6b238993e27fc767a8545fcbe9dafbc2eb6eb015317d79"
+        },
+        {
+          "name": "p04_mechanism_results.parquet",
+          "rows": 15,
+          "sha256": "5f11751aa4ce91c0870c4c4f17d429aeda1c6f695eb2ff73fa0efd5b24642a55"
+        },
+        {
+          "name": "p04_price_dispersion.parquet",
+          "rows": 240,
+          "sha256": "64faa6e2d4f35cdda71411841de1dd8ea77198a842c52df679db8ce785e952e0"
+        },
+        {
+          "name": "p05_extraction_curve.parquet",
+          "rows": 12,
+          "sha256": "a33ce7503867082ea9527e5d120dffc36cbce782144fd270bbbdb1451cefe32f"
+        },
+        {
+          "name": "p05_fiscal_totals.parquet",
+          "rows": 12,
+          "sha256": "05029395455a145e1ae9dd1a1e2d767d03a13ac85886befaf3bfebd2becc462c"
+        },
+        {
+          "name": "p05_tax_burden.parquet",
+          "rows": 60,
+          "sha256": "7661f8172b6ba18cba9cbbdb1db1fa546b85cee6a9ad89c86aab4966a04bbec8"
+        }
+      ],
+      "tree_sha256": "39642071785ed69abe5004aac06d0b53a4965c08c252819e85a2e39609691a71"
+    }
+  ],
+  "baseline_id": "v0.1.0-rc1",
+  "branch": "main",
+  "commit": "a81c223216f989150d69fe42bfe0a78f7eab1374",
+  "content_digest": "c8e34e316c827cea5477aa3fc4829fb1d2ce47f1076a9a95347a52d15f1f49b8",
+  "engine_version": "0.1.0",
+  "files": [
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".env.example",
+      "sha256": "5262a0074f686ba395441a3b779a0e51c5aa4f31db2f39d659d0c5f9f93f57fc",
+      "size_bytes": 102
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".gitignore",
+      "sha256": "7de8d6a1111abcfdf2f47d454ab28437205e31d68c2a45ac2fd55d7af25ebe0f",
+      "size_bytes": 357
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/AGENTS.md",
+      "sha256": "4280352086155b903b82c55789dbb29a52f39f310b44b07e8ca384947024a02c",
+      "size_bytes": 6363
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/RULES.md",
+      "sha256": "27371ed2a6fd08ebca84d07c2f00cef5313a5f888ab430526c090f1c0da9b79b",
+      "size_bytes": 2531
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/agents/architect.md",
+      "sha256": "8b117dc62b7d5b11f6a49e153eb038291d4942eef1ad8d1b741dfd91601bb47f",
+      "size_bytes": 2209
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/agents/implementer.md",
+      "sha256": "b567dfef5221ff004c7adad738f83f51d64eb35669f209950b778bf4368db3c2",
+      "size_bytes": 2309
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/agents/plan-critic.md",
+      "sha256": "fddc35eec542d55a96ff668bada8ffc5830d44f2262f65eaef02da50e86a5900",
+      "size_bytes": 2045
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/agents/repo-scout.md",
+      "sha256": "c97a5cc12d73bb0b39340740b7938763ca77f7d569be2d0f848d4fb22bf5778f",
+      "size_bytes": 1638
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/agents/reviewer.md",
+      "sha256": "23e0ec19e7e662f697be3752f7824d01eac0392f84c22d0757dff1c541034d50",
+      "size_bytes": 2006
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".omp/config.yml",
+      "sha256": "047e17261ae35c3230b8ce3b7ab014b59b1a202caa3cbb519527945096d260f1",
+      "size_bytes": 1591
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": ".python-version",
+      "sha256": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+      "size_bytes": 5
+    },
+    {
+      "group": "readme",
+      "last_commit": null,
+      "path": "README.md",
+      "sha256": "f2d1952ec8963ae78f709b1328d37e6302e4f430a16dfc1a8dd0c735214eb5c8",
+      "size_bytes": 13798
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/01-drought-climate.yaml",
+      "sha256": "1f45840987f8621fa855893a2babc3818860eac93dd69a76d21231d7f55bdb26",
+      "size_bytes": 3700
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/02-famine.yaml",
+      "sha256": "02ef9e04a0cfc46c43cf4b3e399eb8dc49ace7aacd92b6d093bcec7e36e7884f",
+      "size_bytes": 3654
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/03-agriculture.yaml",
+      "sha256": "3ba2fb77913902d0cae1b213ddf98a9d6f7972fd45cc76122071471b9dd9c365",
+      "size_bytes": 2409
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/04-population-migration.yaml",
+      "sha256": "45f586697c25b55eb31dc58143490ddc5e5d1d2e018a718cc4d8573877aee74c",
+      "size_bytes": 2418
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/05-grain-market-prices.yaml",
+      "sha256": "d42119585639dd09a2c546e3a3bf84183c43ad5582a6ba11e4d9a245877265e9",
+      "size_bytes": 2373
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/06-land-debt-elites.yaml",
+      "sha256": "a80df344eaa5e04ef602683be9ce4264f8a035d0f20a664c64e9a646b8c79fa4",
+      "size_bytes": 2178
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/07-taxation-levies.yaml",
+      "sha256": "42a6ed214558aab302147cffb8dfd10090be7e719d05c4f111e6f06cc360f472",
+      "size_bytes": 2584
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/08-relief.yaml",
+      "sha256": "23ed8d94cfbb104fcbe775528d711c9f57bbbfe7ca767b31bcdf78e2d46da45f",
+      "size_bytes": 2218
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/09-military-finance.yaml",
+      "sha256": "2ba254087ffd452108ac09aacfc11755861148341734d29f197f2e753469ccc5",
+      "size_bytes": 2878
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/historical_patterns/10-rebellion-armed-groups.yaml",
+      "sha256": "ff5eaf64d87394df044986a0707bbaf437171c59dae3391a80e85f079c04055a",
+      "size_bytes": 2778
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/normalized/evidence_ledger-01-05.yaml",
+      "sha256": "ea9242e7160033ea4c182ec804e6f2fb3e73b3db3ed282505deb4ed56da7f8f3",
+      "size_bytes": 16057
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/normalized/evidence_ledger-06-10.yaml",
+      "sha256": "3fe12938f381401d0117aa915116d9a9ffb591afbd1389133591c4acc279198d",
+      "size_bytes": 17150
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/normalized/rule_claims.yaml",
+      "sha256": "d2e28ee06ee46c4478badb55eb6036b0304760dd413aeee07929f135def26813",
+      "size_bytes": 17103
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/band.yaml",
+      "sha256": "21d2ce35b23fd54ee8d4ddf427cc0f82725bc8ebe375c83173998510bac07683",
+      "size_bytes": 12224
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/crop.yaml",
+      "sha256": "bc3ee4819ec23ccbb6fa70797c61f9a598b99fabe08ef801cd75e41061e3704c",
+      "size_bytes": 3151
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/elite.yaml",
+      "sha256": "1c49c3106e17c28865bba3efd5a097354a935b491aaf9c53b36e61c45a350a71",
+      "size_bytes": 6492
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/fiscal.yaml",
+      "sha256": "c5c2c8574398673af083e18921ed01b87cbe5746c97fe664e39acbd1dfbc0774",
+      "size_bytes": 6619
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/governance.yaml",
+      "sha256": "76b16a4b66aacf5e32ec02f2f72880f49fe594057a75bbc11996445340bbbb61",
+      "size_bytes": 4882
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/household.yaml",
+      "sha256": "0b0338368eb8fea4786289e069cbe51abd23e771bc3fba7fe29c08944161be01",
+      "size_bytes": 10954
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/market.yaml",
+      "sha256": "51fce66a6a966450eb191dbe5d0da592c36c3281a55c512f87bb26e6a0407add",
+      "size_bytes": 7612
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/migration.yaml",
+      "sha256": "e2c05516760189384d3a0e83b42895ae6eb2aa28262f614bc7d771a6441886bc",
+      "size_bytes": 4636
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/parameters/military.yaml",
+      "sha256": "bcaf098b4bbda2acad13b4b5d402881b157af0b16f889274eed1fe5644c57ae6",
+      "size_bytes": 14341
+    },
+    {
+      "group": "data",
+      "last_commit": null,
+      "path": "data/scenarios/demo.yaml",
+      "sha256": "5c002b2f7ce4f6edf7343f335f84e044161c89562020d0abcd12c7a59231b26b",
+      "size_bytes": 812
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/OMP_ENGINEERING_PLAN.md",
+      "sha256": "8edca073b4c2266ef69e7c7a5f2cf62881f49c5c4f89eda96464f000c1b6f9eb",
+      "size_bytes": 49673
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/adr/0001-node-and-catchment-geography.md",
+      "sha256": "22862b4ebe8c7976d864f76b69ef82b603140153b4b5156dcc944577f478c6bf",
+      "size_bytes": 5855
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/adr/0002-military-abstractions.md",
+      "sha256": "20d1ee934a340d2ffcabfa31ac6dcca56030f093e930a9006bdee71383167714",
+      "size_bytes": 5482
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/architecture/runtime-llm-boundary.md",
+      "sha256": "2a686e9f33c72f28688f723008db9ff28a411f6a992505859317e8e6977fc1c2",
+      "size_bytes": 5492
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/architecture/system-dependency.md",
+      "sha256": "b4fe5aa810d0b2bfd19625befacb3c7b311cb7be797c7b7671842c62de3a53c7",
+      "size_bytes": 23103
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/architecture/system-overview.md",
+      "sha256": "e25b98a4ec9304e3ecfd246c6b55e1be20a1a2094dd4c24186452f78d2a48c1b",
+      "size_bytes": 32491
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/calibration/mismatch.md",
+      "sha256": "4d9dc2902be5fd46d1b928952f35bad692202ff956ede571dc5855740d7a5c7b",
+      "size_bytes": 3090
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/calibration/objective.md",
+      "sha256": "a3adce5e4969373c4af067296e3f4e5f2ab78d6161b5ca0b96c6244ca6368a8e",
+      "size_bytes": 14526
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/calibration/posterior.md",
+      "sha256": "ccc934b4173d5b000bb427c479161c0de7831e097539991ed606e389defb6309",
+      "size_bytes": 2845
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/calibration/prediction.md",
+      "sha256": "c2fce3210f16571de8bb3c7083a7b519e2a901933a69b7f82cc5d6798faa9d6c",
+      "size_bytes": 8409
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/calibration/stability.md",
+      "sha256": "e6b5f97e93d565ce744cb886f4366e20bfcbb5430acca4028fa770ca098325bb",
+      "size_bytes": 2882
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/epistemics/evidence-grades.md",
+      "sha256": "ba4c81cc403249689ef0ef7985eee99a547ab58db1e830ead8e2ef1f22b7d790",
+      "size_bytes": 7404
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/epistemics/model-epistemics.md",
+      "sha256": "348ee8a49f5e5f2566d8ba11e3974cb92a96f36b72a6f6b66eac45acc8a4e54a",
+      "size_bytes": 6061
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/evidence/coverage.md",
+      "sha256": "9df01498a28070da5c1d692cfe1197d84f5005ad8b651003cd6c2855f6975aaa",
+      "size_bytes": 4105
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/evidence/gaps.md",
+      "sha256": "bdbfe63ccaa5128f68a3e45872ae070107871b031e3283c4a731778d9468cb9f",
+      "size_bytes": 4697
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/evidence/uncertainty.md",
+      "sha256": "a28b0703c4688d859b293e3b24605d0cd2db250ae520d1de3afcb25b46dc8dbe",
+      "size_bytes": 14157
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P09.md",
+      "sha256": "53d795e7e7aea863db6e415b6137701bf97753d1df7416653124a62a514aec06",
+      "size_bytes": 3478
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P10.md",
+      "sha256": "8c8adf84ff961166314dd2a474d57bf3e055ed4110cad03d65f957f2c420e2e3",
+      "size_bytes": 3600
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P11.md",
+      "sha256": "79b6c234bb1a6967557cd39426eadcb8bde7bf685631d2179fe5e5298bc443a5",
+      "size_bytes": 3228
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P12.md",
+      "sha256": "253027fd04d7de88be51468b6f9a0260ef73b325256fcebc8a8b7a2399c646ae",
+      "size_bytes": 2689
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P13.md",
+      "sha256": "22002074e5dd5f2b007825a3d3708b161fe01cae0c74b1679cc65371ad9d184b",
+      "size_bytes": 3585
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/exec-plans/P14.md",
+      "sha256": "09ccd36568e7c09844fe5007ca09e8e29755acc3989092c11bb64522debace09",
+      "size_bytes": 4614
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/experiments/ablation.md",
+      "sha256": "e9c202cb445771a2ff530168c7f4259389c4de3c04bf84775652bb2983e815d7",
+      "size_bytes": 39926
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/experiments/interactions.md",
+      "sha256": "f3fff307d182ccebf2925c86dda726306da4aa0b9d32f4e9ee47ba1b08adb7d8",
+      "size_bytes": 6184
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/experiments/policy-robustness.md",
+      "sha256": "a255a4ba87095ff4962ef97a26a089c2e8b74b4162e723ecf47c384bcb3c32f8",
+      "size_bytes": 9498
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/experiments/sensitivity.md",
+      "sha256": "62ffca9b271644f781b5dbc71b43e7e0a8a1c65ec2c80334c57b81f84f7ccded",
+      "size_bytes": 12878
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/experiments/tipping.md",
+      "sha256": "051b2ca879055f34a7571d7a466a8a97294267acf880d0d9c9a340c7104ce92c",
+      "size_bytes": 2510
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M001-fiscal-extraction-inversion.md",
+      "sha256": "2b061e2c991baac564442deeec71630491c3640cf77b98098ec6308bdee83c51",
+      "size_bytes": 6114
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M002-crisis-gating.md",
+      "sha256": "3cabf2d8e26fabc341162b3e827cf21c49cfd659448ae62740bb89024e97e87d",
+      "size_bytes": 6613
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M003-fiscal-military-ratchet.md",
+      "sha256": "450e5c008ad30f5c66c4925be5cc6c86e5351e41b49059e248e19add4284657e",
+      "size_bytes": 6064
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M004-elite-mediation-bifurcation.md",
+      "sha256": "bde0c0c00d8cf3a6120d7b85e01fd528bd28ea4da956cd7829dfbed6c65930cf",
+      "size_bytes": 6803
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M005-insurgent-consolidation.md",
+      "sha256": "02c9d649e6e0762f433aba95dcd7da1d91e2c8c83639b6f3a2d8207a9e0af86e",
+      "size_bytes": 6341
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/M006-famine-mortality.md",
+      "sha256": "d34d839ae1d295175e25c03576d16eba51d3d9905b6fa9620afc32479bd74856",
+      "size_bytes": 4975
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/cards.yaml",
+      "sha256": "b0d65af3958c598ee3d8e48c16b8c89cd21b587347470822fc4ca3e5aae123e8",
+      "size_bytes": 37923
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/index.md",
+      "sha256": "7458a43764025051ab64178d5a232e1a846650bc1a24d97694ec138163db0824",
+      "size_bytes": 3192
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M001-fiscal-extraction-inversion.md",
+      "sha256": "c52deea10a77d98882399429b7fd6fb81de93ab330534bea1536fb39b0fd17bd",
+      "size_bytes": 6299
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M002-crisis-gating.md",
+      "sha256": "48ae74d1b08b010612a8eda89da48e97c85abb1f7cff006c1b944237447d7b6d",
+      "size_bytes": 6872
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M003-fiscal-military-ratchet.md",
+      "sha256": "c405c82ff0cc79d34348ec768779b3d0303443d1290eeeff79dfe35ad351c33f",
+      "size_bytes": 6450
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M004-elite-mediation-bifurcation.md",
+      "sha256": "eaeded3fd2b5bfffd87e110482d4221c32a5816bfa81f72d3cfe2621504ec499",
+      "size_bytes": 6924
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M005-insurgent-consolidation.md",
+      "sha256": "529eb1d30cbc922a02b1c56c6fd89f9b11c156bf4dc4da43f07764a68db1acdc",
+      "size_bytes": 6653
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/M006-famine-mortality.md",
+      "sha256": "878c112dcc13d3da3ba54d31143334b98f24e9d1b74601a936a762206c5263a7",
+      "size_bytes": 5259
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/cards.yaml",
+      "sha256": "6cd234a9aa7dec918e14f8788a1724eb363b274f5bf9f301596344f35f65d24b",
+      "size_bytes": 36065
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/mechanisms/zh/index.md",
+      "sha256": "35c3342405c7782d28f76e76acf9797cb41c75bcf18a644dfa847fe74877f4f2",
+      "size_bytes": 5460
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P00.md",
+      "sha256": "d2bb467e0a0a58968d409ba1a0c707ab741a6b998081616cbcd0d06e32b2245e",
+      "size_bytes": 5942
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P01.md",
+      "sha256": "2c0134ddc04f5996a433eb9b7a5789bf65ffbe6538d3e709ea19ce42faedbf12",
+      "size_bytes": 8476
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P02.md",
+      "sha256": "9dac017503d099e3e6047cdc2c9721c0577ab0c5a7fcf1c1f06d716bfe1a90e0",
+      "size_bytes": 9342
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P03.md",
+      "sha256": "13d53d33cbe9343fc2ceba580413b6c80b61996df4bf9e393b17eadd02128d41",
+      "size_bytes": 14842
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P04.md",
+      "sha256": "e521474ca13d97574cbc057d535c9ed6d4edc136a1de97878bd4a392e6ab1068",
+      "size_bytes": 16242
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P05.md",
+      "sha256": "ef5cc7751fdcfce40904b3d82466e30f099e359e5a9855d9bf2330de6abfa821",
+      "size_bytes": 14842
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P06.md",
+      "sha256": "db83e1f66da43cbc9272f7b8492a47d3bfa49a9365f7a51f74fcb68615ff0ce8",
+      "size_bytes": 14608
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P07.md",
+      "sha256": "4efaa6cab2f06789cbe64f57960831311617c51ab0a87db6edbbbe0cef66a24f",
+      "size_bytes": 19487
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P08.md",
+      "sha256": "7fb9315e50f2c72c142b0d09515583a4572477bc262442a40b25ca3ceb947098",
+      "size_bytes": 17839
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P09.md",
+      "sha256": "20b1d48e81d7b15a21b26a9be612ed120443684de464302e7f67dcff988b2cff",
+      "size_bytes": 19793
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P10.md",
+      "sha256": "88cb6ce0b937d0d092f97ec58f6c80062dc94fc7ef46863c7be7d89ebc433d7f",
+      "size_bytes": 25200
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P11.md",
+      "sha256": "026032bcf067c54be1da485e0f2f50cba2b4f42499e88f914a4ed6225799df8c",
+      "size_bytes": 16782
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P12.md",
+      "sha256": "a3a9a7d564dd2544741cec23d8bd60d225ff58f6023ab6043fb688cef7f9c8c2",
+      "size_bytes": 11871
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P13.md",
+      "sha256": "7adf7d5df46e38bd554dc1a35624b4ce5da2c51baa87e9ba77ab74a436b420ea",
+      "size_bytes": 11446
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/phase-reports/P14.md",
+      "sha256": "86c39cd59c8a61030a3d3fe35714e408207be8171845ccb42e7c2bce9fe5d992",
+      "size_bytes": 11592
+    },
+    {
+      "group": "docs",
+      "last_commit": null,
+      "path": "docs/ui.md",
+      "sha256": "55bfb05d71b0f28e4d4c6b6ade79992ccbb0dac015c4e3afb06957eab1698815",
+      "size_bytes": 6037
+    },
+    {
+      "group": "report",
+      "last_commit": null,
+      "path": "outputs/reports/benchmark.md",
+      "sha256": "a2a6f64ac823cfea6c9b2f42cbe029104edf45736502af91f548d940242a78cb",
+      "size_bytes": 1396
+    },
+    {
+      "group": "report",
+      "last_commit": null,
+      "path": "outputs/reports/mechanism-synthesis.md",
+      "sha256": "9c7de7d53e770eb1f6d9fcfa87c0c43a1b88c94b3f808705fbffa516c759bf87",
+      "size_bytes": 17907
+    },
+    {
+      "group": "report",
+      "last_commit": null,
+      "path": "outputs/reports/mechanism-synthesis.zh.md",
+      "sha256": "e05374939795b373ca4b517158de85cd5ccd4dcf334c176da9f31974a9141c0c",
+      "size_bytes": 17881
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": "pyproject.toml",
+      "sha256": "b3818d46e85cbe112ab5ba66328c234505a0154da56d541acdc511ed97b36bdb",
+      "size_bytes": 2099
+    },
+    {
+      "group": "sources",
+      "last_commit": null,
+      "path": "sources/registry/clusters-01-05.yaml",
+      "sha256": "580471f91498983fc6bb0c5401aa355b32ab6060ef182b1c254f533dae9da2c5",
+      "size_bytes": 12914
+    },
+    {
+      "group": "sources",
+      "last_commit": null,
+      "path": "sources/registry/clusters-06-10.yaml",
+      "sha256": "5a1e83207be7cae347740ac4b0e8b4cf3c40f747ee7f87e05854ec6077ec4313",
+      "size_bytes": 9619
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/__init__.py",
+      "sha256": "1f2173d34231c98b66cb6e82faab1c3b679927b37329de8fd3432fd9aa4f2122",
+      "size_bytes": 463
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/__init__.py",
+      "sha256": "e0b6e027683162b03190284db4977473c4f570cbc5b699755ea3c0121b6965a8",
+      "size_bytes": 63
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/elites.py",
+      "sha256": "b77c3ff32f17095c68cbf6c43da7a615fc7ae4fd4c887c314b02247f1dc2d896",
+      "size_bytes": 13249
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/exchange.py",
+      "sha256": "e759c18d4b7b2e32d028a2a9c25f4235c65c5af6fe0c2844b85a1dc10937c47b",
+      "size_bytes": 3473
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/fixtures.py",
+      "sha256": "4b7e79e56c5cb594bc5ff7b53bf718a7b7114f37bfa7dd968679d646907d94f8",
+      "size_bytes": 9132
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/government.py",
+      "sha256": "126055be16ad46aca3554636091c7b8a661e91d9725b450a8095a9406b1055a1",
+      "size_bytes": 18780
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/households.py",
+      "sha256": "acea90c89cb83cf05d46dd961b122866cb8cdd1edcc1c3d966295afe97a0198b",
+      "size_bytes": 49510
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/ledger.py",
+      "sha256": "65c09111efa351acfc1ac089c0a65263a53a4ae1fa0b52bb2a58522b2090bf7f",
+      "size_bytes": 6522
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/merchants.py",
+      "sha256": "1d57fcd660d691068c69e1ea8c71b906b305da6a73e7df8b9fe2b0f08d2474c1",
+      "size_bytes": 9641
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/actors/military.py",
+      "sha256": "e0959a6eb4bfcadd164d275e361fe1832e8d633c962482965ab2302895183128",
+      "size_bytes": 24846
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/__init__.py",
+      "sha256": "d7bf45e840f7208db883d450e9bcd7957a580f814c35801271d378735ffdd0f9",
+      "size_bytes": 73
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/boundary.py",
+      "sha256": "46bf2bdda8d98ad62ff43b9a24ba5e6776951ac8c85be6a19cbee874e4276f4c",
+      "size_bytes": 19111
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/concentration.py",
+      "sha256": "2f07cc5c73d78b014ed50e43eda9810768c04d275d8684b4b0c2bc05b9e557c4",
+      "size_bytes": 10215
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/distress.py",
+      "sha256": "55cbd805e797febd366054b6acfaa17d81afcf6544e0ee36331d9b15426d7d56",
+      "size_bytes": 8207
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/fiscal.py",
+      "sha256": "9b7eea762105b73e00697ce8c05d364fb7c0a4c675784ef2984c57394f7f3887",
+      "size_bytes": 9581
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/governance.py",
+      "sha256": "9aab9dd711fe0488ec4212224bf4087380a92eb44f09bfa47a9fd5fa703f6d57",
+      "size_bytes": 9335
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/integrated.py",
+      "sha256": "830b185bf260d794b0c043cc576da81d7a8a0adaf8b37e5e739bcb50d7071f3a",
+      "size_bytes": 9459
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/mechanisms.py",
+      "sha256": "45b5f7aa4a1ca532f9f8063b19b6911222a96a47a568e4908fcc88b9a519dd90",
+      "size_bytes": 10252
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/migration.py",
+      "sha256": "c25964a1efb3369a4007ba5730d15ff0f8053ce773cf79625fe1f9ba721bc40b",
+      "size_bytes": 11434
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/military.py",
+      "sha256": "ac67586293af3df22e738491a27c8104263f0a290f96afbd24b3126a90c0c87c",
+      "size_bytes": 15793
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/outcomes.py",
+      "sha256": "a331a3851d4bb33ca21f6d868aaba4bf9d65641e460025190c349c48f4999686",
+      "size_bytes": 13002
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/scalars.py",
+      "sha256": "7e434514d680e6adc8a72e5084ce104384a197cda8d91d9146e5c0627f0024af",
+      "size_bytes": 2327
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/analysis/summary.py",
+      "sha256": "386860a4aba417f54933ae0e6b8d6c9c732d023817bc60034dae2a0db2404655",
+      "size_bytes": 11015
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/__init__.py",
+      "sha256": "0f47d71ef2642195f2ab277ae3976352b8be51e260ee739338ae55cf972ba4bd",
+      "size_bytes": 1568
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/ensemble.py",
+      "sha256": "eee872f46cf143586f210fd8683cb528b24dc469b6a6dab102de78724108b2b4",
+      "size_bytes": 17326
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/freeze.py",
+      "sha256": "688a8e1fbab3010306397b05e27bb95a403882095f8db2b84284317b4a667c7b",
+      "size_bytes": 3788
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/prediction.py",
+      "sha256": "ac4f44ce63d7f8c3df10c38a01d03f5d479782d7a1ab685c3a5209d1707db2f2",
+      "size_bytes": 18598
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/priors.py",
+      "sha256": "b75a171eae9a2134eb321f64a60598430f262b0d7f4af80581a87c265a9f12c0",
+      "size_bytes": 14062
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/reports.py",
+      "sha256": "9521bd931465284cebeb569f5ba48de5a31b65f7b1cd7da72cdbcb951a51aa44",
+      "size_bytes": 26749
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/simulator.py",
+      "sha256": "cadb0e59ab4ed5632c0de0a5f2d55f0109c6f65c3a0298e1de2852888305dd71",
+      "size_bytes": 9819
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/smc.py",
+      "sha256": "170e5092a599cf5be88fba1b254ac24cbb31c574797788dcd54013d2cc908ed7",
+      "size_bytes": 5570
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/summary_stats.py",
+      "sha256": "3e4d0db644e19a19b3132b7e71eb02182fc33ebaf48b2ff7cf7c57dcc70c3ae4",
+      "size_bytes": 31847
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/targets.py",
+      "sha256": "6c9397dd4e118b60577b264a4f1b794897154e4fda4b919e075f01803b819497",
+      "size_bytes": 17198
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/calibration/windows.py",
+      "sha256": "8a77174dc75f0e1cf94d93438dd05f54644b6e5d2d08cf692d492095fd146f79",
+      "size_bytes": 5013
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/cli.py",
+      "sha256": "1dbf8885ad6e503727b40940405a5876eeab01da69d5389181af2e3dc127de81",
+      "size_bytes": 18285
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/__init__.py",
+      "sha256": "63c877d86456459d6b23f2c33e7ac42de4613d74488a7ea1ecfbf651dfed4c94",
+      "size_bytes": 83
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/clock.py",
+      "sha256": "44a9a50e5386f46b196fb192b67ddf0be86895793a5ff2f3c3ccb7ab2483c1e7",
+      "size_bytes": 3764
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/config.py",
+      "sha256": "7e58879232b993d1f4e60a6aeaeebc9cb7e024ce505cf3a16a75d6d49b2d688a",
+      "size_bytes": 4265
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/events.py",
+      "sha256": "132da1e95070bea8b3e59a1efec88f6cef889d1196a3bba2914b50ae881c893b",
+      "size_bytes": 7091
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/hashing.py",
+      "sha256": "9501e4f52181a4725362fabe31faebee6e99d9e60165437f4165df40d72c7130",
+      "size_bytes": 1146
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/kernel.py",
+      "sha256": "0a4e48e851b2103210c9c6efa1f630533aabf8f793f66504279b066b62dcdd72",
+      "size_bytes": 5256
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/manifest.py",
+      "sha256": "457710a1ab6226f4920f2a63616c47473183738692d38d43f1bbe255e1203c4c",
+      "size_bytes": 5467
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/rng.py",
+      "sha256": "c0238c38d91278d06b987cd4e3ea4ae732e9c8862c2098aaae2093729064df8b",
+      "size_bytes": 3044
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/scheduler.py",
+      "sha256": "09f0a5c0b9caa441f423dd1f294bcb68e0be2887479d740b997b1eaecc71a5f6",
+      "size_bytes": 8467
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/core/tick.py",
+      "sha256": "45181415ce139b5db1ba6298b340b842cd55b633d1ea23fda0312164277a8bc8",
+      "size_bytes": 5149
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/env_checks.py",
+      "sha256": "009b6a91d4052264d828af11ff3bc567dadf3f8ee154a063e074f36689e25b82",
+      "size_bytes": 13845
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/__init__.py",
+      "sha256": "cbad505b995b68c9a8d02ab851c686929886ad3035d1d52c12d0b51e95da01f9",
+      "size_bytes": 85
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/cards.py",
+      "sha256": "2a233b6f31ec147f10c237a47291818e1df6faf6614282fc068b6c3e0c2566a7",
+      "size_bytes": 10302
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/coverage.py",
+      "sha256": "411855557997c1b1f6da685885eb718d1945bed063c2d5f5504176e11a2510ee",
+      "size_bytes": 14702
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/grades.py",
+      "sha256": "f8bf44178386d564498e1881f3329d3eb2295fb0c51be7e1e3c9a5a7cd56c888",
+      "size_bytes": 2626
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/ledger.py",
+      "sha256": "f27e69ec9eef1b973a23727f4a92688f1cad6f165575e70c757ca2075b95c439",
+      "size_bytes": 17355
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/parameters.py",
+      "sha256": "b87336d3924c957b5940eaa174b05f4d204b5cad54242e7523b79b91b732bc0f",
+      "size_bytes": 24238
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/provenance.py",
+      "sha256": "7c28818c9c9b090a67cb39bae37f99339a06e2b6d4d7c7eb66439954cba97a86",
+      "size_bytes": 2411
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/evidence/registry.py",
+      "sha256": "6f377f8e1fce6d6cac807e01813671c88bb955f74c2983010c9773c8dc6056a8",
+      "size_bytes": 9146
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/__init__.py",
+      "sha256": "1c21e931a4b8b7998cca24696ee953b67e6857f3639de27451a46635d8b721d8",
+      "size_bytes": 78
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/ablation.py",
+      "sha256": "7f73043253b252edb16cbd74f993052ce7f841d445b6dfa0fc34e008e5845f05",
+      "size_bytes": 40762
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/assembly.py",
+      "sha256": "dc442d508e6d95c41299d2d99e9c6258711bae3b07c0c382e730d5468920113a",
+      "size_bytes": 12919
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/batch.py",
+      "sha256": "0fbc0cbadbd26f81e767084602260ce40e1ee0487fca656656a31a295faef566",
+      "size_bytes": 29076
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/benchmark.py",
+      "sha256": "2cc3c8690e116074597444690fd3f2968cefc1b08ca131282dd9f9895043e7c5",
+      "size_bytes": 13311
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/calibration.py",
+      "sha256": "3c2ee1a65744e67783de4a35e8f426c0530e1253657bc751221069846ab0214e",
+      "size_bytes": 9517
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/counterfactual.py",
+      "sha256": "27b97f9b167159ca82f09defa8af6f0fe6a13c3583f13c7ba9e6c7fe7d1d5742",
+      "size_bytes": 22099
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/demo.py",
+      "sha256": "49a47168e14d36763f20ab05b2628e6133d05f2ba600af51dd16e0afee1b4543",
+      "size_bytes": 6144
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/evidence.py",
+      "sha256": "2567e97c8fac662704d332e9f24cc3628737cdbb6633938f5b4f1b3d176b72ba",
+      "size_bytes": 3219
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/extraction.py",
+      "sha256": "c63b0c8ad54a4696f50226d9e89c0fd76eb625c78570f47b1db976f7701bdbd7",
+      "size_bytes": 10452
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/families.py",
+      "sha256": "b3da13c39b0589829571e59ea091cf0559609d11009d0d3587e20f5e198a1a3a",
+      "size_bytes": 6097
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/household_shock.py",
+      "sha256": "da240e7d3958706bc82c21a809b023280cfbbd9e6f2b4c5d7eaf5b0328655b53",
+      "size_bytes": 5698
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/institutional_smoke.py",
+      "sha256": "bd9e091998f00556101d179f64117f3a2fcfd92dec4d1424f90a84cd626a29c1",
+      "size_bytes": 14628
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/integrated.py",
+      "sha256": "09a7b0add42b9b8203ed848b241b703effbddbc367875ca140a652d71531af73",
+      "size_bytes": 14084
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/interventions.py",
+      "sha256": "ae9092d56e56efbc6357ccc03a02f87f4781a87f886b1d7e4be82a28c9f7fa51",
+      "size_bytes": 19069
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/market_credit.py",
+      "sha256": "c70f5effab81a62206ff9650753428afe84a46b017f5f8fa472296abb8a2f170",
+      "size_bytes": 15860
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/military_stress.py",
+      "sha256": "32466b5d8a64c7216c7ecd284a2bc1bdba76b1c0274c204499302f0869b465a9",
+      "size_bytes": 10054
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/policy_robustness.py",
+      "sha256": "4989ba75713512f1508e948e3b854cdf54df755d80acdf52ba94b7d55b4bfb2f",
+      "size_bytes": 29761
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/replay.py",
+      "sha256": "a97d3b118609018f722d9b129a64d84210d0f67bc53ffac2bfcbba5009bd6782",
+      "size_bytes": 5728
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/runner.py",
+      "sha256": "eddd390dc5dfc88fa2c5d5d4e88c06a85d7002772351731b08f88726ccc394dc",
+      "size_bytes": 19035
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/experiments/sensitivity.py",
+      "sha256": "e7174ef19fe8cd820a4c8ef15a5de2004123997d18f44be90a7724978b855c3f",
+      "size_bytes": 20836
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/hpc/__init__.py",
+      "sha256": "25f5765ca831b7c66807046319cb050c09a96488afbb75c0a43b89e376c5b4b5",
+      "size_bytes": 511
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/hpc/slurm-array.sh.tmpl",
+      "sha256": "eaa3607b26679d9a15a188796df52b004ecd5f7c6b30405ac91f3a844e22d5fa",
+      "size_bytes": 1967
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/hpc/slurm_array.py",
+      "sha256": "22e52b6a846f51449ed080f1e409bf8ac44f38965aa286dab0f4b999c4ee8a65",
+      "size_bytes": 6002
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/__init__.py",
+      "sha256": "57777b0b801423c3299db773fa1a3af41c0106caf696404ae35ce2fd2ad16d04",
+      "size_bytes": 60
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/adapter.py",
+      "sha256": "2356f064e253325ecc2fc6bd0751752573c41ac102b7bbe77922fee02695ef5f",
+      "size_bytes": 8289
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/dataset.py",
+      "sha256": "5f4249e12c40096623bd8eb4616c67750380cb51d7a853949c55961cba5a4304",
+      "size_bytes": 4293
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/disruption.py",
+      "sha256": "0adfe4627de74a3f6b20f839ba100c0b7379407cb41e1c02d1cf427e3537df05",
+      "size_bytes": 3155
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/edges.py",
+      "sha256": "a27101ee970fe93cc8125dc7d26f950b36fec24de5db435a8b159d78cf396d46",
+      "size_bytes": 2588
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/fixtures.py",
+      "sha256": "4ae7fe7a2a0428499ba4511d5cb35c117bfebe46eed2bf41c3020fcabf09d13c",
+      "size_bytes": 13633
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/graphs.py",
+      "sha256": "d7f3e22e4ef336b6fb177796d1019f86eddf46a577435d213702a0193276966f",
+      "size_bytes": 4854
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/migration.py",
+      "sha256": "a848a136f01bcc3f9c1940caee4bb0084c34b6104540906244edfa08653295b5",
+      "size_bytes": 1887
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/military.py",
+      "sha256": "979174242f8173dcb3a1cc19603140d30765b14c74deb3f80a94ea7b50daf42a",
+      "size_bytes": 1907
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/nodes.py",
+      "sha256": "657ac992877982e8095574353c893f99a915fecef9c58e4115e22ece4dd112a0",
+      "size_bytes": 6141
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/networks/trade.py",
+      "sha256": "104923015984bdcbd477aa29da7e4874d3fac825a3395c3fecd553e8b2df2b93",
+      "size_bytes": 1890
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/base.py",
+      "sha256": "20f35ac09272713a699b6a650ccd163138e5664583fc44a58ee52555f4ec69bd",
+      "size_bytes": 15389
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/fiscal.py",
+      "sha256": "2b2092a6c20c79b93f7efa3df6aed6be3b0193e144aef41d3615cce80560d176",
+      "size_bytes": 3505
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/institutional.py",
+      "sha256": "33bbb9bf3f74da3e0d6779bfa8b6b08eb1766059109d4e10bb01f74e19d05738",
+      "size_bytes": 24433
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/random_policy.py",
+      "sha256": "5c792a9bbc597102bdb78aee828b86ebd9d1b0bd7018c0bc58b996a0cf60d1ae",
+      "size_bytes": 4182
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/recording.py",
+      "sha256": "9af551d0d77e0eb3ffc886e9760564d78529513fb8ffc7a7afa4d611be08f6ce",
+      "size_bytes": 9462
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/rules.py",
+      "sha256": "8a491b9e378bd3ed3938a7d26a7b01ad8129568aa38ec4d241eca2b16047d57d",
+      "size_bytes": 9182
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/ustc_v41.py",
+      "sha256": "722962d8762d5ee0491d150bd036d43150d55d504364b660cbbe0cfb708396ec",
+      "size_bytes": 17081
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/policies/utility.py",
+      "sha256": "66f7c935560e21e875ce0953b78f020801d472e18deae4fa52fee37872ca4bfa",
+      "size_bytes": 8202
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/py.typed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/storage/__init__.py",
+      "sha256": "fef93ec090929968ce20492bc1f49906a473637c19b28873bbc138c8d11f567e",
+      "size_bytes": 76
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/storage/run_store.py",
+      "sha256": "a1dacbbd6674fa8259fe668a5219f7a6b56081a31628db5b642c19dc1d489507",
+      "size_bytes": 4468
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/storage/tables.py",
+      "sha256": "9f434ecc2be5fb25255908938a5945fdaa59b4ffacabe641898844f977bcfb80",
+      "size_bytes": 1688
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/storage/warehouse.py",
+      "sha256": "448f8bc7fca24261a0fa1c38acdcbf3f76f2b78cb4d41588535083edfcda6a7c",
+      "size_bytes": 2494
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/synthesis/cards.py",
+      "sha256": "a2cc2d251f817d3bfe57b4de14e78d21737cf33b143c9302bb8265349bdec3b2",
+      "size_bytes": 65683
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/synthesis/evidence.py",
+      "sha256": "94e23b51c9bf9d1d085923014e2b25ed7e185bbf4786029b2ba516a72002bea5",
+      "size_bytes": 15159
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/synthesis/report.py",
+      "sha256": "74f90617b5ecd83e078013ef2a5c8d0bfc1e760f7c69855dd63e9aac5ba719f4",
+      "size_bytes": 23615
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/synthesis/schema.py",
+      "sha256": "aafdc962addb40a63dac25a43c06e600edbc2d5b8976cfca2ba7b782e7d4f6fe",
+      "size_bytes": 11078
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/__init__.py",
+      "sha256": "12c5c03e4af261e8d210a80e9f246c754590118fa3fb39f23ae9eafa0eaa98a7",
+      "size_bytes": 83
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/agriculture.py",
+      "sha256": "f2f851a0dcfe6d2560473bf9d69e624136da3018f6f3d672c595d8e8dec45545",
+      "size_bytes": 7455
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/calendar.py",
+      "sha256": "446a4275fe634be872d6f896518321847c2ae590c6e81a96d9867c44664bf57b",
+      "size_bytes": 8351
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/climate.py",
+      "sha256": "e33b75082e43a284cbfa50029bd78df669f6639dfd537731ae68ebd31567ce1a",
+      "size_bytes": 9651
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/elites.py",
+      "sha256": "2d22263d41ddaa077df609f671085eb224e155807867d04c6afc52a1d1dc4af1",
+      "size_bytes": 9414
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/fiscal.py",
+      "sha256": "488a8a69751acaf39cc78b671b9c78abc6d871cdfd16c700b961d127443d9200",
+      "size_bytes": 26462
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/household_survival.py",
+      "sha256": "75e759ca9f08e9f89fa029a73b60813a16b428c121524f0166e49657c72d84ec",
+      "size_bytes": 11006
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/markets.py",
+      "sha256": "7366db8372cdef6fcda92a85c8ffa4832d6ee0ad9250fcb08cfd527ad9ee0412",
+      "size_bytes": 20505
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/migration.py",
+      "sha256": "1d62d35b3f0ffaaf3f49212d9970ac47a17d9560ecf08b8b342b385eb3f67e0f",
+      "size_bytes": 24697
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/systems/military.py",
+      "sha256": "b0a333890fd8b3769c4403767fa056a226a4340694e21ebe3242b7c32ba5aabf",
+      "size_bytes": 56250
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/ui/__init__.py",
+      "sha256": "9c5cc7e291b7b0bc33c5812b0027f4400262f13c7eab2894e9bd087de861c6e9",
+      "size_bytes": 923
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/ui/app.py",
+      "sha256": "d9eeb1ec4a3125898384101f6155e0c040f03d16473b4cb17c4a987c3418ce90",
+      "size_bytes": 20576
+    },
+    {
+      "group": "code",
+      "last_commit": null,
+      "path": "src/late_ming_lab/ui/data.py",
+      "sha256": "82bc3305b2d424619f5844389dac89882791c5f09d6cbd08a90747e80818ac55",
+      "size_bytes": 33224
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/conftest.py",
+      "sha256": "22ddcab1e00a4725b8c9098f8c1f7e07232c3996dcfb165097642f1f613820a7",
+      "size_bytes": 5288
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/fixtures/llm/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_calibration_pipeline.py",
+      "sha256": "1b80acc485c7b43019fb8f086a9408ba9f946b05f8992af9f30a4d12cddd21f0",
+      "size_bytes": 8091
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_climate_in_kernel.py",
+      "sha256": "55cda777387c28f05012fc59943cded16b349f8c4487fe2061941d79756b9518",
+      "size_bytes": 6566
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_demo_scenario.py",
+      "sha256": "26d0dad3e9cb8c28be953bed1d7aba24b7cac1aa4727358537f8f00b825d717e",
+      "size_bytes": 2799
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_deterministic_reproducibility.py",
+      "sha256": "1c870e44944cfd390cf3faf8fb59ea9b81364a9c110433ff2d30a4534817c4ad",
+      "size_bytes": 3890
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_evidence_reports.py",
+      "sha256": "a577ce50ac629856be9ce474c3a47f7388cc50c846549588b287cd2f29eb1778",
+      "size_bytes": 4145
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_experiment_pipeline.py",
+      "sha256": "4c8dc9014962ee754422385a1b0f2180f0b688e740e01910c6724a409e2e27ca",
+      "size_bytes": 5190
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_extraction_experiment.py",
+      "sha256": "a085fd28ca8a5e8a694a9af9cc6136073d10ee2fc76f419a2a1cace3837244f2",
+      "size_bytes": 5914
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_household_shock.py",
+      "sha256": "841908423db44b2ef52ef13b8f2ae77e9b26bebfc88e22f47fde128d06ed30d1",
+      "size_bytes": 5093
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_integrated_sandbox.py",
+      "sha256": "f9cbad25389d3a1258bf0e7e909128791bbe9b2ee5be8fb43d163a1fe1b9c8b0",
+      "size_bytes": 6138
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_market_credit_experiments.py",
+      "sha256": "a64bbba55e9bf1be6d1355b8e0c6dbc6a0f2ea0aa57cdd4b37f964bd7f3bd873",
+      "size_bytes": 9487
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_mechanism_synthesis.py",
+      "sha256": "7d1565c6f7740321b28d79040e4ddc4d2e780d6052a7ac29fe9631e324e61666",
+      "size_bytes": 5346
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_mechanism_translation.py",
+      "sha256": "1879ef2d2301c1cf487ca16135b5720ad7b939fe76afc9c12bc4f45046c7f788",
+      "size_bytes": 5391
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/integration/test_policy_robustness.py",
+      "sha256": "b94a3e8aee893b332099c62a87b2ebef3fd94456d25607ad13c56b5a6bc8bf05",
+      "size_bytes": 8574
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_calibration_invariants.py",
+      "sha256": "599d8565b8cef5cc94d78db8c76dbec3b075e6c726bb7608f982f8015250ac11",
+      "size_bytes": 14495
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_evidence_invariants.py",
+      "sha256": "f3d022ad0bf0442a1643d4258e089c48f103eeb386c98bb9c6cc48818d7cb022",
+      "size_bytes": 13822
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_experiment_invariants.py",
+      "sha256": "8eb146dde1d617725de3a36a592c7ddef89cb1e4600b060d060388bba7797311",
+      "size_bytes": 15862
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_fiscal_invariants.py",
+      "sha256": "d8151e37fa191d25bc56ce90c7d8dd56d2051edfcaa52468cd2c0d4d6b38ce6f",
+      "size_bytes": 14880
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_household_mass_balance.py",
+      "sha256": "fdd863b31154ee9546b2b5ea3f69d240accc3da31b1d1cc42b0f833a3f89d225",
+      "size_bytes": 7604
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_market_credit_invariants.py",
+      "sha256": "09f10b330fde000f3f10ae6d36d7a7f560e844889b49239379b8962625e07220",
+      "size_bytes": 12191
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_migration_invariants.py",
+      "sha256": "b4d93f0c26bfedef845399e9c9c4358b0aac20ffdc40442f8be6715b2af6b42a",
+      "size_bytes": 10885
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_military_invariants.py",
+      "sha256": "7ac298bdcd4d145e7930ed726944b3eeb962e579225419f1ad48097fc555c0b0",
+      "size_bytes": 15015
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/invariants/test_runtime_llm_boundary.py",
+      "sha256": "c0e79c12deb9bab3fb6215787957a591b5b8d7fec5d2fd0e06232c3cf625d3ed",
+      "size_bytes": 4185
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/policies/test_baseline_policies.py",
+      "sha256": "165b1582476bb20d99c00d56733fc3e9196b7ee633eb987dae3ff23d7c426637",
+      "size_bytes": 13781
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/policies/test_institutional_policy.py",
+      "sha256": "bb411bb8616b89d1f640bd9f24e85ac79d58ccdde65707c0eff138c296a84c34",
+      "size_bytes": 21880
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/policies/test_live_ustc.py",
+      "sha256": "81289a4090530e3fd50abf3f865514f95a464352b48ba831c48bdb1a0a2dcc5e",
+      "size_bytes": 4261
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/policies/test_recording.py",
+      "sha256": "3445b2e2ab93128104886c5c21d3208cf3e5937f5a9832d7c8b77510bab0e743",
+      "size_bytes": 9387
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/regression/test_integrated_regression.py",
+      "sha256": "c87760bf2f80a8e451c1ef19d07c1f0496d11cb474a6bcbe78382ed4f4440601",
+      "size_bytes": 4926
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/regression/test_regression_seed.py",
+      "sha256": "95aa94be859ab395ae1f8dfe8e8afec7f1c2bb154a6794cdfc9e6601007caa70",
+      "size_bytes": 8845
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_batch.py",
+      "sha256": "301a20fd9304efde6e07890fb6359bea55dce7d723afc94d9e069bce28eec714",
+      "size_bytes": 14080
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_benchmark.py",
+      "sha256": "086ba45f5c5b9da5596eacf2da399ca6d4313c7c145cfe1f98a2373fcf626daa",
+      "size_bytes": 5059
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_boundary.py",
+      "sha256": "e6436cf365bb42e00037920cdf8f483787d393182bd20e8ae8b8346b90efa9e6",
+      "size_bytes": 8847
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_calendar.py",
+      "sha256": "9cd94ab7ff189a11b6e0a5d147af5ad1e13d17bea3972eab7685389844a806d3",
+      "size_bytes": 5127
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_cli.py",
+      "sha256": "626229e1482220eb525c6c02f1754321a0fe9dd9bd02aa4b029cfd0eaa435b58",
+      "size_bytes": 3975
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_cli_surfaces.py",
+      "sha256": "64a1b79978c8685b1802a24dca03854dce2defc475c1df0122ef0fe96185a40e",
+      "size_bytes": 5192
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_climate.py",
+      "sha256": "8c263fce9e739dbe923c851946bd5f85bc5f84249931a296a7c641f56bb15707",
+      "size_bytes": 7532
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_clock.py",
+      "sha256": "bc31e6c64b510743a2158555f3663f61eec93e6be3914cc5dc5205d8c4554d26",
+      "size_bytes": 2533
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_config.py",
+      "sha256": "f6f5ac2ffd86297c7761615e470e654e145b6b91d7ac017776184b7cc17fec47",
+      "size_bytes": 3973
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_distress_analysis.py",
+      "sha256": "a5c56b924ad768a92fa1242d7d6dec42739c15b5ca26a82840fcc3047c45eb6b",
+      "size_bytes": 5528
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_elites.py",
+      "sha256": "4079d46056a1030473a6a08d9d994076587d6ce253c53952fcbc160326c66285",
+      "size_bytes": 4509
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_env_checks.py",
+      "sha256": "f3f97383a68388068d5cf21ce19e571ed6041e8a0b181ea1529b945e9ed76626",
+      "size_bytes": 6866
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_events.py",
+      "sha256": "2ee3d50d9fa3af949c10826d35a6928610b51281a6026f8f12e508cab4703ed9",
+      "size_bytes": 5256
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_evidence_grades.py",
+      "sha256": "771452e50128a38efa2c5b8abd2f74712f39b546a05542ef5b2230214e666940",
+      "size_bytes": 1478
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_fiscal_policies.py",
+      "sha256": "1ba949a16c0bc928ec66b75ce5dbd97f1eb27509cb85f8e8fcd71a9bfd86009e",
+      "size_bytes": 4656
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_government.py",
+      "sha256": "078e256a258a46047e7ac7b78c441627f645771d68348e7c47033e593cb495c4",
+      "size_bytes": 6960
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_household_agent.py",
+      "sha256": "30659c73a565b4cfa41369749b4be75c8443438871d2a74dfcca8d3da813b47b",
+      "size_bytes": 17903
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_household_parameters.py",
+      "sha256": "531b40d62834ec5e8532363e3e4123ab49eeb6f675c93303b5a3789daef8e39f",
+      "size_bytes": 2453
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_household_properties.py",
+      "sha256": "a62a52b9f141b6d6f948afd6612c1d1f0eac223eb47f10b72da8c3cc9e919eb0",
+      "size_bytes": 7601
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_kernel.py",
+      "sha256": "24cfbe84d24178eca96e1874e2d530bd9a9dadba92786f546d9049e748811097",
+      "size_bytes": 5950
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_manifest.py",
+      "sha256": "1f8a2eeb423b8dc772643cb3956b17c88baf8441a81b398d4426d093b3208148",
+      "size_bytes": 5126
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_markets.py",
+      "sha256": "9ba4f5863dbc1c8a94e9581e422aa268544684a96969988d4af7bdceeadce947",
+      "size_bytes": 9148
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_mechanism_schema.py",
+      "sha256": "d27fb31a74cc3718535eabdec5246fd176b5914ec6ca03e319c07d9f2bae1fb3",
+      "size_bytes": 7976
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_mechanisms.py",
+      "sha256": "be84a7f035e18ed76aaa6f2c04d01728de359b8c82c6e003999feb918290d759",
+      "size_bytes": 8050
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_medium_fixture.py",
+      "sha256": "d4191ac275621fb7f90cbc1ea9f26b330d82c113876105c3b13de6a22668bda4",
+      "size_bytes": 5676
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_merchants.py",
+      "sha256": "a5b4641be39921809c85a3cc453e84083f58ee18583ff40e64b4ae6db0613dfd",
+      "size_bytes": 4318
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_migration.py",
+      "sha256": "e29c20db56cf4c4fa56adf8b0794eff58c65048cb98965b4721183be2d294407",
+      "size_bytes": 16855
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_military.py",
+      "sha256": "b3f749a15d4abea0e078c00124d4c75e7467946c23439177f9673f44f0e6d4ae",
+      "size_bytes": 16683
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_outcomes.py",
+      "sha256": "8b7fda4f0335624bcdddd037f6e3ab6765a275327cead50b5ca04edc002fbc8e",
+      "size_bytes": 4902
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_priors.py",
+      "sha256": "1e8e41c587f976592911dbe19b6f35fb78da3a7f8a7e4c34d4af080bf91abb28",
+      "size_bytes": 7754
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_rng.py",
+      "sha256": "cb862680a3804c6fd4d1e3865a48897ba5444cee3ac6ed678f97cf670f3f8a55",
+      "size_bytes": 2521
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_scheduler.py",
+      "sha256": "910687e016b301cf91532c111367375ec1053b463dab771df7e126e4a9cd982a",
+      "size_bytes": 5848
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_sensitivity.py",
+      "sha256": "a15fcfb2b2688a4b815faa0997904c85868ff09c3596d9b4137a85f01b80f6ed",
+      "size_bytes": 10293
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_spatial_adapter.py",
+      "sha256": "b651363775d79135bf9516498ff9753e84af78185346fb380557a79ba85b9272",
+      "size_bytes": 6905
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_spatial_dataset.py",
+      "sha256": "b4e2592a1e2803bbde1321319a6bce45c5a01c0ac89055c9f0f31e749f925425",
+      "size_bytes": 6581
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_spatial_graphs.py",
+      "sha256": "bef60982a38733340f3750b6bb50f2da33267fcc579caa975b3c23bc1d81ead0",
+      "size_bytes": 5875
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_spatial_nodes.py",
+      "sha256": "a7fa27c711da44a0dcc7ad5efcf72da4074ffd4ea2d3509ad852a659dacdb3aa",
+      "size_bytes": 4620
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_storage.py",
+      "sha256": "e17e882740fc3c3e52863e6cb097e8cf54d31b6dbd0f7c30e3865c24de8f33e4",
+      "size_bytes": 5715
+    },
+    {
+      "group": "tests",
+      "last_commit": null,
+      "path": "tests/unit/test_ui_data.py",
+      "sha256": "5a3a3513b0ad081234343edd4e3831bcc471a2d619fd4f74a2364b44f0b4b0db",
+      "size_bytes": 17294
+    },
+    {
+      "group": "config",
+      "last_commit": null,
+      "path": "uv.lock",
+      "sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d",
+      "size_bytes": 766294
+    }
+  ],
+  "generated_at_utc": "2026-09-14T09:26:29.984730+00:00",
+  "python_version": "3.12.14",
+  "schema_version": "baseline-v1",
+  "tag": "v0.1.0-rc1",
+  "tracked_file_count": 289
+}

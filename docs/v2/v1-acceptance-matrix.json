@@ -1,0 +1,1544 @@
+{
+  "baseline_commit": "a81c223216f989150d69fe42bfe0a78f7eab1374",
+  "baseline_digest": "c8e34e316c827cea5477aa3fc4829fb1d2ce47f1076a9a95347a52d15f1f49b8",
+  "baseline_id": "v0.1.0-rc1",
+  "cards": [
+    {
+      "citations": [
+        {
+          "detail": "assessed_value_tael_per_mu mu*=0.75 sigma=1.06 on indicators_crossed_end",
+          "kind": "artifact",
+          "locator": "sensitivity citation on M001",
+          "path": "outputs/experiments/p10-morris/runs.parquet"
+        },
+        {
+          "detail": "assessed_value_tael_per_mu median 0.240, contraction 0.401, identified",
+          "kind": "artifact",
+          "locator": "calibration citation on M001",
+          "path": "outputs/calibration/p09-*/ensemble.parquet"
+        },
+        {
+          "detail": "receipts_over_quota_total -0.06 [-0.10, -0.01] down",
+          "kind": "artifact",
+          "locator": "ablation citation on M001",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "quota-erosion-and-surcharge held-out 1.00, whole run 1.00",
+          "kind": "artifact",
+          "locator": "hold-out citation on M001",
+          "path": "outputs/calibration/p09-*/predictive_checks.parquet"
+        },
+        {
+          "detail": "inversion present in 1.00/utility, 0.33/random, 0.00/rule; verdict policy-dependent",
+          "kind": "artifact",
+          "locator": "policy-robustness citation on M001",
+          "path": "outputs/experiments/p12-robustness/mechanism_readings.parquet"
+        },
+        {
+          "detail": "receipts-shortfall-chronic (grade B, target, window 1600-1644): calibration window 1.00",
+          "kind": "registry",
+          "locator": "historical-support citation on M001",
+          "path": "ray-huang-1974"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "The rule policy: 0 of 6 replicates, at the same parameter draws and the same world as the arm that shows it. A structural inversion would not depend on which declared policy is deciding.",
+      "datasets": [
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+            },
+            {
+              "name": "predictive_checks.parquet",
+              "rows": 1280,
+              "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+            },
+            {
+              "name": "predictive_statistics.parquet",
+              "rows": 128,
+              "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-ablations",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "ablation",
+            "design_replicates": "4",
+            "jobs": "52",
+            "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+            "run_count": "52",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 52,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 520,
+              "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 132,
+              "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 52,
+              "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 1040,
+              "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-morris",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "morris",
+            "jobs": "32",
+            "labels": "MORRIS-00000,MORRIS-00001,MORRIS-00002,MORRIS-00003,MORRIS-00004,MORRIS-00005,MORRIS-00006,MORRIS-00007,MORRIS-00008,MORRIS-00009,MORRIS-00010,MORRIS-00011,MORRIS-00012,MORRIS-00013,MORRIS-00014,MORRIS-00015,MORRIS-00016,MORRIS-00017,MORRIS-00018,MORRIS-00019,MORRIS-00020,MORRIS-00021,MORRIS-00022,MORRIS-00023,MORRIS-00024,MORRIS-00025,MORRIS-00026,MORRIS-00027,MORRIS-00028,MORRIS-00029,MORRIS-00030,MORRIS-00031",
+            "run_count": "32",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 32,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 320,
+              "sha256": "7a37e7c0831aa327ce4c8fc80df895e29ddf1f18602322f527ee74ec215ffa43"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 155,
+              "sha256": "01d42be24fbe4a45f28d14abe014bebe973b490bc130165bf09e27a2a71c7fba"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 32,
+              "sha256": "423b116ba3d12ee77752a4fe7ac27f53a3f5433085ba8ee92b83b3e32be9a53a"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 640,
+              "sha256": "b5fb7044902b104b16698b493108800b64ff4e8b7fc07dcc7c21fae39a924068"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p12-robustness",
+          "dirty_at_generation": null,
+          "facts": {
+            "arm_status": "random=ran;rule=ran;ustc=refused;utility=ran",
+            "base_seed": "20260916",
+            "grid_replicates": "2",
+            "policies": "rule,utility,random,ustc",
+            "replicates": "6",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "c1497d39a771abb84d1f5bff8fb35efb9e78c2f6",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 18,
+          "primary_table": "levels.parquet",
+          "tables": [
+            {
+              "name": "decisions.parquet",
+              "rows": 190,
+              "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6"
+            },
+            {
+              "name": "levels.parquet",
+              "rows": 18,
+              "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8"
+            },
+            {
+              "name": "mechanism_readings.parquet",
+              "rows": 54,
+              "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee"
+            },
+            {
+              "name": "tipping_grid.parquet",
+              "rows": 54,
+              "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff"
+            },
+            {
+              "name": "tipping_summary.parquet",
+              "rows": 27,
+              "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7"
+            }
+          ]
+        }
+      ],
+      "extrapolation_limits": "Three declared policies, three counties, thirty-two cohorts. The utility policy's ceiling of 5.0 is a declared bound, not an observed one, and the inversion's dependence on that ceiling is untested. The one arm that varies extraction runs the other way, so the card rests on a within-run co-movement under a single policy.",
+      "id": "M001",
+      "name": "Fiscal Extraction Inversion",
+      "policy_arms": "p10-ablations: 13 declared arms, 4 replicates each; p10-morris: morris design; p12-robustness: rule,utility,random,ustc; refused: ustc",
+      "sampled_by": [
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+        "outputs/experiments/p10-ablations",
+        "outputs/experiments/p10-morris",
+        "outputs/experiments/p12-robustness"
+      ],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "CONDITIONAL"
+    },
+    {
+      "citations": [
+        {
+          "detail": "OPEN_MIGRATION_EXIT breakdown +1.00 [+1.00, +1.00] up; NO_DROUGHT breakdown +0.00 [+0.00, +0.00] unresolved",
+          "kind": "artifact",
+          "locator": "ablation citation on M002",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "NO_DROUGHT x FULL_MILITARY_PAY on indicators_crossed_end: joint +0.00 against -0.50 additive [+0.00, +1.00], additive",
+          "kind": "artifact",
+          "locator": "counterfactual citation on M002",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "strongest parameters on indicators_crossed_end: temporary_share_of_adults_per_month, reference_price_tael_per_shi, land_per_adult_capacity_mu",
+          "kind": "artifact",
+          "locator": "sensitivity citation on M002",
+          "path": "outputs/experiments/p10-morris/runs.parquet"
+        },
+        {
+          "detail": "cells with breakdown: rule 7, random 6, utility 5",
+          "kind": "artifact",
+          "locator": "policy-robustness citation on M002",
+          "path": "outputs/experiments/p12-robustness/tipping_grid.parquet"
+        },
+        {
+          "detail": "shaanxi-net-outflow: held-out 0.16, extrapolation 0.00, whole run 1.00",
+          "kind": "artifact",
+          "locator": "hold-out citation on M002",
+          "path": "outputs/calibration/p09-*/predictive_checks.parquet"
+        },
+        {
+          "detail": "chongzhen-drought-sequence (grade B, hold-out): held-out years 0.00 - a refuted check, cited here as a challenge rather than as support",
+          "kind": "registry",
+          "locator": "historical-challenge citation on M002",
+          "path": "data/historical_patterns/01-drought-climate.yaml"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "The drought ablation: removing the climate shock keeps the baseline outcome - no breakdown in any replicate - so the shock is not the gate. Of the twelve arms in the ablation batch only the gate arm breaks down. Elsewhere in P10 breakdown does occur without it - 7 of the 40 Sobol runs and one tipping cell cross the line under extreme parameter draws - so the claim is about the declared arms, not the only route.",
+      "datasets": [
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+            },
+            {
+              "name": "predictive_checks.parquet",
+              "rows": 1280,
+              "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+            },
+            {
+              "name": "predictive_statistics.parquet",
+              "rows": 128,
+              "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-ablations",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "ablation",
+            "design_replicates": "4",
+            "jobs": "52",
+            "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+            "run_count": "52",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 52,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 520,
+              "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 132,
+              "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 52,
+              "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 1040,
+              "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-morris",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "morris",
+            "jobs": "32",
+            "labels": "MORRIS-00000,MORRIS-00001,MORRIS-00002,MORRIS-00003,MORRIS-00004,MORRIS-00005,MORRIS-00006,MORRIS-00007,MORRIS-00008,MORRIS-00009,MORRIS-00010,MORRIS-00011,MORRIS-00012,MORRIS-00013,MORRIS-00014,MORRIS-00015,MORRIS-00016,MORRIS-00017,MORRIS-00018,MORRIS-00019,MORRIS-00020,MORRIS-00021,MORRIS-00022,MORRIS-00023,MORRIS-00024,MORRIS-00025,MORRIS-00026,MORRIS-00027,MORRIS-00028,MORRIS-00029,MORRIS-00030,MORRIS-00031",
+            "run_count": "32",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 32,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 320,
+              "sha256": "7a37e7c0831aa327ce4c8fc80df895e29ddf1f18602322f527ee74ec215ffa43"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 155,
+              "sha256": "01d42be24fbe4a45f28d14abe014bebe973b490bc130165bf09e27a2a71c7fba"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 32,
+              "sha256": "423b116ba3d12ee77752a4fe7ac27f53a3f5433085ba8ee92b83b3e32be9a53a"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 640,
+              "sha256": "b5fb7044902b104b16698b493108800b64ff4e8b7fc07dcc7c21fae39a924068"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p12-robustness",
+          "dirty_at_generation": null,
+          "facts": {
+            "arm_status": "random=ran;rule=ran;ustc=refused;utility=ran",
+            "base_seed": "20260916",
+            "grid_replicates": "2",
+            "policies": "rule,utility,random,ustc",
+            "replicates": "6",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "c1497d39a771abb84d1f5bff8fb35efb9e78c2f6",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 18,
+          "primary_table": "levels.parquet",
+          "tables": [
+            {
+              "name": "decisions.parquet",
+              "rows": 190,
+              "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6"
+            },
+            {
+              "name": "levels.parquet",
+              "rows": 18,
+              "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8"
+            },
+            {
+              "name": "mechanism_readings.parquet",
+              "rows": 54,
+              "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee"
+            },
+            {
+              "name": "tipping_grid.parquet",
+              "rows": 54,
+              "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff"
+            },
+            {
+              "name": "tipping_summary.parquet",
+              "rows": 27,
+              "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7"
+            }
+          ]
+        }
+      ],
+      "extrapolation_limits": "One gate was intervened on. The relief and trade channels have arms whose effects on the crossed-line count are unresolved at four replicates, so the card does not claim they are not gates. Three counties, thirty-two cohorts, and a movement rule whose distress lines are declared rather than observed.",
+      "id": "M002",
+      "name": "Crisis Gating",
+      "policy_arms": "p10-ablations: 13 declared arms, 4 replicates each; p10-morris: morris design; p12-robustness: rule,utility,random,ustc; refused: ustc",
+      "sampled_by": [
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+        "outputs/experiments/p10-ablations",
+        "outputs/experiments/p10-morris",
+        "outputs/experiments/p12-robustness"
+      ],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "SUPPORTED"
+    },
+    {
+      "citations": [
+        {
+          "detail": "ratchet present in 0 of 3 declared policies; decline months per replicate [11, 35, 37, 43, 45, 53]",
+          "kind": "artifact",
+          "locator": "policy-robustness citation on M003",
+          "path": "outputs/experiments/p12-robustness/mechanism_readings.parquet"
+        },
+        {
+          "detail": "FULL_MILITARY_PAY military_pay_arrears_end_tael +2,299.70 [+1,554.58, +4,753.25] up",
+          "kind": "artifact",
+          "locator": "ablation citation on M003",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "OPEN_MIGRATION_EXIT military_pay_arrears_max_tael +10,287.79 [+7,289.76, +14,415.10] up",
+          "kind": "artifact",
+          "locator": "ablation citation on M003",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "pay_tael_per_soldier_month median 0.508, contraction 0.271",
+          "kind": "artifact",
+          "locator": "calibration citation on M003",
+          "path": "outputs/calibration/p09-*/ensemble.parquet"
+        },
+        {
+          "detail": "pay-monetised-and-arrears (grade A, hold-out, window 1580-1644): held-out years 1.00",
+          "kind": "registry",
+          "locator": "historical-support citation on M003",
+          "path": "ray-huang-1974"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "arrears 254 to 26,849 tael with 37 month(s) of decline, against 287,355 assessed: the rule arm's largest end stock belongs to a replicate that still records dozens of months in which the stock falls, and the arm's largest decline count is 53. Any reading that needs the stock to be monotone is false in this model.",
+      "datasets": [
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+            },
+            {
+              "name": "predictive_checks.parquet",
+              "rows": 1280,
+              "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+            },
+            {
+              "name": "predictive_statistics.parquet",
+              "rows": 128,
+              "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-ablations",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "ablation",
+            "design_replicates": "4",
+            "jobs": "52",
+            "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+            "run_count": "52",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 52,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 520,
+              "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 132,
+              "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 52,
+              "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 1040,
+              "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p12-robustness",
+          "dirty_at_generation": null,
+          "facts": {
+            "arm_status": "random=ran;rule=ran;ustc=refused;utility=ran",
+            "base_seed": "20260916",
+            "grid_replicates": "2",
+            "policies": "rule,utility,random,ustc",
+            "replicates": "6",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "c1497d39a771abb84d1f5bff8fb35efb9e78c2f6",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 18,
+          "primary_table": "levels.parquet",
+          "tables": [
+            {
+              "name": "decisions.parquet",
+              "rows": 190,
+              "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6"
+            },
+            {
+              "name": "levels.parquet",
+              "rows": 18,
+              "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8"
+            },
+            {
+              "name": "mechanism_readings.parquet",
+              "rows": 54,
+              "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee"
+            },
+            {
+              "name": "tipping_grid.parquet",
+              "rows": 54,
+              "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff"
+            },
+            {
+              "name": "tipping_summary.parquet",
+              "rows": 27,
+              "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7"
+            }
+          ]
+        }
+      ],
+      "extrapolation_limits": "The rejection is of the strong claim only, at three counties and 240 ticks. The mechanism behind the declines is not identified: nothing measures whether they come from the payment rule, from re-assessment, or from the extraction arm's own response to the stock. The level claim rests on a single held-out pattern at grade A.",
+      "id": "M003",
+      "name": "Fiscal-Military Ratchet",
+      "policy_arms": "p10-ablations: 13 declared arms, 4 replicates each; p12-robustness: rule,utility,random,ustc; refused: ustc",
+      "sampled_by": [
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+        "outputs/experiments/p10-ablations",
+        "outputs/experiments/p12-robustness"
+      ],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "REJECTED"
+    },
+    {
+      "citations": [
+        {
+          "detail": "NO_ELITE_CREDIT tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88] down; households_departed +121.18 [+91.79, +400.50] up",
+          "kind": "artifact",
+          "locator": "ablation citation on M004",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "elite_hidden_land_share median 0.359 contraction 0.277; interest_rate_monthly median 0.070 contraction 0.368",
+          "kind": "artifact",
+          "locator": "calibration citation on M004",
+          "path": "outputs/calibration/p09-*/ensemble.parquet"
+        },
+        {
+          "detail": "JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT closes both channels at once",
+          "kind": "artifact",
+          "locator": "counterfactual citation on M004",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "no reserved pattern scores the credit channel",
+          "kind": "artifact",
+          "locator": "hold-out citation on M004",
+          "path": "outputs/calibration/p09-*/predictive_statistics.parquet"
+        },
+        {
+          "detail": "debt-transfers-land (grade B, target, window 1600-1644): calibration window 0.94",
+          "kind": "registry",
+          "locator": "historical-support citation on M004",
+          "path": "ray-huang-1974"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "The baseline runs satisfy debt-transfers-land at 0.94 while the tax base contracts by 15,476 mu, with land moving to creditors as the pattern describes. Removing the credit channel makes that contraction deeper, not shallower (tax_base_change_mu -9,539.98 [-12,523.40, -7,849.88] down): mediation and accumulation appear together rather than as alternatives, so the bifurcation as stated is not what the model shows.",
+      "datasets": [
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+            },
+            {
+              "name": "predictive_checks.parquet",
+              "rows": 1280,
+              "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+            },
+            {
+              "name": "predictive_statistics.parquet",
+              "rows": 128,
+              "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-ablations",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "ablation",
+            "design_replicates": "4",
+            "jobs": "52",
+            "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+            "run_count": "52",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 52,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 520,
+              "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 132,
+              "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 52,
+              "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 1040,
+              "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+            }
+          ]
+        }
+      ],
+      "extrapolation_limits": "The card is named for a bifurcation and the evidence resolves one branch of it, which is why the status is WEAK rather than CONDITIONAL: credit is load-bearing, and the claim that elites divide into mediators and accumulators with different consequences is neither measured nor consistent with the runs, where both sides appear together. The credit channel is also entangled with migration, so part of what looks like a credit effect on the base may be a movement effect, and the parameter that pins it is identified against the land-transfer target the mechanism itself implies.",
+      "id": "M004",
+      "name": "Elite Mediation Bifurcation",
+      "policy_arms": "p10-ablations: 13 declared arms, 4 replicates each",
+      "sampled_by": [
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+        "outputs/experiments/p10-ablations"
+      ],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "WEAK"
+    },
+    {
+      "citations": [
+        {
+          "detail": "present in rule 0.83, utility 0.83, random 0.83 of replicates; verdict robust",
+          "kind": "artifact",
+          "locator": "policy-robustness citation on M005",
+          "path": "outputs/experiments/p12-robustness/mechanism_readings.parquet"
+        },
+        {
+          "detail": "LOW_REPRESSION largest_band_share_max -0.05 [-0.10, -0.01] down; NO_BAND_MERGER merges 0 against baseline 0",
+          "kind": "artifact",
+          "locator": "ablation citation on M005",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "many-bands-then-consolidation held-out 0.62, whole run 0.94",
+          "kind": "artifact",
+          "locator": "hold-out citation on M005",
+          "path": "outputs/calibration/p09-*/predictive_checks.parquet"
+        },
+        {
+          "detail": "largest band share leads with reference_price_tael_per_shi, food_shi_per_soldier_month, assessed_value_tael_per_mu",
+          "kind": "artifact",
+          "locator": "sensitivity citation on M005",
+          "path": "outputs/experiments/p10-morris/runs.parquet"
+        },
+        {
+          "detail": "many-bands-then-consolidation (grade B, hold-out, window 1630-1644): held-out years 0.62",
+          "kind": "registry",
+          "locator": "historical-support citation on M005",
+          "path": "lorge-2005"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "The merger arm: raising the cohesion bar to its maximum changes nothing (0 merges against the baseline's 0), and consolidation still appears. Whatever produces it, it is not the merger rule the model's documentation names.",
+      "datasets": [
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "47ffd0bbacf6e90dd838bdfd83c3dca4df65648f3c0a1b6540638aac997d49ae"
+            },
+            {
+              "name": "predictive_checks.parquet",
+              "rows": 1280,
+              "sha256": "96a57357740f682da5ea03710d52ef3213fbc8b329ea1754f46027a9e2636d19"
+            },
+            {
+              "name": "predictive_statistics.parquet",
+              "rows": 128,
+              "sha256": "68686bab6d4460efbef3e5098a68da21f063b318230c6e316c58b13bb667617d"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+          "dirty_at_generation": true,
+          "facts": {
+            "chains": "1",
+            "root_seed": "20260912"
+          },
+          "generation_commit": "ab5ca5ca1ffe7fbf360927b4d9729ba31bae6f52",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "calibration",
+          "primary_rows": 32,
+          "primary_table": "ensemble.parquet",
+          "tables": [
+            {
+              "name": "ensemble.parquet",
+              "rows": 32,
+              "sha256": "90cbd352bdcbc793c0bc77ad641d72d507da6cff83823bf2c96b9631657ecda3"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-ablations",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "ablation",
+            "design_replicates": "4",
+            "jobs": "52",
+            "labels": "BASELINE,FULL_MILITARY_PAY,HIGH_RELIEF,JOINT_NO_DROUGHT+FULL_MILITARY_PAY,JOINT_NO_DROUGHT+HIGH_RELIEF,JOINT_NO_EXTRACTION_ESCALATION+NO_ELITE_CREDIT,LOW_REPRESSION,NO_BAND_MERGER,NO_DROUGHT,NO_ELITE_CREDIT,NO_EXTRACTION_ESCALATION,NO_TRADE_DISRUPTION,OPEN_MIGRATION_EXIT",
+            "run_count": "52",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 52,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 520,
+              "sha256": "3aee69b7b5a7d2474fdcc1454e4d9d8c17c25d89f7708e9c6bbd0f6506d39327"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 132,
+              "sha256": "139661cc7e96f18320479f8ab7ab3d834476cf2b0c45c4bc7d8e111f0d90a8cb"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 52,
+              "sha256": "d1d31df2dc77df2c4b2a3535ab06ffa4aa0ba4c91c593ece3a15ffa5db23ff9c"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 1040,
+              "sha256": "94af620863bf6e926367823a34d8e85b40f427d3ca921cecdde3488bdee3bada"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p10-morris",
+          "dirty_at_generation": true,
+          "facts": {
+            "base_seed": "20260914",
+            "design_kind": "morris",
+            "jobs": "32",
+            "labels": "MORRIS-00000,MORRIS-00001,MORRIS-00002,MORRIS-00003,MORRIS-00004,MORRIS-00005,MORRIS-00006,MORRIS-00007,MORRIS-00008,MORRIS-00009,MORRIS-00010,MORRIS-00011,MORRIS-00012,MORRIS-00013,MORRIS-00014,MORRIS-00015,MORRIS-00016,MORRIS-00017,MORRIS-00018,MORRIS-00019,MORRIS-00020,MORRIS-00021,MORRIS-00022,MORRIS-00023,MORRIS-00024,MORRIS-00025,MORRIS-00026,MORRIS-00027,MORRIS-00028,MORRIS-00029,MORRIS-00030,MORRIS-00031",
+            "run_count": "32",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "72aa3f92bc956fc97213d255ed1b39f812166e44",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 32,
+          "primary_table": "runs.parquet",
+          "tables": [
+            {
+              "name": "governance_timeline.parquet",
+              "rows": 320,
+              "sha256": "7a37e7c0831aa327ce4c8fc80df895e29ddf1f18602322f527ee74ec215ffa43"
+            },
+            {
+              "name": "migration_nodes.parquet",
+              "rows": 155,
+              "sha256": "01d42be24fbe4a45f28d14abe014bebe973b490bc130165bf09e27a2a71c7fba"
+            },
+            {
+              "name": "runs.parquet",
+              "rows": 32,
+              "sha256": "423b116ba3d12ee77752a4fe7ac27f53a3f5433085ba8ee92b83b3e32be9a53a"
+            },
+            {
+              "name": "tax_base.parquet",
+              "rows": 640,
+              "sha256": "b5fb7044902b104b16698b493108800b64ff4e8b7fc07dcc7c21fae39a924068"
+            }
+          ]
+        },
+        {
+          "directory": "outputs/experiments/p12-robustness",
+          "dirty_at_generation": null,
+          "facts": {
+            "arm_status": "random=ran;rule=ran;ustc=refused;utility=ran",
+            "base_seed": "20260916",
+            "grid_replicates": "2",
+            "policies": "rule,utility,random,ustc",
+            "replicates": "6",
+            "ticks": "240",
+            "warmup_ticks": "24"
+          },
+          "generation_commit": "c1497d39a771abb84d1f5bff8fb35efb9e78c2f6",
+          "generation_commit_source": "artifact-manifest",
+          "kind": "experiment",
+          "primary_rows": 18,
+          "primary_table": "levels.parquet",
+          "tables": [
+            {
+              "name": "decisions.parquet",
+              "rows": 190,
+              "sha256": "0f612b12ff8be2b81c2404c4f522b2fbb67ba8808baeac77187526e1734bfff6"
+            },
+            {
+              "name": "levels.parquet",
+              "rows": 18,
+              "sha256": "2fc5b905d3a77576a309efbdf26a3433e13e1d832e2d101016e8befa836912d8"
+            },
+            {
+              "name": "mechanism_readings.parquet",
+              "rows": 54,
+              "sha256": "f7c94da3fc0c005af7aa7fb307d4e7cf1f4ce9c583cb7392eb0b75ad7d5ad3ee"
+            },
+            {
+              "name": "tipping_grid.parquet",
+              "rows": 54,
+              "sha256": "76457033054a7a9be61093aba9c37a6e7247154124c276ec38f5fb772effd7ff"
+            },
+            {
+              "name": "tipping_summary.parquet",
+              "rows": 27,
+              "sha256": "ff80f54a719e1d5fdf0d3ddf21652b37d0bc8b68ee16ae88fb79289096a063b7"
+            }
+          ]
+        }
+      ],
+      "extrapolation_limits": "The causal link the model names - merging on cohesion - was never exercised: zero merges in every arm of the P10 batch, at every level. Consolidation as an outcome is robust; its attribution inside the model is not, and this card does not claim the outcome and the link together. Five or six replicates per policy is enough to show presence, not to estimate the strength.",
+      "id": "M005",
+      "name": "Insurgent Consolidation",
+      "policy_arms": "p10-ablations: 13 declared arms, 4 replicates each; p10-morris: morris design; p12-robustness: rule,utility,random,ustc; refused: ustc",
+      "sampled_by": [
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s20260913",
+        "outputs/calibration/p09-cards87a14e9d-32p-ch1-s991753",
+        "outputs/experiments/p10-ablations",
+        "outputs/experiments/p10-morris",
+        "outputs/experiments/p12-robustness"
+      ],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "SUPPORTED"
+    },
+    {
+      "citations": [
+        {
+          "detail": "famine-lags-harvest-failure (grade B, constraint, window 1628-1635): sequence, not a level not scored",
+          "kind": "registry",
+          "locator": "historical-support citation on M006",
+          "path": "chen-2024-chongzhen"
+        },
+        {
+          "detail": "land-abandonment-in-famine (grade C, target, window 1630-1644): calibration window 1.00",
+          "kind": "registry",
+          "locator": "historical-support citation on M006",
+          "path": "shaanxi-famine-gazetteers"
+        }
+      ],
+      "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend - every batch this card cites ran on it, so no claim in the card is about observed climate",
+      "counterexample": "The model satisfies land-abandonment-in-famine at 1.00 with zero deaths, so any claim that mortality is necessary for abandonment is contradicted inside the model - and any claim that the model's abandonment is historical evidence for a mortality mechanism is contradicted by the model's own structure.",
+      "datasets": [],
+      "extrapolation_limits": "The gap is structural rather than empirical: no mortality event, no mortality parameter, no mortality output, so nothing in the project could have measured this mechanism even in principle. P08 recorded it as a coverage gap; this card records it as the largest single mismatch between the model's mechanism set and the record's causal chain.",
+      "id": "M006",
+      "name": "Famine Mortality",
+      "policy_arms": "no batch and no policy arm: the card cites the record, and nothing the project ran measures this mechanism",
+      "sampled_by": [],
+      "space": "5 county nodes and 3 external nodes (8 nodes), 25 weighted household cohorts covering 21,000 households, 5 elite houses, 7 merchant houses, 5 county governments, 5 garrison units and 0 armed bands at start; the sandbox is a declared fixture graded S, not a reconstruction",
+      "status": "UNIDENTIFIED"
+    }
+  ],
+  "census": {
+    "bands_at_start": 0,
+    "climate": "synthetic stationary: a shock month is drawn independently with probability 0.4 and severity floor 0.6; no observed series and no trend",
+    "climate_source": "src/late_ming_lab/systems/climate.py:SyntheticClimate",
+    "county_count": 5,
+    "elite_count": 5,
+    "external_node_count": 3,
+    "garrison_count": 5,
+    "government_count": 5,
+    "household_cohort_count": 25,
+    "household_count": 21000.0,
+    "merchant_count": 7,
+    "node_count": 8,
+    "scenario_source": "src/late_ming_lab/experiments/integrated.py:IntegratedScenario",
+    "sources": [
+      "src/late_ming_lab/networks/fixtures.py:toy_spatial_dataset",
+      "src/late_ming_lab/actors/fixtures.py:toy_cohort_population",
+      "src/late_ming_lab/experiments/integrated.py:build_integrated_economy"
+    ]
+  },
+  "content_digest": "34c6ebec352d54d3f14827db364088df6bb9c3a1b6bd843a8347922acffc7941",
+  "criteria": [
+    {
+      "evidence": [
+        {
+          "detail": "each rule with its support class and citing claims",
+          "kind": "registry",
+          "locator": "24 rule records",
+          "path": "data/normalized/rule_claims.yaml"
+        },
+        {
+          "detail": "the reverse-direction check that caught the non-canonical rule names",
+          "kind": "code",
+          "locator": "claims to rules and rules to claims",
+          "path": "tests/invariants/test_evidence_invariants.py"
+        },
+        {
+          "detail": "the eighteen citations trimmed and the two rule names that do not exist",
+          "kind": "document",
+          "locator": "what this phase found (and fixed), items 1 to 3",
+          "path": "docs/phase-reports/P08.md"
+        },
+        {
+          "detail": "sources, claims and patterns per cluster, with the layer mix",
+          "kind": "document",
+          "locator": "coverage by cluster",
+          "path": "docs/evidence/coverage.md"
+        },
+        {
+          "detail": "what could not be verified openly and is left to a human",
+          "kind": "document",
+          "locator": "the acquisition queue",
+          "path": "docs/evidence/gaps.md"
+        }
+      ],
+      "number": 1,
+      "statement": "every key rule has provenance",
+      "status": "met",
+      "verdict": "Twenty-four declared rules each carry a support class and the claims that bear on them, and the referential chain is enforced in both directions by the invariant suite - which is how two claims pointing at rule names the code does not have were caught and recorded in the phase that built the registry. The weaker half is what the provenance is worth: eleven rules are evidence-backed, seven theoretically assumed and six exploratory, and thirteen of twenty-five sources were never opened."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "which target checks fail and in what share of draws",
+          "kind": "document",
+          "locator": "failing checks by pattern",
+          "path": "docs/calibration/mismatch.md"
+        },
+        {
+          "detail": "the hold-out scores the failure shares are computed from",
+          "kind": "artifact",
+          "locator": "reserved-pattern checks",
+          "path": "outputs/calibration/p09-*/predictive_checks.parquet"
+        },
+        {
+          "detail": "the three contradicted reserved patterns and the reason they are contradicted",
+          "kind": "document",
+          "locator": "what the ensemble fails at",
+          "path": "docs/calibration/prediction.md"
+        }
+      ],
+      "number": 2,
+      "statement": "multi-scale historical patterns are explained together",
+      "status": "unmet",
+      "verdict": "Not achieved, and measured so. Five target patterns are scored in the calibration window: two are satisfied by every posterior draw, one by 0.81, and two are systematically unsatisfied on their own checks. Of the eight reserved patterns, three are contradicted with the pattern's own falsifier as the failure (chongzhen-drought-sequence 0.00, famine-worst-years-1639-43 0.00, price-spike-concentration 0.44 over the whole run), four are satisfied (many-bands-then-consolidation 0.94, pay-monetised-and-arrears 1.00, quota-erosion-and-surcharge 1.00, relief-overwhelmed-in-worst-years 0.84), and one passes on timing while the quantity it measures is near zero (shaanxi-net-outflow, whose exits are zero inside the hold-out window)."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "calibration / hold-out / extrapolation, tiling the run with no gap",
+          "kind": "code",
+          "locator": "the three-way split",
+          "path": "src/late_ming_lab/calibration/windows.py"
+        },
+        {
+          "detail": "refuses any window but the calibration window",
+          "kind": "code",
+          "locator": "Objective.score",
+          "path": "src/late_ming_lab/calibration/targets.py"
+        },
+        {
+          "detail": "the score does not move when post-split events are deleted",
+          "kind": "code",
+          "locator": "blindness test",
+          "path": "tests/invariants/test_calibration_invariants.py"
+        },
+        {
+          "detail": "frozen bounds, checks and registry digest",
+          "kind": "document",
+          "locator": "the frozen objective",
+          "path": "docs/calibration/objective.md"
+        }
+      ],
+      "number": 3,
+      "statement": "calibration and hold-out are separated",
+      "status": "met",
+      "verdict": "Enforced structurally rather than by convention: the objective refuses every window but the calibration window, the predictive checks refuse the calibration window, and a test runs a real sandbox run, deletes every event after the split, and asserts the score does not move. The reserved patterns were fixed in P08, before any of them was scored."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "the ranking, the NaN indices and the out-of-range values, with intervals",
+          "kind": "document",
+          "locator": "Morris table and Sobol verdict",
+          "path": "docs/experiments/sensitivity.md"
+        },
+        {
+          "detail": "the design the screen is computed from",
+          "kind": "artifact",
+          "locator": "32 rows, 2 trajectories x 15 parameters",
+          "path": "outputs/experiments/p10-morris/runs.parquet"
+        },
+        {
+          "detail": "the Sobol design that cannot estimate a variance share at this size",
+          "kind": "artifact",
+          "locator": "40 rows, base N=4",
+          "path": "outputs/experiments/p10-sobol/runs.parquet"
+        }
+      ],
+      "number": 4,
+      "statement": "model results are explicitly sensitive to parameter perturbation",
+      "status": "partial",
+      "verdict": "A ranking exists and is readable on the migration output; the sensitivity claim is not yet a quantitative one. The Morris screen is two trajectories over fifteen parameters, so most rankings rest on one or two elementary effects, and the Sobol design at four base samples returns four undefined first-order indices and nine of the twelve finite ones outside [0, 1] - the phase reports it as a failed attempt rather than as an estimate."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "every arm is a function of one declared baseline",
+          "kind": "code",
+          "locator": "BASELINE and the arm functions",
+          "path": "src/late_ming_lab/experiments/interventions.py"
+        },
+        {
+          "detail": "a counter per mechanism, so a no-op arm is reported as a no-op",
+          "kind": "document",
+          "locator": "the binding table",
+          "path": "docs/experiments/ablation.md"
+        },
+        {
+          "detail": "the runs the paired differences are computed from",
+          "kind": "artifact",
+          "locator": "52 rows = 13 arms x 4 replicates",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        }
+      ],
+      "number": 5,
+      "statement": "real interventions are possible",
+      "status": "met",
+      "verdict": "Thirteen arms - one declared baseline, nine ablations and three joint arms - are computed differences from that baseline under common random numbers, and the reports carry the counters that show whether an arm bound: elite loans 74 to 0, suppressions 936.5 to 0. Paired intervals, direction stability and Cliff's delta are reported rather than a mean, so an unresolved arm is visible as unresolved."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "band_merges 0 against 0: nothing to remove",
+          "kind": "document",
+          "locator": "did the ablations actually bind",
+          "path": "docs/experiments/ablation.md"
+        },
+        {
+          "detail": "the accumulating branch has no arm to remove",
+          "kind": "document",
+          "locator": "ablation evidence",
+          "path": "docs/mechanisms/M004-elite-mediation-bifurcation.md"
+        },
+        {
+          "detail": "no mortality rule exists, so removing it would be a no-op by construction",
+          "kind": "document",
+          "locator": "ablation evidence",
+          "path": "docs/mechanisms/M006-famine-mortality.md"
+        }
+      ],
+      "number": 6,
+      "statement": "key mechanisms can be removed by ablation",
+      "status": "partial",
+      "verdict": "For the mechanisms that have a removable rule, yes: removing elite credit and suppression both bind and both move the outputs their mechanism reaches. For three of the six cards, no arm can bind at all - the band-merger rule produced zero merges anywhere in the batch, so its ablation is a structural no-op; elite accumulation was never built, so the bifurcation has no second branch to remove; and famine mortality has no rule, parameter or output to delete."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "one breakdown cell at one run per cell",
+          "kind": "document",
+          "locator": "the grid",
+          "path": "docs/experiments/tipping.md"
+        },
+        {
+          "detail": "the region per arm at two replicates per cell",
+          "kind": "document",
+          "locator": "cells with breakdown, per policy",
+          "path": "docs/experiments/policy-robustness.md"
+        },
+        {
+          "detail": "the parameter-side fit is refused, and says why",
+          "kind": "document",
+          "locator": "section 4.3",
+          "path": "outputs/reports/mechanism-synthesis.md"
+        }
+      ],
+      "number": 7,
+      "statement": "the parameter regions in which a mechanism holds can be given",
+      "status": "partial",
+      "verdict": "One region is published and it is a cell, not a surface: the P10 grid is three by three at one run per cell, and exactly one cell breaks down, which is one run rather than a probability. The P12 grid places a region per policy at two replicates per cell and shows it moving with the policy. The parameter-side boundary is refused rather than forced, because the five-fold split cannot be scored at this sample size."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "cross-validated fits, per-policy coefficients, and what they do not decide",
+          "kind": "document",
+          "locator": "sections 4.1 to 4.4",
+          "path": "outputs/reports/mechanism-synthesis.md"
+        },
+        {
+          "detail": "the runs the scenario surface is fitted on",
+          "kind": "artifact",
+          "locator": "the grid rows",
+          "path": "outputs/experiments/p12-robustness/tipping_grid.parquet"
+        },
+        {
+          "detail": "a fit the table cannot carry is refused, not forced",
+          "kind": "code",
+          "locator": "the refusal on a single-class fold",
+          "path": "src/late_ming_lab/analysis/boundary.py"
+        }
+      ],
+      "number": 8,
+      "statement": "the tipping surface can be identified",
+      "status": "partial",
+      "verdict": "A surface can be fitted and its limits are measured: on the P12 grid the cross-validated AUC is 0.754 against an in-sample 0.723 over 54 runs, but per policy the random arm gives 0.550 with a spread of 0.400, which separates almost nothing. The P10 grid cannot resolve a region at one run per cell, and its parameter-side fit is refused, so the identification is partial at 18 to 54 rows per surface."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "one recorded counterexample per card, checked in review",
+          "kind": "registry",
+          "locator": "the counterexample field of all six cards",
+          "path": "docs/mechanisms/cards.yaml"
+        },
+        {
+          "detail": "the counterexample and figure corrections the review forced",
+          "kind": "document",
+          "locator": "the review findings table",
+          "path": "docs/phase-reports/P13.md"
+        },
+        {
+          "detail": "the measurement the inversion counterexample rests on",
+          "kind": "artifact",
+          "locator": "presence per run and policy",
+          "path": "outputs/experiments/p12-robustness/mechanism_readings.parquet"
+        }
+      ],
+      "number": 9,
+      "statement": "historical counterexamples can be listed",
+      "status": "met",
+      "verdict": "Every card carries a counterexample field, and they are real ones: the rule policy shows no extraction inversion at the same parameter draws; the ratchet's strongest replicate still declines in 37 months; consolidation appears unchanged when the merger rule it names is removed. The review of the phase that wrote them found no fabricated number and rewrote the prose that reached past its artifact: a counterexample that cited the wrong replicate, a status moved from CONDITIONAL to WEAK, and a sensitivity ranking that named parameters the card's own table does not rank first."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "six predictions, each naming the measurement that would refute the card",
+          "kind": "registry",
+          "locator": "the falsifiable_prediction field of all six cards",
+          "path": "docs/mechanisms/cards.yaml"
+        },
+        {
+          "detail": "the observations that would count against the model, recorded before scoring",
+          "kind": "registry",
+          "locator": "22 patterns with signatures and falsifiers",
+          "path": "data/historical_patterns"
+        },
+        {
+          "detail": "which sources would discriminate between the surviving candidates",
+          "kind": "document",
+          "locator": "the acquisition queue",
+          "path": "docs/evidence/gaps.md"
+        }
+      ],
+      "number": 10,
+      "statement": "new predictions that return to the historical sources can be proposed",
+      "status": "met",
+      "verdict": "Each card carries a falsifiable prediction naming the arm or observation that would refute it, and several are already decisive: shut the gate and breakdown should not occur; fix collection effort and the inversion should disappear. They are predictions rather than results - the review records that the arms they describe do not exist yet, which is what makes them predictions."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "where each requirement is enforced, and that the live model is closed",
+          "kind": "document",
+          "locator": "the sixteen requirements",
+          "path": "docs/architecture/runtime-llm-boundary.md"
+        },
+        {
+          "detail": "a closed gate fails rather than skipping, so it cannot read as green",
+          "kind": "code",
+          "locator": "the refusal",
+          "path": "tests/policies/test_live_ustc.py"
+        },
+        {
+          "detail": "prompt and response hashes recorded, made by policy rule-v1, not a model",
+          "kind": "artifact",
+          "locator": "2 decision rows",
+          "path": "outputs/institutional/institutional-smoke-20260915-d7f738698fbc-institutional-smoke/decision_trace.parquet"
+        }
+      ],
+      "number": 11,
+      "statement": "LLM decisions do not become an unexplainable black box",
+      "status": "partial",
+      "verdict": "By construction the layer is inspectable: a bounded action space per role, an anonymized observation with no date, place or person, Pydantic-validated output, an inert rationale, a recorded prompt and response hash, and no tools - all enforced offline by tests, including one that drives a hostile rationale and gets the benign world effect. It is also untested at runtime, because zero live decisions exist: the gate is closed, the recorded corpus is empty, and the two decisions in the smoke trace were made by the declared rule policy."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "what commit each artifact recorded, and whether the tree was dirty",
+          "kind": "artifact",
+          "locator": "artifacts[].generation_commit, git_dirty_at_generation",
+          "path": "docs/v2/baseline-v1.json"
+        },
+        {
+          "detail": "null, with config hash, subsystem seeds and tick order present",
+          "kind": "artifact",
+          "locator": "parameter_hash",
+          "path": "outputs/runs/kernel-smoke-20260912-9153567ed602-p05-pressure-0.16/manifest.json"
+        },
+        {
+          "detail": "the parameter_hash gap, recorded and left open by the phase that found it",
+          "kind": "document",
+          "locator": "what this phase found (and fixed), item 6",
+          "path": "docs/phase-reports/P09.md"
+        },
+        {
+          "detail": "the one reproducibility claim a test exercises end to end",
+          "kind": "registry",
+          "locator": "the recorded digest",
+          "path": "data/scenarios/demo.yaml"
+        }
+      ],
+      "number": 12,
+      "statement": "any result can be replayed from its run manifest",
+      "status": "partial",
+      "verdict": "The provenance machinery exists and one end-to-end case is proven: the declared demo reproduces the digest recorded in its scenario file. Three gaps are measured in this phase's own freeze. parameter_hash is null in every run manifest, because the kernel does not know the parameter sets. Seven of the nine artifact families with a manifest were generated from a dirty tree, so the recorded commit does not fully determine their code. And outputs/analysis carries nine Parquet files with no manifest at all, so those results have no recorded generating commit to replay from."
+    }
+  ],
+  "discrepancies": [
+    {
+      "claim": "The mechanism documents state the sandbox the evidence rests on as 'three counties, thirty-two cohorts', in English and in Chinese.",
+      "claim_locator": "M001 and M002 uncertainty fields; docs/mechanisms/M001-*, M002-* and index.md; docs/mechanisms/zh/cards.yaml, zh/M001-*, zh/M002-* and zh/index.md; outputs/reports/mechanism-synthesis.md section 5 and its zh translation. M003 states 'three counties and 240 ticks' instead, which is the same county miscount without the cohort sentence.",
+      "claim_path": "docs/mechanisms/cards.yaml",
+      "consequence": "The card's scale statement is wrong in the direction that matters for extrapolation, and the confusion with the particle count means a reader cannot tell which 32 is being quoted. V2-P02 records a space census in the run manifest so this can never again be written from memory; V2-P09 restates the scale from the artifact.",
+      "evidence": [
+        {
+          "detail": "the measured census: 8 nodes, 5 counties, 25 cohorts, from the built sandbox",
+          "kind": "artifact",
+          "locator": "census",
+          "path": "docs/v2/v1-acceptance-matrix.json"
+        },
+        {
+          "detail": "five county nodes and three external nodes",
+          "kind": "code",
+          "locator": "toy_spatial_dataset",
+          "path": "src/late_ming_lab/networks/fixtures.py"
+        },
+        {
+          "detail": "the runs the cards' ablation evidence is read from",
+          "kind": "artifact",
+          "locator": "52 rows, all from that sandbox",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        }
+      ],
+      "measured": "The sandbox those cards cite is the toy fixture: five county nodes plus three external nodes, twenty-five weighted household cohorts. Neither count is three; thirty-two is the P09 particle count, not a cohort count."
+    },
+    {
+      "claim": "'Six cards over three counties and thirty-two cohorts' is offered as the limit of the causal claim, and M005 names the merger rule as part of consolidation's chain.",
+      "claim_locator": "section 5 first bullet; docs/mechanisms/M005-insurgent-consolidation.md",
+      "claim_path": "outputs/reports/mechanism-synthesis.md",
+      "consequence": "The status SUPPORTED rests on the outcome - fewer, larger bands across policies - not on the chain the card narrates. V2-P05 must make the link fire and measure it, or rewrite the chain around formation and dissolution; V1's own counterexample already says so, so this is a mismatch between the card's chain and its evidence rather than a missing finding.",
+      "evidence": [
+        {
+          "detail": "band_merges 0 in the baseline and 0 in the arm",
+          "kind": "document",
+          "locator": "the binding table",
+          "path": "docs/experiments/ablation.md"
+        },
+        {
+          "detail": "zero merges in every arm's four replicates",
+          "kind": "artifact",
+          "locator": "band_merges column",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        }
+      ],
+      "measured": "The cards' own ablation evidence records zero band merges in every arm of the batch, including the arm built to prevent them, so no arm exercised the named link."
+    }
+  ],
+  "generated_at_utc": "2026-09-14T10:12:40.297858+00:00",
+  "milestones": [
+    {
+      "evidence": [
+        {
+          "detail": "three of eight reserved patterns fail their own falsifier over the run",
+          "kind": "document",
+          "locator": "the reserved-pattern table",
+          "path": "docs/calibration/prediction.md"
+        },
+        {
+          "detail": "two of thirteen parameters move by over a quarter of their prior range",
+          "kind": "document",
+          "locator": "seed comparison",
+          "path": "docs/calibration/stability.md"
+        },
+        {
+          "detail": "one SMC batch per seed: a particle set, not a posterior",
+          "kind": "document",
+          "locator": "identifiability table",
+          "path": "docs/calibration/posterior.md"
+        },
+        {
+          "detail": "the mechanism-side intervention: breakdown in 4 of 4 replicates",
+          "kind": "artifact",
+          "locator": "52 rows; arm OPEN_MIGRATION_EXIT",
+          "path": "outputs/experiments/p10-ablations/runs.parquet"
+        },
+        {
+          "detail": "the sensitivity screen behind the same card",
+          "kind": "artifact",
+          "locator": "32 rows, 2 trajectories",
+          "path": "outputs/experiments/p10-morris/runs.parquet"
+        },
+        {
+          "detail": "three declared policies ran; the runtime arm is refused, so no LLM decided anything",
+          "kind": "artifact",
+          "locator": "arm_status",
+          "path": "outputs/experiments/p12-robustness/manifest.json"
+        }
+      ],
+      "id": "M1",
+      "name": "Mechanism-capable deterministic model",
+      "requirement": "Without any LLM, a calibrated multilayer ABM produces several independent historical patterns in the hold-out window, and for at least one candidate mechanism the sensitivity, ablation and counterfactual tests have all been done.",
+      "status": "partial",
+      "verdict": "The LLM-free half holds and the triple test exists. What does not hold is the first half: the ensemble is a 32-particle pipeline rather than a posterior, two of thirteen parameters are unpinned across sampler seeds, and the hold-out window does not produce several independent patterns - three of the eight reserved patterns are contradicted by the model's own recorded falsifier, and the contradiction traces to a stationary synthetic climate, so those claims are untestable in this model rather than wrong in it."
+    },
+    {
+      "evidence": [
+        {
+          "detail": "consolidation robust at three arms; inversion policy-dependent; ratchet absent",
+          "kind": "document",
+          "locator": "the matrix and its verdict rules",
+          "path": "docs/experiments/policy-robustness.md"
+        },
+        {
+          "detail": "status refused, 0 decisions, with the gate's reason recorded",
+          "kind": "artifact",
+          "locator": "arm_status.ustc",
+          "path": "outputs/experiments/p12-robustness/manifest.json"
+        },
+        {
+          "detail": "the per-run readings the matrix is the share of",
+          "kind": "artifact",
+          "locator": "54 rows = 18 runs x 3 mechanisms",
+          "path": "outputs/experiments/p12-robustness/mechanism_readings.parquet"
+        },
+        {
+          "detail": "one confirmed model id or nothing; no fallback, recording and offline replay",
+          "kind": "document",
+          "locator": "the fail-closed contract",
+          "path": "docs/architecture/runtime-llm-boundary.md"
+        }
+      ],
+      "id": "M2",
+      "name": "Policy-robust mechanism model",
+      "requirement": "Core mechanisms are robust across several institutional decision models: rule, utility and the USTC DeepSeek V4.1 runtime policy.",
+      "status": "partial",
+      "verdict": "Not met as stated, because the arm the milestone names by model never ran: the P11 gate refused the configured id and P12 recorded the refusal rather than imputing a result. What does hold is narrower: with the world, the parameters and the random numbers held fixed, armed-band consolidation appears in five of six replicates under each of the three declared offline policies, extraction inversion reaches the declared presence bar under exactly one of them (utility 6 of 6 replicates, against random 2 of 6 and rule 0 of 6), and the tipping region moves with the policy. No statement is made about a model-backed policy."
+    }
+  ],
+  "reproducibility_statement": "Every path in this document names a file in the repository, and `verify_audit` resolves all of them. Every sample size in section 4 is read from `docs/v2/baseline-v1.json`, which stores each artifact's own byte hashes, row counts and recorded generation commit; no number here was typed from a report. The statuses in sections 2 and 3 are the phase's judgement and are declared in `src/late_ming_lab/release/audit.py`; changing one changes this document's content digest. Nothing in this audit re-runs the model, reads a licensed source, or writes inside a V1 artifact directory.",
+  "schema_version": "v1-acceptance-matrix-v1"
+}
