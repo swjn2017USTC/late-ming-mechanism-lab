@@ -1,0 +1,369 @@
+# model-comparison-register-v2 - pre-registered before any V2-P04 or V2-P05 run is scored.
+#
+# V2-P03 freezes what an outcome *is*; this file freezes what a *comparison* is before the arms that
+# would settle it are built. One entry per discriminator. Each entry names the V1 finding it responds
+# to (with the artifact, pattern or card it is read from), the candidate structures V2-P04/P05 will
+# run against each other, what the project expects and why, the primary outcomes of
+# `validation-protocol-v2.yaml` that can separate the candidates, the observation that would reject
+# the preferred structure, and the summary statistic a reader should look at to see which won.
+#
+# Two rules this file exists to keep:
+#
+#   * an entry is a discriminator, not a research wish. A candidate set that no declared outcome can
+#     separate, and no declared observation can reject, is not pre-registered here.
+#   * the observables are the frozen protocol's. `load_register` refuses an entry whose
+#     discriminating observable is not a primary outcome of the protocol, so a register cannot invent
+#     a reading surface after the results are in.
+schema_version: model-comparison-register-v2
+version: "2.0.0"
+frozen_on: "2026-09-15"
+summary: >-
+  The alternative structures V2-P04 and V2-P05 will test: price formation under four binding
+  constraints, the four relief bottlenecks, migration split by destination and transit loss, observed
+  against synthetic climate forcing, a mortality variant for the famine mechanism, elite mediation
+  against accumulation and foreclosure, the band-consolidation chain split into its six stages, and
+  arrears persistence against the rejected monotone ratchet.
+entries:
+  - id: price-formation-alternatives
+    phase: V2-P04
+    title: Price formation - which constraint sets the local posted price
+    v1_evidence: >-
+      Pattern famine-local-price-extremes fails both of its dispersion checks in the calibration
+      window: dispersion-widens is satisfied in 0.44 of draws and dispersion-tracks-distress in 0.38
+      (docs/calibration/mismatch.md). The recorded 1631 Shangzhou price of 4 tael per dou (40 tael per
+      shi) also lies above the ceiling the card MarketParameters.price_ceiling_ratio allows, so the V1
+      rule cannot post the level the record shows.
+    candidate_structures:
+      - >-
+        stock-bound price: the posted price rises as the node's own grain stock falls, and an arriving
+        merchant can be paid only from the silver the node holds, so a shortfall is grain that is not
+        there rather than grain that is not affordable.
+      - >-
+        capacity-bound price: the gap between two nodes is limited by what the trade link can carry
+        (MarketParameters.capacity_unit_shi_per_month), so an open but thin link cannot equalise its
+        two ends in the crisis years however large the price gap grows.
+      - >-
+        transaction-cost price: the delivered gap equals transport cost plus the declared minimum
+        margin (MarketParameters.transport_cost_tael_per_cost_unit_per_shi,
+        MarketParameters.minimum_trade_margin_tael_per_shi), and no profitable shipment is left
+        unmade.
+      - >-
+        capped price: the posted price is a declared multiple of the reference price
+        (MarketParameters.price_ceiling_ratio), and demand that the cap leaves unsatisfied is recorded
+        as unmet demand rather than expressed as price.
+    prior_expectation: >-
+      The project expects the capacity and transaction-cost structures to widen cross-node dispersion
+      as distress rises while the cap holds it flat, because dispersion is what the record shows and
+      what V1's clearing rule (rule claim market-clearing, market-v1) did not produce; it expects the
+      cap to raise the relief bill, since relief and granary purchases are made at the posted price.
+    discriminating_observables:
+      - market_connectivity
+      - livelihood_shortfall
+      - relief_coverage
+    falsifier: >-
+      Dispersion that stays flat while unmet need rises in the crisis years rejects the capacity and
+      transaction-cost structures in favour of the cap. A stock-bound arm that posts famine-level
+      prices while its stores are recorded as full rejects the stock constraint, and dispersion that
+      widens identically in all four arms rejects the set as inert.
+    summary_statistic: >-
+      The cross-node coefficient of variation of the posted grain price, by month, and the months in
+      which a node records unmet demand at its ceiling price.
+
+  - id: relief-bottleneck-alternatives
+    phase: V2-P04
+    title: Relief coverage - which of the four bottlenecks binds in the peak months
+    v1_evidence: >-
+      Pattern relief-overwhelmed-in-worst-years fails exactly in the years it is about:
+      relief-coverage-falls-as-need-peaks is satisfied in 0.00 of draws in the extrapolation window
+      and 0.25 in the hold-out, against 0.84 over the whole run (docs/calibration/prediction.md). V1
+      reports one coverage ratio (rule claim official-relief, relief-v1) and so cannot say which
+      funnel produced it.
+    candidate_structures:
+      - >-
+        stock-bound relief: release stops at the grain the granary holds, so the uncovered need is
+        grain that was never in store (FiscalParameters.granary_target_cover_months,
+        FiscalParameters.granary_purchase_share_of_silver).
+      - >-
+        silver-bound relief: the granary buys up to a declared share of county silver
+        (FiscalParameters.granary_purchase_share_of_silver), so the same silver buys less relief as
+        the local price rises.
+      - >-
+        logistics-bound relief: delivery to the node is capped by the collection and transport cost of
+        moving grain to it (FiscalParameters.collection_cost_logistics_floor,
+        FiscalParameters.relief_logistics_cost_per_shi_tael), so grain held elsewhere does not reach
+        the node that needs it.
+      - >-
+        eligibility-bound relief: release follows a declared unmet-ratio line
+        (FiscalParameters.relief_eligibility_unmet_ratio, EliteParameters.relief_eligibility_unmet_ratio),
+        so households below the line go unmet while grain stays unissued.
+    prior_expectation: >-
+      The project expects the binding bottleneck to move through the crisis - silver and logistics
+      first, while markets still function, then stock once the granary is empty - because coverage
+      falls precisely in the peak-need years that V1 could describe only with a single ratio.
+    discriminating_observables:
+      - relief_coverage
+      - livelihood_shortfall
+      - market_connectivity
+    falsifier: >-
+      Grain still in the granary in the peak months rejects the stock bottleneck. Uncovered need that
+      persists while both silver and stores are recorded as available rejects the silver and logistics
+      arms and leaves eligibility, and identical coverage in all four arms rejects the set as a
+      relabelling of one funnel.
+    summary_statistic: >-
+      The peak months' unmet need decomposed into four residuals: grain left unissued in the granary,
+      the shortfall of county silver against the purchase bill, volume undelivered on the constrained
+      links, and households above the eligibility line.
+
+  - id: migration-structure-alternatives
+    phase: V2-P04
+    title: Migration structure - temporary, permanent and out-of-region departures
+    v1_evidence: >-
+      Pattern shaanxi-net-outflow fails on timing: exits-in-crisis-years is satisfied in 0.16 of draws
+      over the hold-out and 0.00 in the extrapolation, against 1.00 over the whole run
+      (docs/calibration/prediction.md). The V1 rules (rule claims migration-permanent, migration-v1
+      and migration-temporary, temporary-migration-v1) send a household to one declared destination
+      chosen by price comparison, with a destination capacity that is a constant and an exit that
+      refuses nobody (docs/evidence/tasks.md, migration direction, timing and volume).
+    candidate_structures:
+      - >-
+        temporary departure (V1's seasonal absence): a share of the adults leaves for a declared term
+        and returns; the household, its land and its assessment stay at the origin.
+      - >-
+        permanent departure: the household leaves the register for good, carrying people, grain and
+        silver and abandoning the mu it worked, so the county's assessable base shrinks with it.
+      - >-
+        out-of-region exit with a finite destination: leaving the modelled region passes through an
+        exit with its own declared capacity that can refuse arrivals, so an outflow is a rate against
+        a capacity rather than an unlimited sink.
+      - >-
+        transit loss as a structural term: the route charges a loss and a cost per household
+        (MigrationParameters.transit_loss_share, cost_tael_per_household, cost_tael_per_adult), and
+        the households arriving are reported separately from the households that departed.
+    prior_expectation: >-
+      The project expects the three-way split with a finite exit capacity and a charged transit loss to
+      move the outflow peak into the crisis years, because V1's exit removed movers from a region with
+      nothing to stop them and put the peak outside the window.
+    discriminating_observables:
+      - migration_outflow
+      - fiscal_base
+      - livelihood_shortfall
+    falsifier: >-
+      An outflow that peaks in the same early months with the finite exit and the charged loss as
+      without them rejects the structure as the cause of the timing failure. A permanent arm whose
+      assessable base contracts no faster than the temporary arm rejects the permanent/temporary
+      split, and an outflow that does not move when the exit capacity is lowered rejects the exit
+      capacity as binding.
+    summary_statistic: >-
+      Monthly counts of temporary, permanent and out-of-region departures, the share of departures
+      refused at a finite exit, and the share of movers lost in transit.
+
+  - id: climate-forcing-alternatives
+    phase: V2-P04
+    title: Climate forcing - observed reconstruction against the synthetic draw
+    v1_evidence: >-
+      Pattern chongzhen-drought-sequence is contradicted by the ensemble: shock-peak-in-late-years is
+      satisfied in 0.00 of draws in the hold-out, whole-run and extrapolation windows
+      (docs/calibration/prediction.md), and the diagnosis attributes the failure to the stationary
+      synthetic forcing rather than to the shock rule (docs/evidence/tasks.md, observed drought and
+      famine timing and geography; docs/mechanisms/M002-crisis-gating.md).
+    candidate_structures:
+      - >-
+        synthetic forcing (V1): a stationary draw per node from the declared distribution, kept as the
+        reference arm so a difference is attributable to the input and not to the seed.
+      - >-
+        observed forcing: the V2-P02 annual index built from recorded events at each node, with the
+        declared weights and saturations (HistoricalCoreParameters.drought_weight,
+        HistoricalCoreParameters.famine_weight, HistoricalCoreParameters.drought_saturation_events),
+        allocated to months by the declared profile.
+      - >-
+        one regional series: the observed index is applied as a single series to every node, against
+        the per-node application above; the record's northern concentration is what separates them.
+    prior_expectation: >-
+      The project expects observed forcing to move the shock peak into the last years of the window at
+      the same seeds, because the V1 failure is a property of a stationary draw and not of the
+      drought-to-shock rule (rule claim climate-shock, climate-shock-v1).
+    discriminating_observables:
+      - livelihood_shortfall
+      - migration_outflow
+      - relief_coverage
+    falsifier: >-
+      Observed forcing whose worst node shocks still fall in the warm-up years rejects the climate
+      input as the cause and points at the shock transform or the crop response. A per-node index whose
+      node ranking does not match the record's northern concentration rejects the per-node application
+      in favour of the single regional series, and two arms that differ by less than the protocol's
+      minimum substantive effect reject the forcing change as inert.
+    summary_statistic: >-
+      The year of the window's maximum mean node shock severity, and the share of window shock
+      severity falling in the last fifth of the run, in both arms at common random numbers.
+
+  - id: famine-mortality-variant
+    phase: V2-P05
+    title: Famine mechanism - demographic loss, labour loss, recruitment, or neither
+    v1_evidence: >-
+      M006 is UNIDENTIFIED (docs/mechanisms/M006-famine-mortality.md): no rule, parameter or output
+      exists, so no arm can bind and no hold-out score speaks to it. A sustained subsistence gap
+      currently moves a cohort's unmet ratio and nothing else (docs/evidence/tasks.md, famine
+      mortality and population loss).
+    candidate_structures:
+      - >-
+        no loss (V1): a cohort below the subsistence floor lowers consumption and may migrate, but
+        loses no person and no labour.
+      - >-
+        demographic loss: a cohort below the floor for a declared run of months loses members at a
+        declared rate, which removes consumers and workers together, with deaths reported as their own
+        intermediate quantity.
+      - >-
+        labour loss in place: the shortfall lowers the cohort's effective labour for as long as it
+        persists, so output falls while the population stands, and a recovery restores the labour.
+      - >-
+        recruitment loss: the shortfall pushes eligible adults out through the levy and formation
+        rules instead of through death, so the household loses labour to the garrison and the band
+        (MilitaryParameters.deserter_band_share, BandParameters.recruitment_rate_of_eligible_adults).
+    prior_expectation: >-
+      The project expects the arms to separate on which outcome moves first - demographic and
+      recruitment loss on households remaining and on armed strength, labour loss on the unmet share
+      at an unchanged population - and it expects the card to stay UNIDENTIFIED unless a source can
+      bound the death rate rather than have it chosen to fit an outcome.
+    discriminating_observables:
+      - livelihood_shortfall
+      - migration_outflow
+      - armed_concentration
+    falsifier: >-
+      Identical outcome vectors for the demographic and labour-loss arms at the declared minimum
+      substantive effect reject the demographic variant as a relabelling. A mortality rate chosen to
+      reproduce an outcome rather than bounded by a source rejects the arm as a deliverable and leaves
+      M006 UNIDENTIFIED, and a recruitment arm that leaves band and garrison strength unmoved rejects
+      recruitment as the route.
+    summary_statistic: >-
+      Deaths per thousand household-months below the subsistence floor, the end-of-window population
+      beside a fixed-population arm, and the split of lost adults between death, permanent departure
+      and recruitment.
+
+  - id: elite-mediation-vs-accumulation
+    phase: V2-P05
+    title: Elite branch - mediation of distress against accumulation and foreclosure
+    v1_evidence: >-
+      M004 measured one branch only: pattern debt-transfers-land is satisfied in 0.94 of posterior
+      draws, while removing the credit channel deepens the tax-base contraction (-9,539.98 mu against
+      the baseline's -15,476 mu) instead of weakening it (docs/mechanisms/M004-elite-mediation-bifurcation.md).
+      Mediation and accumulation move together, so the bifurcation as stated is not what V1 shows.
+    candidate_structures:
+      - >-
+        mediation: elite lending and tax advance keep the household on its land, so the assessed base
+        contracts more slowly and the elite's claim is repaid from later harvests
+        (EliteParameters.tax_mediation_advance_share, EliteParameters.loan_to_value).
+      - >-
+        accumulation and foreclosure: loans are secured on land at the declared monthly rate
+        (EliteParameters.interest_rate_monthly, EliteParameters.land_purchase_price_tael_per_mu), and
+        default transfers the land, the assessment that follows it and the tax burden to the creditor.
+      - >-
+        credit removed (V1's ablation arm): the channel is switched off, kept as the null against
+        which the two structures are read.
+    prior_expectation: >-
+      The project expects the two structures to separate on who holds the land after distress and on
+      the county's visible base, because the V1 ablation moves the base further down while the credit
+      channel is on and the elite's share rises either way.
+    discriminating_observables:
+      - fiscal_base
+      - fiscal_realisation
+      - livelihood_shortfall
+    falsifier: >-
+      A mediation arm in which the elite's land share and cohort land inequality rise no less than in
+      the accumulation arm rejects mediation as a distinct structure. An accumulation arm whose
+      defaults leave both the elite's share and the visible base unmoved rejects foreclosure as the
+      transfer channel, and a foreclosure arm whose receipts rise as the base moves to creditors
+      rejects the tax-burden half of the structure.
+    summary_statistic: >-
+      Defaults as a share of loans, the elite land share and cohort land Gini at the end of the window,
+      and the change in the visible assessable base, read beside the household unmet ratio.
+
+  - id: band-consolidation-chain
+    phase: V2-P05
+    title: Band consolidation - formation, refugee intake, deserter intake, merger, split, dissolution
+    v1_evidence: >-
+      M005's declared chain did not fire: band_merges is 0 in the baseline and 0 in the
+      NO_BAND_MERGER arm (outputs/experiments/p10-ablations/runs.parquet, reported in
+      docs/mechanisms/M005-insurgent-consolidation.md), and intake-tracks-desertion is the
+      systematically unsatisfied check of pattern absorption-of-deserters-and-refugees (0.25 of draws,
+      docs/calibration/mismatch.md). The largest band's share is therefore produced by growth, not by
+      the merger the card narrates.
+    candidate_structures:
+      - >-
+        formation: bands arise where unorganized deserters accumulate past a declared minimum, or
+        where distress is high enough and the eligible pool can staff a band over a declared horizon
+        (BandParameters.minimum_formation_troops, BandParameters.formation_unmet_ratio).
+      - >-
+        refugee intake: bands absorb famine refugees, so band growth moves with the unmet ratio,
+        bounded by what a band can feed (BandParameters.food_shi_per_member_month).
+      - >-
+        deserter intake: bands absorb soldiers who leave the garrison, so growth moves with the pay
+        and ration shortfall (MilitaryParameters.deserter_band_share).
+      - >-
+        merger: two co-located bands both above the cohesion line combine, removing one band and
+        moving its men, arms and grain into the survivor (BandParameters.merge_cohesion_above, rule
+        merge-v1).
+      - >-
+        split: a band above the size threshold and below the cohesion line sheds a fragment, lowering
+        concentration without dissolving the band (BandParameters.split_troops_threshold,
+        BandParameters.split_cohesion_below, rule split-v1).
+      - >-
+        dissolution: a band below the declared troop floor disbands, returning its members to the
+        population or scattering them (BandParameters.dissolve_troops_below).
+    prior_expectation: >-
+      The project expects merger and split to be the only stages that move the largest band's share
+      independently of total armed strength, because the V1 arm shows consolidation proceeding while
+      mergers never fire, which leaves growth alone to produce the share.
+    discriminating_observables:
+      - armed_concentration
+      - military_supply
+      - migration_outflow
+    falsifier: >-
+      Merger and dissolution event counts that stay at zero under arms that declare them on reject the
+      chain as stated, which is the V1 result. A largest-band share that rises identically with merger
+      forced off rejects merger as the binding stage, and refugee intake that does not move with the
+      unmet ratio rejects the refugee stage.
+    summary_statistic: >-
+      Event counts per stage - formation, refugee intake, deserter intake, merger, split, dissolution -
+      and each stage's contribution to the change in the largest band's share of all armed men.
+
+  - id: arrears-persistence-vs-ratchet
+    phase: V2-P05
+    title: Arrears - persistence and hysteresis against the rejected monotone ratchet
+    v1_evidence: >-
+      The monotone ratchet is REJECTED: pattern pay-monetised-and-arrears is satisfied in 1.00 of
+      draws on the accumulation question alone, and accumulation-without-clearing was never a scored
+      pattern, so the strong form survived in the project's own reporting on an unmeasured quantity
+      (docs/mechanisms/M003-fiscal-military-ratchet.md). The V1 rule (rule claim military-finance,
+      military-finance-v1) carries the unpaid obligation forward as a stock and pays it down from
+      later receipts, but how that stock clears is neither a declared structure nor a reported
+      quantity.
+    candidate_structures:
+      - >-
+        persistence: the stock is carried forward and paid down from later receipts in proportion to
+        what the treasury collects, so a recovery in receipts empties it.
+      - >-
+        hysteresis: the stock clears less than proportionally to receipts, so a residual remains for
+        months after the shortfall ends and the next shortfall lands on top of it.
+      - >-
+        remission: a declared remission writes off a share of the stock without payment, as an
+        exceptional act rather than a standing rule of the treasury.
+      - >-
+        monotone ratchet (V1's rejected strong form, kept as the reference arm): the stock only ever
+        rises.
+    prior_expectation: >-
+      The project expects persistence and hysteresis to separate in the months after the worst pay
+      shortfall - persistence clears most of the stock once receipts recover, hysteresis keeps a
+      residual that the next shortfall enlarges - and it expects no arm to reproduce the monotone
+      ratchet.
+    discriminating_observables:
+      - fiscal_arrears
+      - military_supply
+      - fiscal_realisation
+    falsifier: >-
+      A stock that clears at the same rate in every arm once receipts recover rejects hysteresis. A
+      stock unchanged after the recovery months in every arm rejects the persistence family and leaves
+      the ratchet standing, and a remission that moves neither the stock nor the receipts rejects the
+      remission act.
+    summary_statistic: >-
+      The arrears stock at the end of the window, and the share of the stock cleared in the twelve
+      months after the window's worst pay shortfall, in each arm.

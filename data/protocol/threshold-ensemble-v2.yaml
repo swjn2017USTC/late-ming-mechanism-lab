@@ -1,0 +1,179 @@
+# threshold-ensemble-v2 - the eight governance reading lines, each with the band it could be read
+# over. Frozen before any V2 result is read, beside validation-protocol-v2.yaml.
+#
+# GovernanceIndicatorParameters declares eight lines that turn a measurement into a verdict. Every
+# one of them has a grade-S card in data/parameters/governance.yaml that says the same thing: "a
+# reading line for a report, not a mechanism value". This file adds what the cards do not carry -
+# where the live value sits inside a declared band, what that band rests on, and how it is sampled -
+# so that a report can recompute its verdicts across the band (protocol derived reading
+# `crossed_lines`) instead of reporting one line's verdict as if it were a finding.
+#
+# The rules this file keeps:
+#
+#   * one entry per line and nothing else: the eight fields of GovernanceIndicatorParameters. `id`
+#     is the field name, `indicator` is the id analysis/governance.py reports the row under, and
+#     `direction` is the direction that module computes the crossing in (`below-is-failure` uses
+#     `measure < line`, `above-is-failure` uses `measure > line`).
+#   * `identity` is read from the line's own card: `evidence-bounded` when the card cites a ledger
+#     claim, otherwise `model-assumption`. All eight cards cite neither a source nor a ledger entry,
+#     so all eight lines are model assumptions here; that is what the cards say and nothing here
+#     upgrades it.
+#   * a grid is symmetric about the live line with an odd number of points, so the live line is
+#     always one member of the ensemble and the verdict the model actually runs is never missing
+#     from the recomputed distribution.
+#   * a uniform rule draws independently across the whole band, which is the only treatment that
+#     does not privilege one end of it.
+#   * no range was chosen to make the live line look principled, and none is narrower than the
+#     disagreement the record leaves open. Where a range rests on a pattern, the pattern is named -
+#     and none of those patterns states a level, so every range here is declared, not measured.
+#
+# The design is the product over entries: 5^4 grid points times 3^4 uniform draws = 50,625 members.
+schema_version: threshold-ensemble-v2
+version: "2.0.0"
+frozen_on: "2026-09-15"
+summary: >-
+  Eight reading lines, eight bands, and the sampling rule for each. The bands are declared around
+  the live lines because the historical record supports the direction of what these lines measure
+  and not its size; the file says so per line rather than implying a source it does not have.
+entries:
+  - id: receipts_below_quota_share
+    indicator: fiscal_receipts
+    direction: below-is-failure
+    value: 0.5
+    identity: model-assumption
+    range: [0.3, 0.7]
+    source: >-
+      declared band around the live line. `receipts-shortfall-chronic` (grade B,
+      data/historical_patterns/07-taxation-levies.yaml) supports that receipts fell short of the
+      assessed quota and that arrears accumulated, not by how much, and the line's card carries no
+      range of its own.
+    sampling:
+      kind: grid
+      points: 5
+    note: >-
+      Five readings from 0.3 to 0.7, so the verdict turns on whether collecting a third of what a
+      county demanded counts as failure, which no locator settles.
+
+  - id: tax_base_contraction_share
+    indicator: tax_base_contraction
+    direction: above-is-failure
+    value: 0.02
+    identity: model-assumption
+    range: [0.005, 0.035]
+    source: >-
+      declared band around the live line. `quota-erosion-and-surcharge` (grade B,
+      data/historical_patterns/07-taxation-levies.yaml) records the erosion of the registered base
+      in form, and the protocol compares `fiscal_base` on direction only; no locator states what
+      share of the base a county lost.
+    sampling:
+      kind: uniform
+      draws: 3
+    note: >-
+      Three draws between a base that barely moves (0.5 per cent over the run) and one that
+      contracts by 3.5 per cent, with the live line at 2 per cent between them.
+
+  - id: arrears_growth_tael_per_month
+    indicator: tax_arrears_growth
+    direction: above-is-failure
+    value: 1.0
+    identity: model-assumption
+    range: [0.0, 4.0]
+    source: >-
+      declared band around the live line. `pay-monetised-and-arrears` (grade A,
+      data/historical_patterns/09-military-finance.yaml) says arrears accumulated rather than
+      cleared, and that its 53-85 per cent is a central-treasury share at another level of
+      government; this line is denominated in the model's own silver, so the band is declared.
+    sampling:
+      kind: uniform
+      draws: 3
+    note: >-
+      Three draws from a stock that does not grow at all to one growing by four tael a month,
+      which is four times the live line.
+
+  - id: pay_shortfall_share
+    indicator: military_pay_shortfall
+    direction: above-is-failure
+    value: 0.5
+    identity: model-assumption
+    range: [0.3, 0.7]
+    source: >-
+      declared band around the live line. `pay-monetised-and-arrears` (grade A,
+      data/historical_patterns/09-military-finance.yaml) supports a shortfall that is structural
+      rather than episodic, and states no share of the monthly obligation.
+    sampling:
+      kind: grid
+      points: 5
+    note: >-
+      Five readings separating "arrears are routine" from "the garrison is mostly unpaid", with the
+      live half-paid line in the middle of the band.
+
+  - id: band_troops_share_of_adults
+    indicator: armed_share_of_adults
+    direction: above-is-failure
+    value: 0.01
+    identity: model-assumption
+    range: [0.002, 0.018]
+    source: >-
+      declared band around the live line, spanning the order of magnitude
+      `many-bands-then-consolidation` (grade B, data/historical_patterns/10-rebellion-armed-groups.yaml)
+      puts armed men in - tens of thousands of men against a population of millions - as an order
+      of magnitude and not a share.
+    sampling:
+      kind: uniform
+      draws: 3
+    note: >-
+      Three draws across a factor of nine: one armed man per five hundred adults at the floor, one
+      per fifty-five at the ceiling, and the live line at one per hundred.
+
+  - id: largest_band_share
+    indicator: largest_band_share
+    direction: above-is-failure
+    value: 0.5
+    identity: model-assumption
+    range: [0.2, 0.8]
+    source: >-
+      declared band around the live line, from "many bands, none dominant" to "one band with most
+      of the armed men". `many-bands-then-consolidation` (grade B,
+      data/historical_patterns/10-rebellion-armed-groups.yaml) supports that ordering, and the
+      protocol records `armed_concentration` at comparison level `ordering`, not `magnitude`.
+    sampling:
+      kind: grid
+      points: 5
+    note: >-
+      Five readings of the largest band's share, so a report can show whether the consolidation
+      verdict survives its line moving from a fifth of the armed men to four fifths.
+
+  - id: out_migration_share_of_households
+    indicator: out_migration
+    direction: above-is-failure
+    value: 0.01
+    identity: model-assumption
+    range: [0.001, 0.05]
+    source: >-
+      declared band around the live line. `shaanxi-net-outflow` (grade C,
+      data/historical_patterns/04-population-migration.yaml) scores the sign and the timing of the
+      outflow per node and no volume; the floor stays above zero because the live parameter refuses
+      a zero line, and a declared band cannot offer one.
+    sampling:
+      kind: uniform
+      draws: 3
+    note: >-
+      Three draws from one household in a thousand to one in twenty leaving the core counties over
+      the run, around a live line of one in a hundred.
+
+  - id: unmet_share_of_need
+    indicator: subsistence_shortfall
+    direction: above-is-failure
+    value: 0.25
+    identity: model-assumption
+    range: [0.05, 0.45]
+    source: >-
+      declared band around the live line. `relief-overwhelmed-in-worst-years` (grade C,
+      data/historical_patterns/08-relief.yaml) documents that the covered share of need fell as need
+      peaked and gives no coverage or unmet rate, so the band is declared.
+    sampling:
+      kind: grid
+      points: 5
+    note: >-
+      Five readings from a floor that is mostly met to one that is nearly half unmet, with the live
+      quarter unmet at the centre.
