@@ -131,9 +131,19 @@ def smoke_seats(regions: tuple[str, ...]) -> tuple[ActorSeat, ...]:
 
 
 def build_policy(
-    name: str, *, transport: ChatTransport | None = None, seed: int = 20_260_915
+    name: str,
+    *,
+    transport: ChatTransport | None = None,
+    seed: int = 20_260_915,
+    settings: object | None = None,
 ) -> InstitutionalPolicy:
-    """The policy the smoke run is asked for, refused loudly when it is not available."""
+    """The policy the smoke run is asked for, refused loudly when it is not available.
+
+    ``settings`` lets a caller supply declared settings instead of reading the environment: the
+    replay path needs that, because a cluster has no credential to read and the gate must stay shut
+    there. Without it the settings come from :func:`~late_ming_lab.policies.ustc_v41.load_settings`,
+    which is what every other caller wants.
+    """
     if name == "rule":
         return RulePolicy()
     if name == "utility":
@@ -147,8 +157,8 @@ def build_policy(
             raise SmokeError("policy='replay' needs a transport built from the fixture store")
         from late_ming_lab.policies.ustc_v41 import load_settings
 
-        settings = load_settings()
-        return _ustc_with_transport(transport, settings)
+        resolved = settings if settings is not None else load_settings()
+        return _ustc_with_transport(transport, resolved)
     raise SmokeError(
         f"unknown policy {name!r}; expected 'rule', 'utility', 'random', 'replay' or 'ustc'"
     )
@@ -167,6 +177,7 @@ def run_institutional(
     *,
     policy: str = "rule",
     transport: ChatTransport | None = None,
+    settings: object | None = None,
     config: ArmConfiguration | None = None,
     ticks: int = SMOKE_TICK_COUNT,
     warmup_ticks: int = SMOKE_WARMUP_TICKS,
@@ -200,7 +211,7 @@ def run_institutional(
     seats = smoke_seats(county_nodes)
     layer = InstitutionalDecisionSystem(
         seats=seats,
-        policy=build_policy(policy, transport=transport, seed=seed),
+        policy=build_policy(policy, transport=transport, settings=settings, seed=seed),
         fallback=None if policy in {"rule", "random"} else RulePolicy(),
         levers=levers,
         adults=sum(cohort.adults for cohort in economy.population),
