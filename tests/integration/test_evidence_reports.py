@@ -8,14 +8,23 @@ reader would trust.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
 
-from late_ming_lab.evidence.coverage import grade_summary, support_summary
+from late_ming_lab.evidence.coverage import (
+    coverage_report,
+    gap_report,
+    grade_summary,
+    support_summary,
+)
+from late_ming_lab.evidence.tasks import build_tasks
 from late_ming_lab.experiments.evidence import (
     COVERAGE_ARTIFACT,
     GAPS_ARTIFACT,
+    TASKS_ARTIFACT,
+    TASKS_JSON_ARTIFACT,
     UNCERTAINTY_ARTIFACT,
     load_evidence_base,
     write_evidence_reports,
@@ -32,10 +41,19 @@ def written(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, dict[str, s
     return directory, texts
 
 
-def test_the_three_reports_are_written(written: tuple[Path, dict[str, str]]) -> None:
+def test_every_report_is_written(written: tuple[Path, dict[str, str]]) -> None:
     _, texts = written
-    assert set(texts) == {COVERAGE_ARTIFACT, UNCERTAINTY_ARTIFACT, GAPS_ARTIFACT}
+    assert set(texts) == {
+        COVERAGE_ARTIFACT,
+        UNCERTAINTY_ARTIFACT,
+        GAPS_ARTIFACT,
+        TASKS_ARTIFACT,
+        TASKS_JSON_ARTIFACT,
+    }
     for name, text in texts.items():
+        if name.endswith(".json"):
+            assert json.loads(text)["tasks"], f"{name} holds no tasks"
+            continue
         assert text.startswith("# "), f"{name} has no title"
         assert len(text) > 500, f"{name} is too thin to be a report"
 
@@ -115,3 +133,53 @@ def test_the_support_summary_covers_every_rule() -> None:
     base = load_evidence_base(REPO_ROOT)
     summary = support_summary(base.rules)
     assert sum(summary.values()) == len(base.rules)
+
+
+def test_the_ranked_tasks_agree_with_the_registries() -> None:
+    """The ranking is computed, not written: every component is re-derivable from the registries."""
+    base = load_evidence_base(REPO_ROOT)
+    tasks = build_tasks(registry=base.registry, cards=base.cards, snapshots=base.snapshots)
+    assert [task.rank for task in tasks.tasks] == list(range(1, len(tasks.tasks) + 1))
+    assert len({task.key for task in tasks.tasks}) == len(tasks.tasks)
+    for task in tasks.tasks:
+        assert task.score == task.relevance * task.debt
+        assert task.debt == (
+            len(task.weak_cards)
+            + len(task.unread_sources)
+            + len(task.pending_snapshots)
+            + (2 if task.missing_mechanism else 0)
+        )
+        assert task.unverified_sources == tuple(
+            source_id
+            for source_id in task.unread_sources
+            if base.registry.require(source_id).verification.value == "unverified"
+        )
+    scores = [task.score for task in tasks.tasks]
+    assert scores == sorted(scores, reverse=True)
+
+
+def test_the_reports_carry_the_rights_and_verification_state() -> None:
+    base = load_evidence_base(REPO_ROOT)
+    coverage = coverage_report(
+        registry=base.registry,
+        ledger=base.ledger,
+        cards=base.cards,
+        patterns=base.patterns,
+        rules=base.rules,
+        snapshots=base.snapshots,
+    )
+    gaps = gap_report(
+        registry=base.registry,
+        ledger=base.ledger,
+        cards=base.cards,
+        patterns=base.patterns,
+        rules=base.rules,
+        snapshots=base.snapshots,
+    )
+    for record in base.snapshots:
+        assert record.id in coverage, record.id
+    assert f"- snapshots recorded: {len(base.snapshots)}" in coverage
+    assert "## What was read" in coverage
+    for source in base.registry:
+        if source.verification.value == "unverified":
+            assert source.next_action in gaps, source.id
