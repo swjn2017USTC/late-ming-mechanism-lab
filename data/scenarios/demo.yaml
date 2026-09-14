@@ -1,4 +1,7 @@
-# Declared by P14. The expected values are a reproducibility pin, not a fit target.
+# Declared by P14; re-pinned by V2-P04. The pin moved because the price, relief and migration chains
+# now record their own constraints as events, so the log is longer and its digest is different while
+# no behavioural count moved: the V2-P04 phase report records that comparison row by row. The values
+# below are what the current code produces, and they remain a reproducibility pin, not a fit target.
 schema_version: demo-scenario-v1
 id: demo-shaanxi-henan
 description: 'The reproducible demo: the medium sandbox space under the declared climate and fiscal pressure
@@ -17,6 +20,6 @@ sandbox:
   pay_share_of_treasury: 0.5
   garrison_troops: 300.0
 expected:
-  simulation_digest: 75b23583d915ac9f7897b28746464f1686fe551b41371b63f5ecab971740ea4c
-  event_count: 232877
+  simulation_digest: 61097186d760c5c1d359133d76bcef7772f80c54f9caccc5fe515f3cdfbcd46b
+  event_count: 253517
   tick_count: 240

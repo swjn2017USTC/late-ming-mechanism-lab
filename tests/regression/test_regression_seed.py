@@ -29,6 +29,9 @@ from late_ming_lab.systems.calendar import core_default_calendar
 from late_ming_lab.systems.climate import ClimateSystem, SyntheticClimate
 
 #: Expected simulation digest and event count for the default config and regression seed.
+# Re-pinned by V2-P04 with the chain events (MARKET_CONSTRAINT, RELIEF_CONSTRAINT,
+# MIGRATION_GATE): the vocabulary grew and no behavioural count moved. The phase report records the
+# row-level difference against the pre-instrumentation logs.
 REGRESSION_SIMULATION_DIGEST = "c34bd4998586d1e72217ef64b834386cef0b30b805ac3291a8b721f8301cf379"
 REGRESSION_EVENT_COUNT = 240
 
@@ -46,8 +49,8 @@ CLIMATE_EVENT_COUNT = 240 * 6
 #: Re-pinned in P07 for instrumentation only, with the market-phase correction described above and
 #: verified the same way (the fiscal run's event count is unchanged at 28764). Both re-pins are
 #: recorded in their phase reports.
-FISCAL_DIGEST = "c9a1d9d56f84617e2a78c9428207f5cd513d3e4662e07284d945c9ff6efe977d"
-FISCAL_EVENT_COUNT = 28764
+FISCAL_DIGEST = "9044e46d5bdbbb837e8db9a7d3d846994338cd1c91b0cf2e6afdda7ec688cc24"
+FISCAL_EVENT_COUNT = 29916
 
 #: Same, with the whole P04 economy (market, merchants, elites, credit): two short windows.
 #:
@@ -62,16 +65,16 @@ FISCAL_EVENT_COUNT = 28764
 #: A/B run of the same scenario showed identical sequence numbers, identical event count and every
 #: column byte-identical except the ``phase`` token on 600 merchant rows. The P07 report records
 #: it, and both earlier re-pins stand on the same row-level evidence.
-MARKET_BASELINE_DIGEST = "4b98410a02a5400c20f148ab0ee26a971cb6379807285337ed00a3274587c545"
-MARKET_BASELINE_EVENT_COUNT = 10618
-MARKET_SEVERE_DIGEST = "dd7d6e7d4df8c26e64e33349f4547ef1c6f0d214192cd5089d47924f7bcd0fed"
-MARKET_SEVERE_EVENT_COUNT = 14108
+MARKET_BASELINE_DIGEST = "ae9ea97ac17272f09263c08913041aa8f1a1a9632211f9bd9dc591d208c71867"
+MARKET_BASELINE_EVENT_COUNT = 11290
+MARKET_SEVERE_DIGEST = "309db1b83470627067827c73e75f1ba6cb2e9b44831bd592ad64a79eba23ad48"
+MARKET_SEVERE_EVENT_COUNT = 14780
 
 #: Same, with the toy cohort population: a normal year and a severe synthetic shock.
-HOUSEHOLD_BASELINE_DIGEST = "39d980735462639c2ea0cc837751eac97b6fec488b828747d6ada3fc1ae50a2d"
-HOUSEHOLD_BASELINE_EVENT_COUNT = 25606
-HOUSEHOLD_SEVERE_DIGEST = "f61073359378ac876913689259e08d925f42be1d4e38be1ea089b9e334197060"
-HOUSEHOLD_SEVERE_EVENT_COUNT = 33606
+HOUSEHOLD_BASELINE_DIGEST = "d997ce51698c19b9b01a6f573a607d830b05e6dfca0be8e5c263711c42e95a92"
+HOUSEHOLD_BASELINE_EVENT_COUNT = 27286
+HOUSEHOLD_SEVERE_DIGEST = "ab10bd16faa9ecddd527cfac57b7f6a7a6d7721f0f15c8bfc19d0c90c658677a"
+HOUSEHOLD_SEVERE_EVENT_COUNT = 35286
 
 
 def _regression_run() -> SimulationKernel:

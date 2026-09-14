@@ -6,10 +6,13 @@ five-county fixture and the twelve-county fixture, with every mechanism from P02
 migration wired in the same order.
 
 They change when any mechanism, its parameters, the tick order, the event vocabulary or the
-ordering of draws inside a subsystem changes — and the P07 pins are the first ones taken *after*
-the sandbox was proved deterministic across processes: iterating a set of node ids had made the
-number of events depend on the interpreter's string hash seed, which no single-process replay could
-detect. — which is exactly what a regression seed is for:
+ordering of draws inside a subsystem changes — as they did in V2-P04, when the price, relief
+and migration chains began recording their own constraints: the vocabulary grew, the
+behavioural counts did not, and the phase report shows the row-level difference.
+
+They are also the first pins taken *after* the sandbox was proved deterministic across processes:
+iterating a set of node ids had made the number of events depend on the interpreter's string hash
+seed, which no single-process replay could detect — which is exactly what a regression seed is for:
 without it, "the sandbox still works" would be an opinion. Update them deliberately, in the commit
 that changes the contract, and record the row-level difference in the phase report; never to make
 a red test go green.
@@ -32,12 +35,12 @@ from late_ming_lab.experiments.integrated import (
 )
 
 #: The five-county fixture over the full window.
-TOY_DIGEST = "f4d83122b04966ecbfc110d6610b2185cbf9c2bb56f04f73204ee3e4cc0d3144"
-TOY_EVENT_COUNT = 99_737
+TOY_DIGEST = "c221b8e1dc807166304af1fcf3bda8b7b36effd9b75b2eda2000de3d843cb575"
+TOY_EVENT_COUNT = 108_617
 
 #: The twelve-county fixture over the full window.
-MEDIUM_DIGEST = "cbb25e76b81b92ace8abd01e930fa7282fa9d66649dc76147a6c363e1ac0679c"
-MEDIUM_EVENT_COUNT = 235_342
+MEDIUM_DIGEST = "525048b64a7614488adc2b45110815175cda8896413bbd854c42b59450ca240e"
+MEDIUM_EVENT_COUNT = 255_982
 
 #: The wiring every integrated run must register, in phase order.
 EXPECTED_SYSTEMS: tuple[str, ...] = (

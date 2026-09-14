@@ -1,4 +1,12 @@
-# Declared by V2-P02. The expected values are a reproducibility pin, not a fit target.
+# Declared by V2-P02; re-pinned by V2-P04.
+#
+# The pin moved once, in V2-P04, and the reason is recorded here rather than in a commit message:
+# the price, relief and migration chains now record their own constraints as events
+# (MARKET_CONSTRAINT, RELIEF_CONSTRAINT, MIGRATION_GATE), so the log is longer and its digest is
+# different while the model's behaviour is not: every behavioural event count on the twelve
+# counties is unchanged from the pre-instrumentation run, which the V2-P04 phase report records
+# column by column. The values below are what the current code produces, and they are a
+# reproducibility pin, not a fit target.
 schema_version: demo-scenario-v1
 id: historical-core-v1
 description: >-
@@ -22,6 +30,6 @@ sandbox:
   pay_share_of_treasury: 0.5
   garrison_troops: 300.0
 expected:
-  simulation_digest: c75cbc96e54ff53ee8953a4bb6a8c6d4ff79a33296d8bbc7b0f5921f651f31a9
-  event_count: 226470
+  simulation_digest: e856aa13b75c06646d5534a07578a95a3bec598ee4a32072e851e51baadd5e59
+  event_count: 247110
   tick_count: 240

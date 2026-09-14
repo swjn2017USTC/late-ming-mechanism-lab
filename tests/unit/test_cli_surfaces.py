@@ -20,7 +20,15 @@ REPOSITORY = Path(__file__).resolve().parents[2]
 
 
 def test_every_family_names_what_it_runs_and_what_it_writes() -> None:
-    assert set(FAMILIES) == {"ablations", "p10", "p12", "integrated", "evidence", "mechanisms"}
+    assert set(FAMILIES) == {
+        "ablations",
+        "p04",
+        "p10",
+        "p12",
+        "integrated",
+        "evidence",
+        "mechanisms",
+    }
     for name, family in FAMILIES.items():
         assert family.name == name
         assert family.description
@@ -43,6 +51,14 @@ def test_a_document_family_refuses_a_seed_it_has_no_use_for() -> None:
 def test_the_integrated_family_refuses_a_replicate_axis_it_does_not_have() -> None:
     with pytest.raises(ExperimentError, match="once"):
         run_family("integrated", root=REPOSITORY, replicates=3)
+
+
+def test_the_holdout_family_refuses_a_seed_it_does_not_declare() -> None:
+    """V2-P04's arms are a comparison at declared seeds; another axis is another comparison."""
+    with pytest.raises(ExperimentError, match="declared seeds"):
+        run_family("p04", root=REPOSITORY, replicates=2)
+    with pytest.raises(ExperimentError, match="declared"):
+        run_family("p04", root=REPOSITORY, seed=1)
 
 
 def test_the_analyzer_reads_each_artifact_kind_by_its_layout() -> None:

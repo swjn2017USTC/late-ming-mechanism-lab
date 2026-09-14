@@ -153,9 +153,11 @@ def test_sweep_parameters_are_the_bounded_scalar_cards(cards: ParameterCards) ->
     ]
     excluded = [card for card in bounded if card.parameter_set in NON_ECONOMY_PARAMETER_SETS]
     assert {card.parameter_set for card in excluded} == set(NON_ECONOMY_PARAMETER_SETS)
+    # V2-P04 added four bounded cards (two price-chain, two migration-chain), which is what moved
+    # these counts: the set is derived above, and the counts are pinned so a fifth cannot slip in.
     assert len(excluded) == 8
-    assert len(sweeps) == 15
-    assert len(economy_bounded) == 17
+    assert len(sweeps) == 19
+    assert len(economy_bounded) == 21
     assert {sweep.name for sweep in sweeps} == {card.id for card in economy_bounded} - set(
         DICT_VALUED
     )
