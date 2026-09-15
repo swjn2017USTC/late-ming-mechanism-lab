@@ -86,6 +86,8 @@ EXTRACTION_RULE_VERSION: Final[str] = "extraction-policy-v1"
 #: every candidate bound in shi and ``outcome`` names the one that bound: ``stock``, ``silver``,
 #: ``capacity``, ``eligibility`` or ``none``.
 RELIEF_CONSTRAINT_EVENT: Final[str] = "RELIEF_CONSTRAINT"
+#: What an arrears rule removed, one row per application: settlement, remission or recovery.
+ARREARS_RELIEF_EVENT: Final[str] = "ARREARS_RELIEF"
 
 #: Relative slack for "the fill spent the whole budget the rule allows it to spend": the market
 #: turns ``budget`` into ``shi = budget / price`` and back into ``cost = shi * price``, which can
@@ -274,6 +276,12 @@ class TaxCollectionSystem:
             return 0.0
         collected = 0.0
         outstanding = target
+        # The V2-P05 rules run first, and the order is part of the rule: a county recovering old
+        # obligations collects what a household *has* before it meets this month's assessment
+        # through the liquidation ladder. Run after the ladder — or after its first silver step —
+        # they could never fire, because the ladder spends the silver first; that is what the first
+        # version of this rule measured, and it is why the order is stated rather than implied.
+        outstanding = self._recover_arrears(ctx, county, cohort, outstanding, assessed=target)
 
         advanced = min(
             self._tax_mediation.advance_tael(
@@ -296,8 +304,10 @@ class TaxCollectionSystem:
             collected += advanced
             outstanding -= advanced
 
+        paid_tael = 0.0
         if outstanding > 0.0:
             payment = min(outstanding, cohort.silver_tael)
+            paid_tael = payment
             if payment > 0.0:
                 emit_cohort_event(
                     ctx,
@@ -322,6 +332,12 @@ class TaxCollectionSystem:
                 collected += payment
                 outstanding -= payment
 
+        # The settlement and remission legs run on what is still owed after the month's silver
+        # payment and before the ladder: a settlement is a discount on a payment actually made, so
+        # it has to see the payment, and a remission is a decision about the remaining obligation.
+        outstanding = self._settle_and_remit(
+            ctx, county, cohort, outstanding, assessed=target, paid_tael=paid_tael
+        )
         outstanding = self._sell_grain_for_tax(ctx, county, cohort, outstanding)
         outstanding = self._sell_movables_for_tax(ctx, county, cohort, outstanding)
         outstanding = self._sell_land_for_tax(ctx, county, cohort, outstanding)
@@ -345,6 +361,176 @@ class TaxCollectionSystem:
                 self.phase,
             )
         return collected
+
+    def _settle_and_remit(
+        self,
+        ctx: TickContext,
+        county: CountyGovernment,
+        cohort: HouseholdCohortAgent,
+        outstanding: float,
+        *,
+        assessed: float,
+        paid_tael: float,
+    ) -> float:
+        """The settlement and remission legs, applied to what the month's assessment still owes.
+
+        A settlement is a discount *on a payment*, which is what its card says and what makes it
+        an institution rather than a haircut: the credit is a share of what the household paid
+        this month, so a household with no silver gets nothing. The first version of this rule
+        credited a share of the outstanding obligation whatever the household had paid, and the log
+        showed it firing on cohorts holding no silver at all — an assessment haircut wearing a
+        settlement's name.
+
+        Remission is the other institution and reads the model's own measured distress, not a
+        date or a place.
+        """
+        parameters = self._parameters
+        if outstanding <= 0.0:
+            return outstanding
+        if parameters.arrears_settlement_share > 0.0 and paid_tael > 0.0:
+            credit = min(outstanding, paid_tael * parameters.arrears_settlement_share)
+            outstanding -= credit
+            self._emit_arrears_relief(
+                ctx,
+                county,
+                cohort,
+                outcome="settlement",
+                removed_tael=credit,
+                outstanding_tael=outstanding,
+                assessed_tael=assessed,
+                paid_tael=paid_tael,
+            )
+        if parameters.arrears_remission_share > 0.0:
+            ratio = self._population.unmet_ratio(cohort.cohort_id)
+            if ratio >= parameters.arrears_remission_unmet_ratio:
+                remitted = min(outstanding, outstanding * parameters.arrears_remission_share)
+                outstanding -= remitted
+                self._emit_arrears_relief(
+                    ctx,
+                    county,
+                    cohort,
+                    outcome="remission",
+                    removed_tael=remitted,
+                    outstanding_tael=outstanding,
+                    assessed_tael=assessed,
+                    unmet_ratio=ratio,
+                )
+        return outstanding
+
+    def _recover_arrears(
+        self,
+        ctx: TickContext,
+        county: CountyGovernment,
+        cohort: HouseholdCohortAgent,
+        outstanding: float,
+        *,
+        assessed: float,
+    ) -> float:
+        """The V2-P05 candidates by which an outstanding obligation falls, and what they removed.
+
+        Each is neutral at zero (or, for the remission line, at a value no ratio can reach), so the
+        V1 path is what the neutral values reproduce: an obligation is carried whole until a later
+        month's assessment is paid against it. The three are different institutions — a settlement
+        discount for paying, a remission for a household that cannot, and a recovery rule that
+        clears old obligations once a household holds silver again — and the log says which one
+        fired, on what, and what it cost the claim.
+
+        Nothing here decides who deserves relief: the remission test reads the model's own rolling
+        unmet ratio, and the recovery test reads the cohort's own silver against its own assessment.
+        """
+        parameters = self._parameters
+        if outstanding <= 0.0:
+            return outstanding
+        if parameters.arrears_remission_share > 0.0:
+            ratio = self._population.unmet_ratio(cohort.cohort_id)
+            if ratio >= parameters.arrears_remission_unmet_ratio:
+                remitted = min(outstanding, outstanding * parameters.arrears_remission_share)
+                outstanding -= remitted
+                self._emit_arrears_relief(
+                    ctx,
+                    county,
+                    cohort,
+                    outcome="remission",
+                    removed_tael=remitted,
+                    outstanding_tael=outstanding,
+                    assessed_tael=assessed,
+                    unmet_ratio=ratio,
+                )
+        if parameters.arrears_recovery_share > 0.0:
+            carried = cohort.tax_arrears_tael
+            threshold = parameters.arrears_recovery_silver_months * max(assessed, 1e-9)
+            if carried > 0.0 and cohort.silver_tael >= threshold:
+                cleared = min(carried * parameters.arrears_recovery_share, cohort.silver_tael)
+                payment = cohort.record_tax_payment(
+                    silver_tael=cleared,
+                    assessed_tael=assessed,
+                    county_id=county.government_id,
+                    channel="arrears-recovery",
+                    rule_version=TAX_RULE_VERSION,
+                )
+                emit_cohort_event(ctx, cohort, payment, self.phase)
+                emit_government_event(
+                    ctx,
+                    county,
+                    county.receive_tax(
+                        silver_tael=cleared, payer_id=cohort.cohort_id, channel="arrears-recovery"
+                    ),
+                    self.phase,
+                )
+                emit_cohort_event(
+                    ctx,
+                    cohort,
+                    cohort.record_tax_arrears(
+                        delta_tael=-cleared,
+                        county_id=county.government_id,
+                        rule_version=TAX_RULE_VERSION,
+                    ),
+                    self.phase,
+                )
+                emit_government_event(
+                    ctx, county, county.record_arrears(delta_tael=-cleared), self.phase
+                )
+                self._emit_arrears_relief(
+                    ctx,
+                    county,
+                    cohort,
+                    outcome="recovery",
+                    removed_tael=cleared,
+                    outstanding_tael=carried - cleared,
+                    assessed_tael=assessed,
+                )
+        return outstanding
+
+    def _emit_arrears_relief(
+        self,
+        ctx: TickContext,
+        county: CountyGovernment,
+        cohort: HouseholdCohortAgent,
+        *,
+        outcome: str,
+        removed_tael: float,
+        outstanding_tael: float,
+        assessed_tael: float,
+        unmet_ratio: float = 0.0,
+        paid_tael: float = 0.0,
+    ) -> None:
+        """Record what one arrears rule removed, so a stock is attributed and not only counted."""
+        ctx.emit(
+            ARREARS_RELIEF_EVENT,
+            phase=self.phase.token,
+            agent_id=cohort.cohort_id,
+            region=county.node_id,
+            rule_version=TAX_RULE_VERSION,
+            trigger={
+                "removed_tael": removed_tael,
+                "outstanding_after_tael": outstanding_tael,
+                "assessed_tael": assessed_tael,
+                "unmet_ratio": unmet_ratio,
+                "silver_tael": cohort.silver_tael,
+                "paid_tael": paid_tael,
+            },
+            outcome=outcome,
+        )
 
     # ------------------------------------------------------------------ liquidation path
 

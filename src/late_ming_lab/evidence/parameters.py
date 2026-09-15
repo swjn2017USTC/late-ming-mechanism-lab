@@ -251,6 +251,17 @@ class EliteParameters(BaseModel):
 
     tax_mediation_advance_share: float = Field(ge=0, le=1)
 
+    # V2-P05, the accumulating branch of M004. Neutral at 0, which is V1's credit rule exactly:
+    # an obligation is never declared in default, so no default and no foreclosure is ever
+    # recorded. A positive value is the number of consecutive months a cohort may carry an
+    # outstanding obligation with no repayment before the lender declares it in default.
+    foreclosure_after_unserviced_months: int = Field(default=0, ge=0)
+    # V2-P05. Neutral at 0.0, which is V1's credit rule exactly: a default takes no land, because
+    # V1's lender holds a claim and never the pledge. Above zero it is the share of the pledged
+    # land the lender takes when it forecloses, so 1.0 takes the whole pledge and a smaller share
+    # leaves the household the remainder.
+    foreclosure_land_share_of_pledge: float = Field(default=0.0, ge=0, le=1)
+
     provenance: DataProvenance
 
 
@@ -321,6 +332,44 @@ class FiscalParameters(BaseModel):
     granary_target_cover_months: float = Field(ge=0)
     granary_purchase_share_of_silver: float = Field(ge=0, le=1)
 
+    # V2-P05. Three rules by which an arrears stock can fall, each neutral at zero so the V1
+    # structure — arrears accumulate and are cleared only by a later month's assessment — is what
+    # the neutral values reproduce. V1's monotone-ratchet claim was rejected, not restored: these
+    # are candidates for the *persistence* a stock shows, and each records what it removed.
+    arrears_settlement_share: float = Field(
+        ge=0,
+        le=1,
+        description=(
+            "of a payment made against an outstanding obligation, the share credited again as "
+            "settlement; zero pays exactly what was paid"
+        ),
+    )
+    arrears_remission_share: float = Field(
+        ge=0,
+        le=1,
+        description="share of an obligation remitted when the cohort qualifies",
+    )
+    arrears_remission_unmet_ratio: float = Field(
+        ge=0,
+        le=1,
+        description=(
+            "the cohort's rolling unmet ratio at or above which remission applies; 1.0 is neutral "
+            "because a ratio cannot exceed it, so nothing is ever remitted"
+        ),
+    )
+    arrears_recovery_share: float = Field(
+        ge=0,
+        le=1,
+        description="share of a cohort's prior arrears cleared when its silver position recovers",
+    )
+    arrears_recovery_silver_months: float = Field(
+        gt=0,
+        description=(
+            "how many months of the current assessment a cohort must hold in silver before the "
+            "recovery rule applies"
+        ),
+    )
+
     provenance: DataProvenance
 
     @model_validator(mode="after")
@@ -359,6 +408,11 @@ def core_default_fiscal_parameters() -> FiscalParameters:
         relief_logistics_cost_per_shi_tael=0.02,
         granary_target_cover_months=1.0,
         granary_purchase_share_of_silver=0.5,
+        arrears_settlement_share=0.0,
+        arrears_remission_share=0.0,
+        arrears_remission_unmet_ratio=1.0,
+        arrears_recovery_share=0.0,
+        arrears_recovery_silver_months=2.0,
         provenance=DataProvenance.assumption(
             "development-scale assessment value, collection and relief costs, elite hiding and "
             "granary rules; grade S, to be replaced by sourced parameter cards in P08"

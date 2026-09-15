@@ -1,0 +1,66 @@
+# V2-P05 parameter cards: the accumulating branch M004's card says was never measured.
+#
+# Both are neutral at zero, which is what makes the `elite-mediation-only` arm a no-op by
+# construction: at the neutral values a loan is serviced or it is not, and no land ever changes hands
+# on default. M004's own falsifiable prediction is the test these parameters exist for — an
+# accumulating branch should contract the assessable base further than the closed-credit arm does,
+# and if it does not, the bifurcation has no second branch.
+schema_version: parameter-cards-v1
+parameter_set: EliteParameters
+cards:
+- id: foreclosure_after_unserviced_months
+  name: months unserviced before foreclosure
+  parameter_set: EliteParameters
+  definition: >-
+    how many months a loan may go unserviced before the lender takes the pledged land
+  unit: months
+  mechanism: elite credit, land and the assessable base
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0
+  central_text: null
+  sources: []
+  reasoning: >-
+    Zero means never: the rule cannot fire, which is the V1 structure and what every other arm is read
+    against. The model's credit channel had no default at all — a loan that could not be serviced
+    simply stayed outstanding — so the card M004 rests on could only describe one branch. This
+    parameter is the second branch's term, and nothing in the registry dates a foreclosure.
+  uncertainty: >-
+    No source states a term. The value is an assumption; it enters the V2 sensitivity pool and any
+    branch result is conditional on it.
+  sensitivity_priority: high
+  version: elite-parameters-v1 (V2-P05)
+  range:
+    low: 0
+    high: 36
+    basis: no source; the upper end is three years of an unserviced obligation
+    conflicts: ''
+  ledger_entries: []
+- id: foreclosure_land_share_of_pledge
+  name: foreclosure land share of pledge
+  parameter_set: EliteParameters
+  definition: the share of the pledged land the lender takes when a loan is foreclosed
+  unit: share of the pledge
+  mechanism: elite credit, land and the assessable base
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    At zero the lender takes nothing even if the term passes, so the rule is doubly neutral and the
+    ablation arm is exact. Above zero the transfer is a real move of mu from the cohort to the elite,
+    recorded in the log, and the assessable base the county can see shrinks with it.
+  uncertainty: >-
+    Unconstrained by any source: how much of a pledge a foreclosure took, and whether interest or
+    principal was forgiven with it, is an institutional detail the record does not settle here.
+  sensitivity_priority: high
+  version: elite-parameters-v1 (V2-P05)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; 1.0 takes the whole pledge
+    conflicts: ''
+  ledger_entries: []

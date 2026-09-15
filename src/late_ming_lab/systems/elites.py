@@ -41,6 +41,7 @@ from late_ming_lab.systems.markets import MarketBook, emit_elite_event
 
 CREDIT_RULE_VERSION: Final[str] = "elite-credit-v1"
 LAND_RULE_VERSION: Final[str] = "elite-land-v1"
+FORECLOSURE_RULE_VERSION: Final[str] = "elite-foreclosure-v1"
 RELIEF_RULE_VERSION: Final[str] = "elite-relief-v1"
 TAX_MEDIATION_RULE_VERSION: Final[str] = "tax-mediation-v1"
 ELITE_STATE_RULE_VERSION: Final[str] = "elite-state-v1"

@@ -119,6 +119,7 @@ class CohortEventType(StrEnum):
     MIGRATION_ARRIVAL = "MIGRATION_ARRIVAL"
     MIGRANT_SUBSISTENCE = "MIGRANT_SUBSISTENCE"
     LAND_SALE = "LAND_SALE"
+    FORECLOSURE = "FORECLOSURE"
     COPING_TRANSITION = "COPING_TRANSITION"
     TAX_PAYMENT = "TAX_PAYMENT"
     TAX_ARREARS = "TAX_ARREARS_ASSESSED"
@@ -469,6 +470,47 @@ class HouseholdCohortAgent(LedgerAgent):
                 f"reason_is_{reason}": 1.0,
             },
             outcome=f"distress-sale-for-{reason}",
+        )
+
+    def record_foreclosure(
+        self,
+        *,
+        mu: float,
+        pledge_mu: float,
+        settled_tael: float,
+        lender_id: str,
+        rule_version: str,
+    ) -> CohortEvent:
+        """Lose pledged land to a lender who has called an unserviced loan.
+
+        No silver arrives: the land is taken in satisfaction of the debt, so the obligation falls
+        as the land leaves. Both movements are capped by what the cohort actually holds, so a
+        foreclosure can never leave a negative balance, and the household keeps whatever it holds
+        above the share of the pledge that was taken — the caller takes a declared share of the
+        pledge, never the whole holding unless that share is 1.0. The pledge itself is forfeit
+        whole: only the obligation is settled, and the value the land carries above it is the
+        lender's, not a payment back to this household.
+        """
+        taken = min(mu, self.land_mu)
+        settled = min(settled_tael, self.debt_tael)
+        self._apply(
+            land=-taken,
+            debt=-settled,
+            impacts=((LAND_DELTA, -taken), (DEBT_DELTA, -settled)),
+        )
+        return CohortEvent(
+            event_type=CohortEventType.FORECLOSURE,
+            rule_version=rule_version,
+            trigger={
+                "mu_transferred": taken,
+                "pledge_mu": pledge_mu,
+                "settled_tael": settled,
+                "land_left_mu": self.land_mu,
+                "debt_tael": self.debt_tael,
+                LAND_DELTA: -taken,
+                DEBT_DELTA: -settled,
+            },
+            outcome=f"foreclosed-by:{lender_id}",
         )
 
     def surplus_for_sale(self, *, parameters: HouseholdParameters) -> float:

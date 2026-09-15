@@ -43,6 +43,8 @@ class EliteEventType:
     GRAIN_RECEIVED = "ELITE_GRAIN_RECEIPT"
     LOAN_ISSUED = "ELITE_LOAN"
     LOAN_REPAID = "ELITE_LOAN_REPAID"
+    DEFAULT = "ELITE_DEFAULT"
+    FORECLOSURE = "ELITE_FORECLOSURE"
     LAND_PURCHASE = "ELITE_LAND_PURCHASE"
     RELIEF = "ELITE_RELIEF"
     GRAIN_SALE = "ELITE_GRAIN_SALE"
@@ -140,6 +142,65 @@ class LocalEliteAgent(LedgerAgent):
                 "grain_shi": self.grain_shi,
             },
             outcome=f"{reason}:{payer_id}",
+        )
+
+    def declare_default(
+        self,
+        *,
+        outstanding_tael: float,
+        months_unserviced: int,
+        borrower_id: str,
+        rule_version: str,
+    ) -> EliteEvent:
+        """Record that a borrower's obligation went unserviced past the declared term.
+
+        Nothing moves here: a default is a statement about the claim, and it is recorded so the
+        foreclosure that follows it is attributable. The rule that calls it lives in the debt
+        phase, which is the only place that knows whether a month was serviced.
+        """
+        return EliteEvent(
+            event_type=EliteEventType.DEFAULT,
+            rule_version=rule_version,
+            trigger={
+                "outstanding_tael": outstanding_tael,
+                "months_unserviced": float(months_unserviced),
+            },
+            outcome=f"defaulted:{borrower_id}",
+        )
+
+    def foreclose_land(
+        self,
+        *,
+        mu: float,
+        pledge_mu: float,
+        settled_tael: float,
+        surplus_tael: float,
+        borrower_id: str,
+        rule_version: str,
+    ) -> EliteEvent:
+        """Take pledged land in satisfaction of an unserviced claim.
+
+        No silver moves, which is what separates this from :meth:`buy_land`: the lender keeps the
+        claim's silver and takes the land instead. The pledge is forfeit whole, so where its value
+        exceeds the obligation it settles, the excess stays with the lender — that margin is the
+        lender's gain and is recorded as ``surplus_over_claim_tael`` rather than left implicit.
+        The claim itself falls on the borrower's side, where claims are held — the elite's
+        outstanding claims are derived from borrower debt, so recording ``settled_tael`` here and
+        not there could not drift.
+        """
+        self._apply(land=mu, impacts=((LAND_DELTA, mu),))
+        return EliteEvent(
+            event_type=EliteEventType.FORECLOSURE,
+            rule_version=rule_version,
+            trigger={
+                "mu_transferred": mu,
+                "pledge_mu": pledge_mu,
+                "settled_tael": settled_tael,
+                "surplus_over_claim_tael": surplus_tael,
+                "land_mu": self.land_mu,
+                LAND_DELTA: mu,
+            },
+            outcome=f"foreclosed-from:{borrower_id}",
         )
 
     def buy_land(

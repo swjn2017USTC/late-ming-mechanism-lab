@@ -1,0 +1,155 @@
+# V2-P05 parameter cards: the three rules by which an arrears stock can fall.
+#
+# All five are grade S. Each neutral value reproduces the V1 behaviour exactly — nothing is settled,
+# nothing is remitted, nothing is recovered until a later month's assessment is paid — which is what
+# makes the `arrears-rules-off` arm a no-op by construction and the three rule arms a test of the
+# rules rather than of a number.
+#
+# V1's monotone-ratchet claim was *rejected* by its own card, and nothing here restores it: these are
+# rules by which a stock falls, and the persistence they let the phase measure is a property of the
+# stock, not a claim that it can only rise.
+schema_version: parameter-cards-v1
+parameter_set: FiscalParameters
+cards:
+- id: arrears_settlement_share
+  name: arrears settlement share
+  parameter_set: FiscalParameters
+  definition: >-
+    of a payment made against an outstanding obligation, the share credited again as a settlement
+  unit: share of the payment
+  mechanism: fiscal extraction and the arrears stock
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    A settlement is an institution, not a measurement: a county that lets a payer settle old
+    obligations at a discount collects something rather than nothing. The model has no such rule, so
+    an obligation is carried whole until paid in full, and the phase cannot ask whether a stock
+    persists because of the terms or because of the harvest. At zero the payment buys exactly its own
+    value, which is the V1 rule.
+  uncertainty: >-
+    Nothing in the registry prices a settlement. The value is an assumption, it enters the V2
+    sensitivity pool, and any statement resting on it is conditional on it.
+  sensitivity_priority: high
+  version: fiscal-parameters-v1 (V2-P05)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; 1.0 would make a payment clear twice what it pays
+    conflicts: ''
+  ledger_entries: []
+- id: arrears_remission_share
+  name: arrears remission share
+  parameter_set: FiscalParameters
+  definition: the share of an outstanding obligation remitted when a cohort qualifies
+  unit: share of the outstanding obligation
+  mechanism: fiscal extraction and the arrears stock
+  level: meso
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    Remission is the other side of settlement: an obligation a household cannot meet is sometimes
+    written off, and the record's remissions are institutionally attested for the period though no
+    series here quantifies them. At zero nothing is ever written off, which is the V1 rule.
+  uncertainty: >-
+    No card in the registry carries a remission share. The value is an assumption and enters the V2
+    sensitivity pool.
+  sensitivity_priority: high
+  version: fiscal-parameters-v1 (V2-P05)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; 1.0 would write off the whole obligation of every qualifying household
+    conflicts: ''
+  ledger_entries: []
+- id: arrears_remission_unmet_ratio
+  name: arrears remission unmet ratio
+  parameter_set: FiscalParameters
+  definition: >-
+    the cohort's rolling unmet ratio at or above which remission applies
+  unit: ratio of unmet need to need, over twelve months
+  mechanism: fiscal extraction and the arrears stock
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 1.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    The qualifying test is the model's own measured distress, not a date or a place: a household is
+    remitted when its rolling unmet ratio reaches the line. The neutral value is 1.0 because a ratio
+    cannot exceed it, so nothing ever qualifies and the V1 rule stands.
+  uncertainty: >-
+    The line is a reading choice on the model's own quantity. It is deliberately at the value that
+    disables the rule, so the phase's control is exact, and a later phase that wants a real line has
+    to argue for one.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (V2-P05)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; the quantity itself is bounded by one
+    conflicts: ''
+  ledger_entries: []
+- id: arrears_recovery_share
+  name: arrears recovery share
+  parameter_set: FiscalParameters
+  definition: the share of a cohort's prior arrears cleared when its silver position recovers
+  unit: share of the prior arrears
+  mechanism: fiscal extraction and the arrears stock
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 0.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    A recovering household that holds silver again is the case in which a stock drawn from a shock
+    can be expected to fall. The rule reads only the cohort's own silver and its own assessment, so no
+    outside information enters it. At zero nothing is ever cleared this way, which is the V1 rule.
+  uncertainty: >-
+    Unconstrained by any source: how much of an old obligation a recovering household clears, and how
+    quickly, is an institutional question the record does not settle here.
+  sensitivity_priority: high
+  version: fiscal-parameters-v1 (V2-P05)
+  range:
+    low: 0.0
+    high: 1.0
+    basis: no source; 1.0 clears the whole prior obligation in one month once the silver is there
+    conflicts: ''
+  ledger_entries: []
+- id: arrears_recovery_silver_months
+  name: arrears recovery silver months
+  parameter_set: FiscalParameters
+  definition: >-
+    how many months of the current assessment a cohort must hold in silver before the recovery rule
+    applies
+  unit: months of the assessed obligation
+  mechanism: fiscal extraction and the arrears stock
+  level: micro
+  support_class: theoretically-assumed
+  evidence_grade: S
+  central: 2.0
+  central_text: null
+  sources: []
+  reasoning: >-
+    The threshold converts "recovered" into a quantity the model already measures: silver held against
+    the month's own assessment. It has no effect at all while arrears_recovery_share is zero, and it
+    is recorded because a rule whose only parameter is its share cannot say when it acts.
+  uncertainty: >-
+    No source constrains it. It is the smallest quantity in the file that is still a rule rather than
+    a constant, and it enters the sensitivity pool with the share it qualifies.
+  sensitivity_priority: medium
+  version: fiscal-parameters-v1 (V2-P05)
+  range:
+    low: 0.1
+    high: 12.0
+    basis: no source; the upper end is a year of assessment held in silver
+    conflicts: ''
+  ledger_entries: []
