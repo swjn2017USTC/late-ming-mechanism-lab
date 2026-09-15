@@ -23,6 +23,7 @@ def test_every_family_names_what_it_runs_and_what_it_writes() -> None:
     assert set(FAMILIES) == {
         "ablations",
         "p04",
+        "p06",
         "p10",
         "p12",
         "integrated",

@@ -109,6 +109,63 @@ def _run_mechanisms(root: Path, *, replicates: int | None, seed: int | None) -> 
     return (*write_mechanism_docs(root, book), write_synthesis(root, book, bundle))
 
 
+def _run_p06(root: Path, *, replicates: int | None, seed: int | None) -> tuple[Path, ...]:
+    """The V2-P06 pilot ladder: rungs, the gate, the freeze and the generated document.
+
+    A driver of its own, because the phase's artifact must be reproducible from the tree: the
+    review found the first pilot had been run by hand and its hash could not be regenerated.
+    """
+    from late_ming_lab.calibration.simulator import SimulatorSettings
+    from late_ming_lab.calibration.v2 import (
+        PROCESS_SEEDS,
+        SAMPLER_SEEDS,
+        SeedConditionedSimulator,
+        freeze_posterior,
+        ladder_gate,
+        prior_widths,
+        run_rung,
+        write_calibration_document,
+        write_rung_table,
+    )
+    from late_ming_lab.evidence.cards import load_cards
+    from late_ming_lab.evidence.ledger import load_patterns
+
+    if replicates is not None or seed is not None:
+        raise ExperimentError("the p06 pilot's rungs and seeds are declared; it has no overrides")
+    cards = load_cards(root)
+    registry = load_patterns(root)
+    settings = SimulatorSettings(tick_count=72, warmup_ticks=12)
+    widths = prior_widths(cards)
+    rungs = []
+    stop = None
+    for particles in (4, 8):
+        for sampler_seed in SAMPLER_SEEDS:
+            simulator = SeedConditionedSimulator(
+                cards, registry, mode="process-seeds", seeds=PROCESS_SEEDS, settings=settings
+            )
+            rung = run_rung(simulator, cards, particles=particles, sampler_seed=sampler_seed)
+            rungs.append(rung)
+        if len(rungs) >= 2 * len(SAMPLER_SEEDS):
+            stop = ladder_gate(
+                rungs[0],
+                rungs[-1],
+                prior_widths=widths,
+                previous_prediction=rungs[0].prediction,
+            )
+            if stop.converged:
+                break
+    if stop is None:
+        raise ExperimentError("the p06 pilot produced no gate verdict")
+    freeze_posterior(
+        root,
+        rungs=tuple(rungs),
+        stop=stop,
+        simulator=simulator,
+        sampler_seeds=SAMPLER_SEEDS,
+    )
+    return (write_rung_table(root, tuple(rungs)), write_calibration_document(root))
+
+
 def _run_p04(root: Path, *, replicates: int | None, seed: int | None) -> tuple[Path, ...]:
     """The V2-P04 arms, the no-op check and the generated diagnosis.
 
@@ -148,6 +205,11 @@ FAMILIES: Final[dict[str, Family]] = {
         name="p12",
         description="three declared decision policies under common random numbers",
         runner=_run_p12,
+    ),
+    "p06": Family(
+        name="p06",
+        description="the V2-P06 calibration pilot ladder, its gate, its freeze and its document",
+        runner=_run_p06,
     ),
     "p04": Family(
         name="p04",

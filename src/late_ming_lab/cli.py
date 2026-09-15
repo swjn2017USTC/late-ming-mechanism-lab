@@ -252,6 +252,7 @@ def calibrate(
     ] = False,
 ) -> None:
     """Run one SMC calibration batch and write the ensemble."""
+    from late_ming_lab.calibration.v2 import PosteriorNotFrozenError, load_frozen_posterior
     from late_ming_lab.experiments.calibration import (
         run_calibration_batch,
         run_posterior_predictive,
@@ -271,8 +272,13 @@ def calibrate(
                 progressbar=True,
             )
         if predictive:
-            run_posterior_predictive(root, batch_dir=directory)
-    except (ValueError, FileNotFoundError) as error:
+            frozen = load_frozen_posterior(root)
+            run_posterior_predictive(
+                root,
+                batch_dir=directory,
+                posterior_hash=str(frozen["posterior_hash"]),
+            )
+    except (ValueError, FileNotFoundError, PosteriorNotFrozenError) as error:
         typer.echo(f"calibrate failed: {error}", err=True)
         raise typer.Exit(code=1) from error
     typer.echo(f"batch: {directory}")

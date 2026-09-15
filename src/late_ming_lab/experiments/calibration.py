@@ -184,9 +184,22 @@ def ensemble_from(
 
 
 def run_posterior_predictive(
-    root: str | Path, *, batch_dir: str | Path, draw_limit: int | None = None
+    root: str | Path,
+    *,
+    batch_dir: str | Path,
+    posterior_hash: str,
+    draw_limit: int | None = None,
 ) -> Path:
-    """Run the ensemble forward into every window and persist the predictive tables."""
+    """Run the ensemble forward into every window and persist the predictive tables.
+
+    The reserved windows may be read only against a frozen posterior, and only by a caller that
+    names its hash: this is the isolation V2-P03 froze and V2-P06 built the gate for. A caller
+    without the hash, or with another one, is refused before a single run starts — the check is here
+    rather than in the report because a report cannot refuse anything.
+    """
+    from late_ming_lab.calibration.v2 import assert_holdout_allowed
+
+    assert_holdout_allowed(root, posterior_hash=posterior_hash)
     directory = Path(root) / str(batch_dir)
     inputs = load_calibration_inputs(root)
     ensemble = Ensemble.load(directory)
