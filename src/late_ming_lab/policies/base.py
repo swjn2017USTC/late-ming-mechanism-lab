@@ -46,7 +46,7 @@ class PolicyError(RuntimeError):
 
 
 class ModelNotConfirmedError(PolicyError):
-    """The endpoint's model id is not the operator-confirmed runtime model.
+    """The endpoint's model id is not the runtime model ADR 0003 declares.
 
     Raised *before* any credential is read and before any request is made. There is deliberately
     no fallback path: a caller that catches this may switch to a declared rule-based policy, but

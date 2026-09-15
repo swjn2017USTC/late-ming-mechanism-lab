@@ -18,7 +18,8 @@ Three ways to run it, and the difference between them is the point:
 - ``policy="replay"`` — the same layer driven by recorded fixtures: the model id, prompts and
   answers come from `tests/fixtures/llm/`, so a recorded live decision replays with no network.
 - ``policy="ustc"`` — the live runtime model. It fails closed unless ``USTC_LLM_MODEL`` is the
-  operator-confirmed id and ``USTC_LLM_ENABLED=1``; there is no fallback to another model.
+  the id declared by ``docs/adr/0003-runtime-model-amendment.md`` and ``USTC_LLM_ENABLED=1``;
+  there is no fallback to another model, and none to a rule policy either.
 """
 
 from __future__ import annotations
@@ -125,7 +126,14 @@ def smoke_seats(regions: tuple[str, ...]) -> tuple[ActorSeat, ...]:
     if len(regions) < 2:
         raise SmokeError("the smoke scenario needs at least two county regions")
     return tuple(
-        ActorSeat(code=code, role=role, region=regions[index % len(regions)])
+        ActorSeat(
+            code=code,
+            role=role,
+            region=regions[index % len(regions)],
+            # What the actor is told: an anonymous code. The node id stays on the seat for the lever
+            # lookup and the trace, and never reaches a prompt.
+            opaque_region=f"R{index % len(regions) + 1}",
+        )
         for index, (code, role) in enumerate(SEAT_ROLES)
     )
 
@@ -212,7 +220,11 @@ def run_institutional(
     layer = InstitutionalDecisionSystem(
         seats=seats,
         policy=build_policy(policy, transport=transport, settings=settings, seed=seed),
-        fallback=None if policy in {"rule", "random"} else RulePolicy(),
+        # A model-backed arm runs with no fallback: a refused decision leaves the state alone and
+        # is recorded as a refusal. Wiring a rule policy underneath the runtime arm would impute a
+        # scripted answer into the arm the model was supposed to be tested on, which is the one
+        # thing the runtime arm exists to avoid.
+        fallback=None,
         levers=levers,
         adults=sum(cohort.adults for cohort in economy.population),
         starting_households=sum(cohort.households for cohort in economy.population),

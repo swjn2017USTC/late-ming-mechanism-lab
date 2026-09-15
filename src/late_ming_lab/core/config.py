@@ -23,7 +23,10 @@ DEFAULT_ROOT_SEED: Final[int] = 20260912
 MAX_ROOT_SEED: Final[int] = 2**63 - 1
 
 #: The only runtime institutional-policy model permitted (RULES 8). Disabled by default.
-RUNTIME_LLM_MODEL_ID: Final[str] = "ustc-deepseek-v4.1"
+#: The runtime institutional policy's model id: declared by operator decision in
+#: `docs/adr/0003-runtime-model-amendment.md`. It is deliberately *not* recorded as a verification
+#: against the account's `/v1/models`, and reports must cite the ADR rather than a confirmation.
+RUNTIME_LLM_MODEL_ID: Final[str] = "deepseek-flash"
 
 DEFAULT_SCENARIO_ID: Final[str] = "kernel-smoke"
 DEFAULT_POLICY_ID: Final[str] = "noop-v1"

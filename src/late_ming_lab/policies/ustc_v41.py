@@ -3,8 +3,9 @@
 This is the only place in the repository that talks to a model at runtime, and it is built so that
 the ways it can fail are all refusals:
 
-- **the model is confirmed or the policy does not exist.** The configured id must equal the id the
-  operator confirmed against the account's ``/v1/models``; anything else raises
+- **the model is declared or the policy does not exist.** The configured id must equal the id
+  `docs/adr/0003-runtime-model-amendment.md` declares — a decision, explicitly not a verification
+  against the account's ``/v1/models``; anything else raises
   :class:`ModelNotConfirmedError` before a credential is read or a socket is opened. The forbidden
   fallbacks (V4 Pro, legacy V4 Flash, Qwen, GLM, OpenCode Go, OpenAI) are named in the refusal so a
   reader can see what was refused rather than guessing.
@@ -30,6 +31,7 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 from typing import Any, Final, Protocol, runtime_checkable
 
 import httpx
@@ -52,16 +54,18 @@ from late_ming_lab.policies.base import (
     render_prompt,
 )
 
-#: The model ids the operator has confirmed for runtime use. Exactly one today, matched exactly: a
-#: near-miss such as a variant suffix is not a confirmation, and this package will not treat it as
-#: one. Adding an id here is an operator act, not a configuration change.
+#: The model id the runtime layer may call. Exactly one, matched exactly: a near miss such as a
+#: variant suffix is not the declared id. Changing it is an operator act recorded in an ADR, not a
+#: configuration change.
 CONFIRMED_MODEL_IDS: Final[tuple[str, ...]] = (RUNTIME_LLM_MODEL_ID,)
 
-#: Ids that must never be reached from this layer, named so a refusal can say what it refused. They
-#: are matched as substrings of a candidate id; the confirmed id is checked first.
+#: Ids that must never be reached from this layer, named so a refusal can say what it refused.
+#: ADR 0003 removed `flash` from this list because the declared runtime id now carries it; the
+#: exact-match rule in `confirmed_model_id` is what keeps every near miss out, and it is not a
+#: weaker fence — a string that is not the one declared id is refused whoever it is. They are
+#: matched as substrings of a candidate id, and the declared id is checked first.
 FORBIDDEN_MODEL_MARKERS: Final[tuple[str, ...]] = (
     "pro",
-    "flash",
     "qwen",
     "glm",
     "gpt",
@@ -125,6 +129,38 @@ class UstcSettings(BaseModel):
     api_key: SecretStr
 
 
+#: The host the runtime endpoint must be. The model id is fenced by exact match; the endpoint is
+#: fenced here, because "the declared USTC endpoint" is part of the declaration and an unfenced base
+#: URL would let the same credential be sent anywhere.
+DECLARED_ENDPOINT_HOST: Final[str] = "api.llm.ustc.edu.cn"
+
+
+def _declared_base_url(raw: str) -> str:
+    """The declared endpoint, or a refusal that names what was wrong with it.
+
+    Refused before the credential is read, for the same reason the model id is: a misconfigured
+    endpoint must not receive the key even once.
+    """
+    candidate = raw.strip().rstrip("/")
+    if not candidate:
+        raise PolicyUnavailableError(
+            f"{ENV_BASE_URL} is empty: the runtime layer calls the declared USTC endpoint or "
+            "nothing"
+        )
+    if not candidate.startswith("https://"):
+        raise PolicyUnavailableError(
+            f"{ENV_BASE_URL}={candidate!r} is not https; the runtime layer sends a credential and "
+            "will not send it in the clear"
+        )
+    host = candidate.removeprefix("https://").split("/", 1)[0].split(":", 1)[0]
+    if host != DECLARED_ENDPOINT_HOST:
+        raise PolicyUnavailableError(
+            f"{ENV_BASE_URL} names {host!r}, not the declared endpoint "
+            f"{DECLARED_ENDPOINT_HOST!r}: the declaration covers the endpoint as well as the model"
+        )
+    return candidate
+
+
 def confirmed_model_id(model_id: str) -> str:
     """Return the id if it is the operator-confirmed runtime model, otherwise refuse.
 
@@ -153,6 +189,7 @@ def load_settings(
     cannot be mistaken for a credential problem and a wrong model cannot be called "just once".
     """
     values = environ if environ is not None else _process_environment()
+    base_url = _declared_base_url(values.get(ENV_BASE_URL, ""))
     model_id = confirmed_model_id(values.get(ENV_MODEL, ""))
     if values.get(ENV_ENABLED, "0") not in {"1", "true", "True"}:
         raise PolicyUnavailableError(
@@ -161,7 +198,7 @@ def load_settings(
         )
     source = credential_source or EnvironmentCredential(values)
     return UstcSettings(
-        base_url=values.get(ENV_BASE_URL, "").rstrip("/"),
+        base_url=base_url,
         model_id=model_id,
         enabled=True,
         timeout_seconds=float(values.get("USTC_LLM_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS)),
@@ -169,10 +206,35 @@ def load_settings(
     )
 
 
-def _process_environment() -> Mapping[str, str]:
+#: The repository's uncommitted environment file. It is read here — and only here — because the
+#: operator's switch lives in it and nothing else in the package loads it: an operator who sets the
+#: variables in `.env` and gets no effect has been told something false by the tooling.
+ENV_FILE: Final[str] = ".env"
+
+
+def _process_environment(repository_root: str | Path | None = None) -> Mapping[str, str]:
+    """The process environment, with the repository's `.env` underneath it.
+
+    Precedence is the process's, not the file's: an exported variable beats the file, so a one-off
+    override never has to be written down. Values are read and passed on; nothing here prints,
+    logs or returns them for display, and the key reaches the client as a `SecretStr` and nowhere
+    else. A missing or unreadable file is not an error: the environment alone is a valid answer.
+    """
     import os
 
-    return dict(os.environ)
+    values = dict(os.environ)
+    root = Path(repository_root) if repository_root is not None else Path.cwd()
+    for candidate in (root / ENV_FILE, root.parent / ENV_FILE):
+        if not candidate.is_file():
+            continue
+        for line in candidate.read_text(encoding="utf-8").splitlines():
+            entry = line.strip()
+            if not entry or entry.startswith("#") or "=" not in entry:
+                continue
+            name, _, value = entry.partition("=")
+            values.setdefault(name.strip(), value.strip())
+        break
+    return values
 
 
 class _RetryDecision:

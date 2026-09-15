@@ -1,19 +1,21 @@
 """The live USTC tests: opt-in, and fail-closed when the runtime model is not confirmed.
 
 Nothing here runs in the default suite — `pyproject.toml` excludes the marker — and nothing here
-runs at all until an operator has confirmed the model id against the account's ``/v1/models`` and
-set ``USTC_LLM_ENABLED=1``. When it is not confirmed, the first test fails with the refusal rather
-than skipping: a silent skip would read as "the live layer is fine, it just did not run today".
+runs at all until the runtime model id is declared (ADR 0003) and the switch is on. When it is not,
+the first test fails with the refusal rather than skipping: a silent skip would read as "the live
+layer is fine, it just did not run today".
+
+The environment is read through the policy's own reader, so the uncommitted ``.env`` the operator
+edits is what drives this suite; an exported variable still wins over it.
 
 ```bash
-cp .env.example .env && chmod 600 .env      # then set the key and the confirmed model id
-USTC_LLM_ENABLED=1 uv run pytest -m live_ustc
+# .env: base url, key, the declared model id, USTC_LLM_ENABLED=1
+uv run pytest -m live_ustc
 ```
 """
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -42,20 +44,28 @@ FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "llm"
 
 
 def _live_settings() -> UstcSettings:
-    """The runtime settings, or a failure that says exactly what is missing."""
-    return load_settings(environ=dict(os.environ))
+    """The runtime settings, or a failure that says exactly what is missing.
+
+    Read through `_process_environment`, the reader the policy itself uses, so this suite sees the
+    same environment the layer does — `.env` underneath, the process on top.
+    """
+    from late_ming_lab.policies.ustc_v41 import _process_environment
+
+    return load_settings(environ=_process_environment(Path(__file__).resolve().parents[2]))
 
 
 def test_the_configured_model_is_the_confirmed_runtime_model() -> None:
     """The gate itself, against the real environment. Refused rather than skipped when it fails."""
-    configured = os.environ.get(ENV_MODEL, "")
+    from late_ming_lab.policies.ustc_v41 import _process_environment
+
+    configured = _process_environment(Path(__file__).resolve().parents[2]).get(ENV_MODEL, "")
     if configured not in CONFIRMED_MODEL_IDS:
         with pytest.raises(ModelNotConfirmedError):
             _live_settings()
         pytest.fail(
-            f"{ENV_MODEL}={configured!r} is not a confirmed runtime model; confirmed ids are "
-            f"{CONFIRMED_MODEL_IDS}. P11 fails closed here on purpose: set {ENV_MODEL} to the id "
-            f"an operator confirmed against the account's /v1/models and {ENV_ENABLED}=1."
+            f"{ENV_MODEL}={configured!r} is not the declared runtime model; declared ids are "
+            f"{CONFIRMED_MODEL_IDS}. This fails closed on purpose: set {ENV_MODEL} to the id ADR "
+            f"0003 declares and {ENV_ENABLED}=1 in the uncommitted .env."
         )
     settings = _live_settings()
     assert settings.model_id in CONFIRMED_MODEL_IDS
@@ -64,7 +74,11 @@ def test_the_configured_model_is_the_confirmed_runtime_model() -> None:
 
 def test_one_live_decision_round_trips_through_a_recorded_fixture() -> None:
     """The phase's recording contract: a live answer becomes a fixture and replays identically."""
-    policy = policy_from_environment(environ=dict(os.environ))
+    from late_ming_lab.policies.ustc_v41 import _process_environment
+
+    policy = policy_from_environment(
+        environ=_process_environment(Path(__file__).resolve().parents[2])
+    )
     observation = PolicyObservation(
         actor="GOV-L1",
         role=ActorRole.COUNTY,

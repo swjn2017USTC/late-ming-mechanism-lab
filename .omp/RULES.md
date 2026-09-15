@@ -16,12 +16,17 @@ Background and rationale live in `.omp/AGENTS.md` and `docs/`.
 
 7. An LLM MUST NEVER determine physical or economic state directly (harvest, price, tax
    revenue, death, migration, battle outcome, recruitment counts).
-8. Runtime LLM = USTC-confirmed DeepSeek V4.1 only.
+8. Runtime LLM = the single model id declared in `docs/adr/0003-runtime-model-amendment.md`
+   (`deepseek-flash` at the declared USTC endpoint), declared by operator decision rather than
+   verified against `/v1/models`. Nothing else may run, and nothing may be called a confirmation
+   that was not one.
 9. The runtime LLM has no tools.
 10. The runtime LLM never receives API credentials, filesystem, or shell access.
 11. No automatic fallback from USTC V4.1 to another model. Fail closed, or switch to an
     explicitly declared rule-based policy.
-12. OpenCode Go is development-only; it is never runtime simulation intelligence.
+12. OpenCode Go is development-only; it is never runtime simulation intelligence. The runtime id
+   declared in ADR 0003 shares a name with a development model, and the ban is on the role, not on
+   the string: the runtime policy runs at the declared USTC endpoint, not through OMP model roles.
 13. Tests MUST NOT require live LLM access; `@pytest.mark.live_ustc` is opt-in only.
 
 ## Provenance and reproducibility

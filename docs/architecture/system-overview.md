@@ -383,7 +383,7 @@ and output, and nothing else. Domain mechanisms attach to it as systems in later
 
 | Concern | Module | Enforced contract |
 | --- | --- | --- |
-| Configuration | `core/config.py` | Frozen Pydantic model, `extra="forbid"`, cross-field validation; runtime LLM off by default and, when enabled, restricted to `ustc-deepseek-v4.1`; `content_hash()` over canonical JSON |
+| Configuration | `core/config.py` | Frozen Pydantic model, `extra="forbid"`, cross-field validation; runtime LLM off by default and, when enabled, restricted to the id `docs/adr/0003-runtime-model-amendment.md` declares (`deepseek-flash`); `content_hash()` over canonical JSON |
 | Time | `core/clock.py` | Zero-based monthly ticks, pure integer month arithmetic, `warmup`/`shock` split, out-of-window access raises |
 | Randomness | `core/rng.py` | One root `SeedSequence` spawned into seven independent streams; 128-bit per-stream seed recorded in the manifest; a global `random.seed(...)` is prohibited |
 | Events | `core/events.py` | Frozen events ordered by `(tick, seq)`; trigger values stored as a read-only mapping and canonical JSON; Parquet round-trip is lossless |

@@ -171,9 +171,21 @@ def test_a_narrowed_space_is_still_the_space_the_policy_may_use() -> None:
 # --- the model gate ------------------------------------------------------------------------
 
 
-def test_the_confirmed_model_is_the_only_one_that_may_be_called() -> None:
+def test_the_declared_model_is_the_only_one_that_may_be_called() -> None:
+    """One id, declared by ADR 0003: everything else is refused by exact match, near misses too.
+
+    `deepseek-flash` was on the forbidden list until the ADR made it the declared runtime id; the
+    fence that keeps an unconfirmed model out is now the exact match itself, which is why the near
+    misses below are refused even though they share its name.
+    """
     assert confirmed_model_id(CONFIRMED) == CONFIRMED
-    for forbidden in ("deepseek-flash", "deepseek-v4-pro", "gpt-5.2", "qwen3.8-flash"):
+    for forbidden in (
+        "ustc-deepseek-v4.1",
+        "deepseek-v4-pro",
+        "deepseek-flash-v2",
+        "gpt-5.2",
+        "qwen3.8-flash",
+    ):
         with pytest.raises(ModelNotConfirmedError) as error:
             confirmed_model_id(forbidden)
         assert "no fallback" in str(error.value)
@@ -193,8 +205,8 @@ def test_the_credential_is_never_read_when_the_model_is_not_confirmed() -> None:
             raise AssertionError("the credential was read before the model gate")
 
     configured = {
-        "USTC_LLM_BASE_URL": "https://api.example.invalid/v1",
-        "USTC_LLM_MODEL": "deepseek-flash",
+        "USTC_LLM_BASE_URL": "https://api.llm.ustc.edu.cn/v1",
+        "USTC_LLM_MODEL": "deepseek-v4-pro",
         "USTC_LLM_ENABLED": "1",
     }
     with pytest.raises(ModelNotConfirmedError):
@@ -207,7 +219,7 @@ def test_a_disabled_layer_refuses_before_reading_the_credential() -> None:
             raise AssertionError("the credential was read while disabled")
 
     configured = {
-        "USTC_LLM_BASE_URL": "https://api.example.invalid/v1",
+        "USTC_LLM_BASE_URL": "https://api.llm.ustc.edu.cn/v1",
         "USTC_LLM_MODEL": CONFIRMED,
         "USTC_LLM_ENABLED": "0",
     }
@@ -215,9 +227,31 @@ def test_a_disabled_layer_refuses_before_reading_the_credential() -> None:
         load_settings(environ=configured, credential_source=ExplodingCredential())
 
 
+def test_the_endpoint_is_fenced_like_the_model_is() -> None:
+    """The declaration covers the endpoint too: the same key must not be sent somewhere else."""
+
+    class ExplodingCredential:
+        def api_key(self) -> SecretStr:
+            raise AssertionError("the credential was read before the endpoint gate")
+
+    for base_url in (
+        "",
+        "http://api.llm.ustc.edu.cn/v1",
+        "https://attacker.example/v1",
+        "https://api.llm.ustc.edu.cn.evil.example/v1",
+    ):
+        configured = {
+            "USTC_LLM_BASE_URL": base_url,
+            "USTC_LLM_MODEL": CONFIRMED,
+            "USTC_LLM_ENABLED": "1",
+        }
+        with pytest.raises(PolicyUnavailableError):
+            load_settings(environ=configured, credential_source=ExplodingCredential())
+
+
 def test_an_endpoint_that_answers_as_another_model_is_refused() -> None:
     """The failure the gate exists for: a configured id that the endpoint does not honour."""
-    transport = StubTransport([valid_answer()], model_id="deepseek-flash")
+    transport = StubTransport([valid_answer()], model_id="deepseek-flash-neighbour")
     policy = USTCV41Policy(transport=transport, settings=settings_for())
 
     with pytest.raises(ModelNotConfirmedError, match="answered as"):

@@ -33,8 +33,13 @@ ARTIFACTS_ROOT: Final[str] = "outputs"
 CARDS_FILE: Final[str] = "docs/mechanisms/cards.yaml"
 P10_MANIFEST_FILE: Final[str] = "outputs/experiments/p10-ablations/manifest.json"
 
-#: The switch the runtime decision layer reads. Anything but an off value is an error here: the
-#: layer is disabled by default, stays disabled until P11, and is never enabled on a compute node.
+#: The switch the runtime decision layer reads. Off is the environment this check expects: a compute
+#: node runs the model with no credential and no endpoint, and a batch that turns the layer on there
+#: is a configuration error. An operator turning it on for a local runtime run is a *declared* state
+#: (ADR 0003), and `doctor` reports it as such rather than as a fault.
+#:
+#: The check reads the same environment the policy reads — the process's, with the repository's
+#: `.env` underneath it — so `doctor` cannot say "off" while the policy is calling a model.
 ENV_LLM_ENABLED: Final[str] = "USTC_LLM_ENABLED"
 _OFF_VALUES: Final[tuple[str, ...]] = ("", "0", "false", "no", "off")
 
@@ -264,7 +269,9 @@ def _api_key_finding() -> Finding:
 
 
 def _llm_switch_finding() -> Finding:
-    value = os.environ.get(ENV_LLM_ENABLED)
+    from late_ming_lab.policies.ustc_v41 import _process_environment
+
+    value = _process_environment().get(ENV_LLM_ENABLED)
     if value is None:
         return Finding(
             "llm-enabled", True, f"{ENV_LLM_ENABLED} is unset: the runtime layer is off", INFO
@@ -275,10 +282,12 @@ def _llm_switch_finding() -> Finding:
         )
     return Finding(
         "llm-enabled",
-        False,
-        f"{ENV_LLM_ENABLED}={value!r} turns the runtime decision layer on; it is disabled by "
-        "default, stays disabled until P11, and is never enabled on a compute node",
-        ERROR,
+        True,
+        f"{ENV_LLM_ENABLED}={value!r}: the runtime decision layer is on for this environment. "
+        "That is a declared operator state (ADR 0003), and it must never hold on a compute node: "
+        "the node sets no endpoint and no credential, and a batch that calls a model from one is a "
+        "configuration error",
+        WARNING,
     )
 
 

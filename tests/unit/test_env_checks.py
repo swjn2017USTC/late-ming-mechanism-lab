@@ -177,9 +177,14 @@ def test_the_runtime_switch_is_off_by_default_and_on_is_an_error(
 
     monkeypatch.setenv(ENV_LLM_ENABLED, "1")
     enabled = _finding(check_environment(root), "llm-enabled")
-    assert enabled.severity == ERROR
-    assert not enabled.ok
-    assert not check_environment(root).ok()
+    # An operator running the runtime layer locally is a declared state (ADR 0003): the check
+    # reports it and says where it must not hold, rather than calling the operator's own switch an
+    # environment error. A compute node is the place this must never appear.
+    assert enabled.severity == WARNING
+    assert enabled.ok
+    assert "compute node" in enabled.detail
+    assert check_environment(root).ok()
+    assert _finding(check_environment(root), "llm-enabled").severity == WARNING
 
 
 def test_a_visible_key_variable_is_named_and_its_value_is_never_printed(

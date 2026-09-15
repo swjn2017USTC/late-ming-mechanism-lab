@@ -10,7 +10,7 @@ and the readings are the declared mechanism verdicts plus the run's own outcome 
 rule      a declared threshold table
 utility   a bounded linear objective
 random    a seeded control
-ustc      the runtime model, which fails closed unless the model id is operator-confirmed
+ustc      the runtime model, which fails closed unless the id ADR 0003 declares is configured
 ```
 
 Three verdict rules, declared here and applied to whatever arms actually ran:

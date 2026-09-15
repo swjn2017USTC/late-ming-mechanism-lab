@@ -170,11 +170,22 @@ TRIGGERS: Final[tuple[Trigger, ...]] = default_triggers()
 
 @dataclass(frozen=True, slots=True)
 class ActorSeat:
-    """One occupied institutional seat: an opaque code, a role, and the region it speaks for."""
+    """One occupied institutional seat: an opaque code, a role, and the region it speaks for.
+
+    `region` is the node the seat acts on, used to find the levers a decision can pull and recorded
+    in the trace. `opaque_region` is what the *actor* is told: an anonymous code, because a prompt
+    that names a place hands the actor information about where it stands in the sequence, which is
+    what the boundary exists to withhold.
+    """
 
     code: str
     role: ActorRole
     region: str
+    opaque_region: str = ""
+
+    def displayed_region(self) -> str:
+        """The region as the actor sees it: the opaque code when one is declared, else the node."""
+        return self.opaque_region or self.region
 
     def action_space(self) -> tuple[InstitutionalAction, ...]:
         return ROLE_ACTIONS[self.role]
@@ -489,7 +500,7 @@ class InstitutionalDecisionSystem:
         observation = PolicyObservation(
             actor=seat.code,
             role=seat.role,
-            region=seat.region,
+            region=seat.displayed_region(),
             tick=ctx.tick,
             measures=tuple(sorted(measures.items())),
             action_space=seat.action_space(),

@@ -18,8 +18,10 @@ from late_ming_lab.policies.ustc_v41 import CONFIRMED_MODEL_IDS, confirmed_model
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-#: Every model id that may appear in this repository as a *runtime* model. One, and it is confirmed.
-ALLOWED_RUNTIME_MODELS = ("ustc-deepseek-v4.1",)
+#: Every model id that may appear in this repository as a *runtime* model. One, and it is declared
+#: by `docs/adr/0003-runtime-model-amendment.md` — declared rather than read off the account,
+#: which is the distinction the ADR exists to keep visible.
+ALLOWED_RUNTIME_MODELS = ("deepseek-flash",)
 
 #: Names that must never be reachable as a runtime model, checked against the source of the layer.
 FORBIDDEN_RUNTIME_MODEL_NAMES = ("deepseek-v4-pro", "deepseek-pro", "gpt-4", "qwen", "glm")

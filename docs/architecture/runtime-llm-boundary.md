@@ -16,7 +16,7 @@ Binding rules: `.omp/RULES.md` rules 7–13 and 22–23.
 | | Development-time | Runtime institutional policy |
 | --- | --- | --- |
 | Purpose | Write, review, and analyze code and documents | Choose among bounded policy actions inside a simulation run |
-| Allowed models | OpenCode Go (`deepseek-v4.1-flash`, `mimo-v2.5`, `qwen3.8-flash`, `glm-5.3-flash`) | USTC DeepSeek V4.1 only |
+| Allowed models | OpenCode Go (`deepseek-v4.1-flash`, `mimo-v2.5`, `qwen3.8-flash`, `glm-5.3-flash`) | exactly one id, declared in `docs/adr/0003-runtime-model-amendment.md` (`deepseek-flash`) |
 | Routing | `.omp/config.yml` (`modelRoles`, `task.agentModelOverrides`) | `src/late_ming_lab/policies/ustc_v41.py` (P11), never via OMP model roles |
 | Default state | enabled | **disabled** (`USTC_LLM_ENABLED=0`) |
 | Tools | OMP tool surface | none |
@@ -103,8 +103,11 @@ API credentials beyond the transport layer that calls it.
   policy. Never silently fall back.
 - Forbidden fallbacks: DeepSeek V4 Pro, legacy V4 Flash, Qwen, GLM, OpenCode Go, OpenAI.
 - Retry only on retryable transport errors; handle 429 explicitly; enforce timeouts.
-- Model identity is validated: `USTC_LLM_MODEL` must resolve to the operator-confirmed USTC
-  V4.1 id (authoritative source: the account's `/v1/models`). If it is not that id: fail closed.
+- Model identity is validated: `USTC_LLM_MODEL` must resolve to the single declared id (ADR 0003,
+  `deepseek-flash`). The declaration is an operator decision, **not** a reading taken from the
+  account's `/v1/models`; reports must say "declared by ADR 0003" and may not say "confirmed". If the
+  configured id is anything else — including a near miss — the policy fails closed before reading the
+  credential.
 
 ## Recording and replay
 
