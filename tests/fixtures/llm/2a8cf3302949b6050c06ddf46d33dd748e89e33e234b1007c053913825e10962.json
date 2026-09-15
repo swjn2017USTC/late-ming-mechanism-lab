@@ -1,0 +1,11 @@
+{
+  "model_id": "deepseek-flash",
+  "note": "recorded by the V2-P08 corpus pass",
+  "prompt_hash": "2a8cf3302949b6050c06ddf46d33dd748e89e33e234b1007c053913825e10962",
+  "provenance": "deepseek-flash",
+  "request_hash": "2a8cf3302949b6050c06ddf46d33dd748e89e33e234b1007c053913825e10962",
+  "response_content": "{\"action\":\"RELAX_EXTRACTION\",\"intensity\":0.6,\"priority\":\"STABILIZE_TAX_BASE\",\"rationale\":\"With 9 months of arrears, 18% unmet need, and only 2.4 months of food cover, easing extraction is needed to prevent flight and preserve the tax base.\"}",
+  "response_hash": "b805156a3e59636dafce60e7d2198c2facbfa807842ccf5270d29e5660aebbef",
+  "response_model_id": "deepseek-flash",
+  "schema_version": "llm-fixture-v1"
+}

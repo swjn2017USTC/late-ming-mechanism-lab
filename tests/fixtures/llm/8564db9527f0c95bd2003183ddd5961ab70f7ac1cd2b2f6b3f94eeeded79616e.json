@@ -1,0 +1,11 @@
+{
+  "model_id": "deepseek-flash",
+  "note": "recorded by the V2-P08 corpus pass",
+  "prompt_hash": "8564db9527f0c95bd2003183ddd5961ab70f7ac1cd2b2f6b3f94eeeded79616e",
+  "provenance": "deepseek-flash",
+  "request_hash": "8564db9527f0c95bd2003183ddd5961ab70f7ac1cd2b2f6b3f94eeeded79616e",
+  "response_content": "{\"action\":\"RELAX_EXTRACTION\",\"intensity\":0.6,\"priority\":\"STABILIZE_TAX_BASE\",\"rationale\":\"With over half the population out-migrating and 7.2 months of arrears, easing extraction is needed to retain the tax base before it collapses entirely.\"}",
+  "response_hash": "3fe3d6593bf5f4ea8eb5fde554f719d9da01e8de9e0e4210fcafc0a4061eeb8e",
+  "response_model_id": "deepseek-flash",
+  "schema_version": "llm-fixture-v1"
+}

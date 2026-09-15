@@ -1,0 +1,11 @@
+{
+  "model_id": "deepseek-flash",
+  "note": "recorded by tests/policies/test_live_ustc.py",
+  "prompt_hash": "2cbac68fa3af9d6df6eb096ee799a3f77502dfa33d1943015efb2c2450697d0a",
+  "provenance": "live",
+  "request_hash": "2cbac68fa3af9d6df6eb096ee799a3f77502dfa33d1943015efb2c2450697d0a",
+  "response_content": "{\"action\":\"RELAX_EXTRACTION\",\"intensity\":0.6,\"priority\":\"STABILIZE_TAX_BASE\",\"rationale\":\"With 7.2 months of arrears and 18% unmet need, easing collection preserves the tax base and reduces flight risk.\"}",
+  "response_hash": "a6b5939196a7afc89ce437953c7fc61bbc60faf915f8567626d86de9c6a45aa2",
+  "response_model_id": "deepseek-flash",
+  "schema_version": "llm-fixture-v1"
+}

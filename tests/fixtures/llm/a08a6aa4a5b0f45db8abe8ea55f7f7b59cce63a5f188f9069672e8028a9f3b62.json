@@ -1,0 +1,11 @@
+{
+  "model_id": "deepseek-flash",
+  "note": "recorded by the V2-P08 corpus pass",
+  "prompt_hash": "a08a6aa4a5b0f45db8abe8ea55f7f7b59cce63a5f188f9069672e8028a9f3b62",
+  "provenance": "deepseek-flash",
+  "request_hash": "a08a6aa4a5b0f45db8abe8ea55f7f7b59cce63a5f188f9069672e8028a9f3b62",
+  "response_content": "{\"action\":\"MAINTAIN\",\"intensity\":0.4,\"priority\":\"SUSTAIN_ARMY\",\"rationale\":\"With over half of adults armed and garrison pay shortfalls, keeping the current posture preserves the force while avoiding provocation.\"}",
+  "response_hash": "8f0b70587d8b3e985f8e9997aabb99ee4f3e98755f0382afaa1115dd8d0a0289",
+  "response_model_id": "deepseek-flash",
+  "schema_version": "llm-fixture-v1"
+}

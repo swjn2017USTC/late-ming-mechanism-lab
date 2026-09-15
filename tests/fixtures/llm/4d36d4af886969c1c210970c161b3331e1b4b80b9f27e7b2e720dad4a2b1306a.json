@@ -1,0 +1,11 @@
+{
+  "model_id": "deepseek-flash",
+  "note": "recorded by the V2-P08 corpus pass",
+  "prompt_hash": "4d36d4af886969c1c210970c161b3331e1b4b80b9f27e7b2e720dad4a2b1306a",
+  "provenance": "deepseek-flash",
+  "request_hash": "4d36d4af886969c1c210970c161b3331e1b4b80b9f27e7b2e720dad4a2b1306a",
+  "response_content": "{\"action\":\"RELAX_EXTRACTION\",\"intensity\":0.6,\"priority\":\"STABILIZE_TAX_BASE\",\"rationale\":\"With 7.2 months of arrears and 18% unmet need, further extraction risks flight and collapse of the tax base, so easing collection preserves future receipts.\"}",
+  "response_hash": "e692de35508e3b50ce6886ede4a0a585f1ee25f76500cb6df2e99e7bb2a3931b",
+  "response_model_id": "deepseek-flash",
+  "schema_version": "llm-fixture-v1"
+}
