@@ -20,6 +20,8 @@ evidence the phase report records, pinned here so a later change cannot quietly 
 
 from __future__ import annotations
 
+import shutil
+
 import polars as pl
 import pytest
 
@@ -67,6 +69,10 @@ INSTRUMENTED_COUNTS = {
 
 @pytest.fixture(scope="module")
 def reference_run() -> ArmRun:
+    # A scratch root, cleared first: the store refuses a run whose stamped code revision differs,
+    # which is exactly what it should do and exactly what happens whenever the phase that owns this
+    # file changes any code the run touches.
+    shutil.rmtree(OUTPUT_ROOT, ignore_errors=True)
     return run_arm(
         Arm(
             label=REFERENCE_ARM,

@@ -45,8 +45,14 @@ from late_ming_lab.core.config import SimulationConfig
 from late_ming_lab.core.kernel import SimulationKernel
 from late_ming_lab.evidence.ledger import load_patterns
 from late_ming_lab.evidence.parameters import (
+    BandParameters,
+    EliteParameters,
+    FiscalParameters,
     MarketParameters,
     MigrationParameters,
+    core_default_band_parameters,
+    core_default_elite_parameters,
+    core_default_fiscal_parameters,
     core_default_governance_indicators,
     core_default_market_parameters,
     core_default_migration_parameters,
@@ -60,7 +66,14 @@ from late_ming_lab.protocol.thresholds import load_ensemble, sample_draws
 from late_ming_lab.storage.run_store import RunStore
 from late_ming_lab.storage.tables import read_json, read_table
 
-_T = TypeVar("_T", MarketParameters, MigrationParameters)
+_T = TypeVar(
+    "_T",
+    MarketParameters,
+    MigrationParameters,
+    FiscalParameters,
+    BandParameters,
+    EliteParameters,
+)
 
 #: The file an arm writes beside its run: the declaration, the diff, and the parameter sets used.
 ARM_PROVENANCE_FILE: Final[str] = "holdout-arm.json"
@@ -70,6 +83,9 @@ HOLDOUT_ROOT: Final[str] = "outputs/v2/p04"
 
 #: The reference arm's label: the V1 structure on the V2 input.
 REFERENCE_ARM: Final[str] = "reference"
+
+#: The prefix every arm's run id and scenario id carries.
+PREFIX: Final[str] = "p04"
 
 #: The declared world seeds. Identical across arms: a structural difference read across different
 #: seeds would be a difference between seeds.
@@ -137,12 +153,34 @@ class Arm:
     expects_effect: bool
     market: dict[str, float] = field(default_factory=dict)
     migration: dict[str, float] = field(default_factory=dict)
+    fiscal: dict[str, float] = field(default_factory=dict)
+    band: dict[str, float] = field(default_factory=dict)
+    elite: dict[str, float] = field(default_factory=dict)
 
     def market_parameters(self) -> MarketParameters:
         return self._applied(core_default_market_parameters(), self.market)
 
     def migration_parameters(self) -> MigrationParameters:
         return self._applied(core_default_migration_parameters(), self.migration)
+
+    def fiscal_parameters(self) -> FiscalParameters:
+        return self._applied(core_default_fiscal_parameters(), self.fiscal)
+
+    def band_parameters(self) -> BandParameters:
+        return self._applied(core_default_band_parameters(), self.band)
+
+    def elite_parameters(self) -> EliteParameters:
+        return self._applied(core_default_elite_parameters(), self.elite)
+
+    def parameter_sets(self) -> dict[str, object]:
+        """The sets an arm can move, keyed by the class name the economy build takes."""
+        return {
+            "MarketParameters": self.market_parameters(),
+            "MigrationParameters": self.migration_parameters(),
+            "FiscalParameters": self.fiscal_parameters(),
+            "BandParameters": self.band_parameters(),
+            "EliteParameters": self.elite_parameters(),
+        }
 
     @staticmethod
     def _applied(base: _T, overrides: dict[str, float]) -> _T:
@@ -171,6 +209,18 @@ class Arm:
             reference = getattr(core_default_migration_parameters(), name)
             if value != reference:
                 moved[f"MigrationParameters.{name}"] = float(value)
+        for name, value in self.fiscal.items():
+            reference = getattr(core_default_fiscal_parameters(), name)
+            if value != reference:
+                moved[f"FiscalParameters.{name}"] = float(value)
+        for name, value in self.band.items():
+            reference = getattr(core_default_band_parameters(), name)
+            if value != reference:
+                moved[f"BandParameters.{name}"] = float(value)
+        for name, value in self.elite.items():
+            reference = getattr(core_default_elite_parameters(), name)
+            if value != reference:
+                moved[f"EliteParameters.{name}"] = float(value)
         return moved
 
 
@@ -256,21 +306,16 @@ def run_arm(
     output_root: str | Path = HOLDOUT_ROOT,
     ticks: int = 240,
     warmup_ticks: int = 24,
+    prefix: str = PREFIX,
 ) -> ArmRun:
     """Run one declared structure on the historical core, keeping its log."""
-    economy = build_integrated_economy(
-        HISTORICAL_SCENARIO,
-        parameter_sets={
-            "MarketParameters": arm.market_parameters(),
-            "MigrationParameters": arm.migration_parameters(),
-        },
-    )
+    economy = build_integrated_economy(HISTORICAL_SCENARIO, parameter_sets=arm.parameter_sets())
     run_config = SimulationConfig.model_validate(
         {
             "tick_count": ticks,
             "warmup_ticks": warmup_ticks,
             "root_seed": root_seed,
-            "scenario_id": f"p04-{arm.label}",
+            "scenario_id": f"{prefix}-{arm.label}",
             "policy_id": "p04-holdout-v1",
         }
     )
@@ -653,6 +698,7 @@ def load_arm_runs(
     root: str | Path = ".",
     output_root: str | Path = HOLDOUT_ROOT,
     arms: tuple[Arm, ...] | None = None,
+    prefix: str = "p04",
 ) -> tuple[ArmRun, ...]:
     """Re-open the arms' runs from disk, so a document can be rewritten without re-running them.
 
@@ -665,11 +711,11 @@ def load_arm_runs(
     directory_root = Path(output_root)
     runs: list[ArmRun] = []
     for arm in chosen:
-        prefix = f"p04-{arm.label}-"
+        stem = f"{prefix}-{arm.label}-"
         directories = sorted(
             path
-            for path in directory_root.glob(f"{prefix}*")
-            if path.name[len(prefix) :].split("-", 1)[0].isdigit()
+            for path in directory_root.glob(f"{stem}*")
+            if path.name[len(stem) :].split("-", 1)[0].isdigit()
             and (path / "agent_events.parquet").is_file()
         )
         if not directories:
@@ -728,11 +774,7 @@ def protocol_scores(
     scores: dict[str, dict[str, object]] = {}
     for run in runs:
         economy = build_integrated_economy(
-            HISTORICAL_SCENARIO,
-            parameter_sets={
-                "MarketParameters": run.arm.market_parameters(),
-                "MigrationParameters": run.arm.migration_parameters(),
-            },
+            HISTORICAL_SCENARIO, parameter_sets=run.arm.parameter_sets()
         )
         population_adults = sum(cohort.adults for cohort in economy.population)
         starting_households = sum(cohort.households for cohort in economy.population)

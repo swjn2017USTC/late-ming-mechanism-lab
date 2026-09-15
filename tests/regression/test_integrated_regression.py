@@ -65,7 +65,7 @@ EXPECTED_SYSTEMS: tuple[str, ...] = (
 )
 
 #: Digest of that wiring: name, phase, reads and writes for every registered system.
-EXPECTED_SYSTEMS_DIGEST = "822625248093abe5e47622afc6f17d7f8946837cf408aba6f78532e8ae4334ff"
+EXPECTED_SYSTEMS_DIGEST = "902395f3e145bc718cdcd2337abe5f456e01c6a488d35b2ec6667a50ce3f5a44"
 
 
 def test_the_toy_regression_run_matches_its_pinned_sandbox() -> None:

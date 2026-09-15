@@ -64,7 +64,15 @@ BASE = 512
 SEED = 20_260_914
 
 #: The two cards whose range the sweep set must decline, because their field is a mapping.
-DICT_VALUED = ("yield_shi_per_mu", "rent_share_of_harvest")
+#: Bounded cards the sweep does not vary, with the reason. The first two are dict-valued (a yield
+#: curve and a rent schedule, not a scalar); `foreclosure_after_unserviced_months` is an integer
+#: month count, and the design varies bounded *floats* — it reaches the sensitivity pool when the
+#: design is rebuilt around integer grids, which V2-P07 owns.
+NOT_SWEPT = (
+    "yield_shi_per_mu",
+    "rent_share_of_harvest",
+    "foreclosure_after_unserviced_months",
+)
 
 #: The two medium-priority cards the prior table leaves out of calibration and this sweep keeps.
 MEDIUM_PRIORITY = ("land_per_adult_capacity_mu", "wage_grain_shi_per_adult_month")
@@ -153,18 +161,19 @@ def test_sweep_parameters_are_the_bounded_scalar_cards(cards: ParameterCards) ->
     ]
     excluded = [card for card in bounded if card.parameter_set in NON_ECONOMY_PARAMETER_SETS]
     assert {card.parameter_set for card in excluded} == set(NON_ECONOMY_PARAMETER_SETS)
-    # V2-P04 added four bounded cards (two price-chain, two migration-chain), which is what moved
-    # these counts: the set is derived above, and the counts are pinned so a fifth cannot slip in.
+    # V2-P04 added four bounded cards (two price-chain, two migration-chain) and V2-P05 six more
+    # (three arrears rules, two foreclosure fields, one remission line): the set is derived above,
+    # and the counts are pinned so another cannot slip in unnoticed.
     assert len(excluded) == 8
-    assert len(sweeps) == 19
-    assert len(economy_bounded) == 21
+    assert len(sweeps) == 25
+    assert len(economy_bounded) == 28
     assert {sweep.name for sweep in sweeps} == {card.id for card in economy_bounded} - set(
-        DICT_VALUED
+        NOT_SWEPT
     )
     assert set(MEDIUM_PRIORITY) <= {sweep.name for sweep in sweeps}
     # The registry's card order, which is what makes two designs comparable column by column.
     assert tuple(sweep.name for sweep in sweeps) == tuple(
-        card.id for card in economy_bounded if card.id not in DICT_VALUED
+        card.id for card in economy_bounded if card.id not in NOT_SWEPT
     )
     for sweep in sweeps:
         card = cards.require(sweep.parameter_set, sweep.name)
