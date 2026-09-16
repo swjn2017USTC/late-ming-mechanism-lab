@@ -49,7 +49,7 @@
       "sha256": "e135baceea10778dbe7681b51b49f7e04d001ff5af83495bf13e9424e5b93b49"
     }
   ],
-  "bundle_hash": "696b40a7745d10e8fc0d21075ed9b6cb4628be8d06d74455c6cbab236766fdb4",
+  "bundle_hash": "4f9656cadaf47ec4a98b071614339c7bf32c5e480311a6a65c5e9e06c66ddf76",
   "candidate": "v0.2.0-rc1",
   "cards": [
     "docs/mechanisms/v2_1/M001.md",
@@ -108,7 +108,7 @@
       "status": "met"
     }
   ],
-  "git_sha": "c882ec1bca8736de3c2a20318282737e8c31ad00",
+  "git_sha": "7ad8ea55e94aa9920678e7c8b8bbbf3cb80154fd",
   "pyproject_sha256": "4d002943b264dc77a2998014582740ee3f05e0231633444db9a9e7f91b60be9e",
   "reports": [
     {
@@ -145,6 +145,6 @@
   "schema_version": "release-bundle-v2_1",
   "tag_created": false,
   "translation_version": "zh-v2.1",
-  "tree_dirty": true,
+  "tree_dirty": false,
   "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
 }
