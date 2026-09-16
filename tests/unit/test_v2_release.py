@@ -22,6 +22,7 @@ than against a stub. What is not paid for is the simulation behind those artifac
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -40,6 +41,15 @@ from late_ming_lab.synthesis.v2 import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
+
+#: The phrase in a generated document that names *which code* produced it. V2's documents are the
+#: record of the V2 release, and every phase after V2 adds source, so a live regeneration cannot
+#: reproduce that phrase — nor should it: rewriting it would make the record false. The phrase is
+#: held to the bundle published beside the document, which states the same thing machine-readably.
+CODE_IDENTITY = re.compile(r"the package's \d+ sources as `[0-9a-f]+`")
+
+#: What the phrase is replaced with on both sides before the rest of the document is compared.
+CODE_IDENTITY_MASK = "the package's <n> sources as `<digest>`"
 
 
 @pytest.fixture(scope="module")
@@ -336,9 +346,17 @@ def test_the_committed_documents_are_what_the_code_produces(tmp_path: Path) -> N
     Generated documents that no longer match their generator are the failure mode this catches — a
     card edited by hand, a status re-pinned after an artifact moved, a table written by an earlier
     revision of the module.
+
+    One phrase is compared differently, for the reason the record exists: the Release gate's line
+    names the code that produced *this* release, so a regeneration under later code must disagree
+    with it. That line is held to `release-bundle.json`, published beside the document and stating
+    the same fact in machine-readable form — a document that named a different code than its own
+    bundle would be the failure this test is for.
     """
     root = _scratch_root(tmp_path)
     build_v2_release(root)
+    bundle = json.loads((ROOT / "docs/v2/release-bundle.json").read_text(encoding="utf-8"))
+    recorded = f"the package's {bundle['code_files']} sources as `{bundle['code_digest'][:16]}`"
 
     from late_ming_lab.synthesis.v2 import CARDS_FILE
 
@@ -357,7 +375,14 @@ def test_the_committed_documents_are_what_the_code_produces(tmp_path: Path) -> N
     for relative in documents:
         generated = (root / relative).read_text(encoding="utf-8")
         committed = (ROOT / relative).read_text(encoding="utf-8")
-        assert generated == committed, f"{relative} was not produced by this code"
+        assert len(CODE_IDENTITY.findall(generated)) == len(CODE_IDENTITY.findall(committed)), (
+            f"{relative} states its code identity a different number of times than the generator"
+        )
+        for identity in CODE_IDENTITY.findall(committed):
+            assert identity == recorded, f"{relative} names {identity} and its bundle {recorded}"
+        assert CODE_IDENTITY.sub(CODE_IDENTITY_MASK, generated) == CODE_IDENTITY.sub(
+            CODE_IDENTITY_MASK, committed
+        ), f"{relative} was not produced by this code"
 
 
 def test_the_bundle_does_not_count_itself_as_a_dirty_tree() -> None:

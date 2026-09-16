@@ -1,0 +1,323 @@
+{
+  "card_free_cards": 85,
+  "central_outside_range": [
+    {
+      "finding": "the card records 0.005, below its own range [0.01, 0.1]",
+      "name": "interest_rate_monthly"
+    }
+  ],
+  "declared_but_not_applied": [
+    "pay_tael_per_soldier_month",
+    "food_shi_per_soldier_month"
+  ],
+  "declared_parameters": [
+    "yield_loss_scale",
+    "subsistence_grain_per_adult_month_shi",
+    "permanent_migration_unmet_ratio",
+    "temporary_migration_unmet_ratio",
+    "interest_rate_monthly",
+    "assessed_value_tael_per_mu",
+    "elite_hidden_land_share",
+    "reference_price_tael_per_shi",
+    "permanent_share_of_households_per_month",
+    "temporary_share_of_adults_per_month",
+    "pay_tael_per_soldier_month",
+    "food_shi_per_soldier_month",
+    "food_shi_per_member_month"
+  ],
+  "excluded_parameters": [
+    "yield_shi_per_mu",
+    "rent_share_of_harvest",
+    "land_per_adult_capacity_mu",
+    "wage_grain_shi_per_adult_month"
+  ],
+  "generator": "python -m late_ming_lab.v2_1 audit",
+  "range_carrying_cards": 37,
+  "resolutions": [
+    {
+      "finding": "central value outside its own declared range",
+      "parameters": [
+        "interest_rate_monthly"
+      ],
+      "reason": "P10 may not move the central, exclude the parameter (that would change the prior table and the frozen posterior's prior_digest), or edit the card (that would change data/parameters/*.yaml, which evidence_digest covers and the frozen outputs/v2/p06/posterior.json records)",
+      "resolution": "registered carried item"
+    },
+    {
+      "finding": "range-carrying cards in neither the declared nor the excluded list",
+      "parameters": [
+        "foreclosure_after_unserviced_months",
+        "foreclosure_land_share_of_pledge",
+        "arrears_recovery_share",
+        "arrears_recovery_silver_months",
+        "arrears_remission_share",
+        "arrears_remission_unmet_ratio",
+        "arrears_settlement_share",
+        "crop_saturation_events",
+        "crop_weight",
+        "drought_saturation_events",
+        "drought_weight",
+        "famine_saturation_events",
+        "famine_weight",
+        "pest_saturation_events",
+        "pest_weight",
+        "demand_pressure_cap",
+        "demand_pressure_weight",
+        "destitution_departure_share",
+        "destitution_exit_share"
+      ],
+      "reason": "19 of the 37 range-carrying cards need an exclusion rule each, and no measurement in this phase produces one; registering the gap is the honest action, and inventing the rules is not available to this phase",
+      "resolution": "registered carried item"
+    },
+    {
+      "finding": "a card whose range block carries no bounds",
+      "parameters": [
+        "monthly_allocation_profile"
+      ],
+      "reason": "it is not a drawable range, so it is neither a prior nor an excludable card; excluded_parameters refuses a card with no bounded range by design",
+      "resolution": "registered carried item"
+    },
+    {
+      "finding": "declared priors whose parameter set the simulator does not rebuild",
+      "parameters": [
+        "pay_tael_per_soldier_month",
+        "food_shi_per_soldier_month"
+      ],
+      "reason": "the draw is checked, hashed into the run identity and then dropped before the run, so those priors are declared and ineffective; changing it changes what the frozen posterior means, which is not this phase's to change",
+      "resolution": "registered carried item, and a defect rather than a registry choice"
+    }
+  ],
+  "schema_version": "v2_1-parameter-registry-findings-v1",
+  "simulator_applies_sets": [
+    "BandParameters",
+    "CropParameters",
+    "EliteParameters",
+    "FiscalParameters",
+    "HouseholdParameters",
+    "MarketParameters",
+    "MigrationParameters"
+  ],
+  "unclassified_numeric": 19,
+  "unclassified_range_cards": [
+    {
+      "central": 0.0,
+      "name": "foreclosure_after_unserviced_months",
+      "numeric_range": true,
+      "parameter_set": "EliteParameters",
+      "range_high": 36.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "foreclosure_land_share_of_pledge",
+      "numeric_range": true,
+      "parameter_set": "EliteParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "arrears_recovery_share",
+      "numeric_range": true,
+      "parameter_set": "FiscalParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 2.0,
+      "name": "arrears_recovery_silver_months",
+      "numeric_range": true,
+      "parameter_set": "FiscalParameters",
+      "range_high": 12.0,
+      "range_low": 0.1,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "arrears_remission_share",
+      "numeric_range": true,
+      "parameter_set": "FiscalParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 1.0,
+      "name": "arrears_remission_unmet_ratio",
+      "numeric_range": true,
+      "parameter_set": "FiscalParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "arrears_settlement_share",
+      "numeric_range": true,
+      "parameter_set": "FiscalParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 4.0,
+      "name": "crop_saturation_events",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 8.0,
+      "range_low": 2.0,
+      "sensitivity_priority": "low",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.5,
+      "name": "crop_weight",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 0.8,
+      "range_low": 0.2,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 6.0,
+      "name": "drought_saturation_events",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 12.0,
+      "range_low": 3.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 1.0,
+      "name": "drought_weight",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 1.0,
+      "range_low": 0.5,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 4.0,
+      "name": "famine_saturation_events",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 8.0,
+      "range_low": 2.0,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.75,
+      "name": "famine_weight",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 1.0,
+      "range_low": 0.4,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": null,
+      "name": "monthly_allocation_profile",
+      "numeric_range": false,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": null,
+      "range_low": null,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": false,
+      "support_class": "evidence-backed"
+    },
+    {
+      "central": 4.0,
+      "name": "pest_saturation_events",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 8.0,
+      "range_low": 2.0,
+      "sensitivity_priority": "low",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.4,
+      "name": "pest_weight",
+      "numeric_range": true,
+      "parameter_set": "HistoricalCoreParameters",
+      "range_high": 0.6,
+      "range_low": 0.1,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": false,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 4.0,
+      "name": "demand_pressure_cap",
+      "numeric_range": true,
+      "parameter_set": "MarketParameters",
+      "range_high": 20.0,
+      "range_low": 1.0,
+      "sensitivity_priority": "medium",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "demand_pressure_weight",
+      "numeric_range": true,
+      "parameter_set": "MarketParameters",
+      "range_high": 10.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "destitution_departure_share",
+      "numeric_range": true,
+      "parameter_set": "MigrationParameters",
+      "range_high": 0.2,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    },
+    {
+      "central": 0.0,
+      "name": "destitution_exit_share",
+      "numeric_range": true,
+      "parameter_set": "MigrationParameters",
+      "range_high": 1.0,
+      "range_low": 0.0,
+      "sensitivity_priority": "high",
+      "simulator_can_carry_it": true,
+      "support_class": "theoretically-assumed"
+    }
+  ],
+  "unclassified_text_only": 1
+}

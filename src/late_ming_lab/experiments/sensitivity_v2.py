@@ -478,6 +478,33 @@ def _pilot_settings() -> SimulatorSettings:
     return SimulatorSettings(tick_count=PILOT_TICKS, warmup_ticks=PILOT_WARMUP)
 
 
+#: Every key ``write_sensitivity_manifest`` declares, in the order it builds them, so an artifact
+#: written by an earlier revision can be compared with this one by key instead of by eye — and so
+#: the writer refuses to emit a payload whose keys have moved away from what a reader was told.
+#: ``extra`` keys and ``manifest_hash`` are added on top and are not listed here.
+DECLARED_MANIFEST_KEYS: Final[tuple[str, ...]] = (
+    "schema_version",
+    "morris_ladder",
+    "morris_top_k",
+    "morris_bootstrap",
+    "morris_top_k_stability",
+    "sobol_ladder",
+    "sobol_value_tolerance",
+    "arm_ladder",
+    "arm_interval_width_max",
+    "arm_minimum_substantive_effect",
+    "tipping_points",
+    "tipping_replicates",
+    "tipping_reserved_seeds",
+    "sobol_parameter_limit",
+    "seed",
+    "window",
+    "held_parameters",
+    "levels",
+    "pawn",
+)
+
+
 def write_sensitivity_manifest(
     root: str | Path,
     *,
@@ -521,6 +548,12 @@ def write_sensitivity_manifest(
         "pawn": pawn.to_dicts() if pawn is not None else [],
         **(dict(extra) if extra else {}),
     }
+    declared = (*DECLARED_MANIFEST_KEYS, *(sorted(extra) if extra else ()))
+    if tuple(payload) != declared:
+        raise SensitivityV2Error(
+            f"the payload's keys have moved away from the declared set: {tuple(payload)} is not "
+            f"{declared}; a reader comparing an artifact by key would be told the wrong thing"
+        )
     payload["manifest_hash"] = hash_text(canonical_json(payload))
     path = repository / MANIFEST_PATH
     write_json(path, payload)
@@ -555,6 +588,7 @@ __all__ = [
     "ARM_INTERVAL_WIDTH_MAX",
     "ARM_LADDER",
     "ARM_MINIMUM_SUBSTANTIVE_EFFECT",
+    "DECLARED_MANIFEST_KEYS",
     "LEVELS_PATH",
     "MANIFEST_PATH",
     "MORRIS_BOOTSTRAP",
