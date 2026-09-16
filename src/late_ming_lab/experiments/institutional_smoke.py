@@ -240,7 +240,7 @@ def run_institutional(
     )
     systems = _with_layer(economy.systems, layer)
     result = SimulationKernel(run_config, systems).run(run_label="institutional-smoke")
-    traces = pl.DataFrame(layer.decisions) if layer.decisions else _empty_trace()
+    traces = _trace_frame(layer.decisions)
     refusals_frame = _refusals_frame(layer)
     thresholds = core_default_governance_indicators()
     outcomes = outcome_scalars(
@@ -382,24 +382,34 @@ def _first_link(economy: Economy) -> tuple[str, str] | None:
     return None
 
 
-def _empty_trace() -> pl.DataFrame:
-    return pl.DataFrame(
-        schema={
-            "tick": pl.Int64,
-            "actor": pl.String,
-            "role": pl.String,
-            "region": pl.String,
-            "policy": pl.String,
-            "model_id": pl.String,
-            "prompt_hash": pl.String,
-            "response_hash": pl.String,
-            "action": pl.String,
-            "intensity": pl.Float64,
-            "priority": pl.String,
-            "rationale": pl.String,
-            "outcome": pl.String,
-            "trigger": pl.String,
-            "levers": pl.String,
-            "latency_ms": pl.Float64,
-        }
-    )
+#: The decision trace's schema, declared rather than inferred.
+#:
+#: Inference is the bug this exists to prevent: an arm that calls no model writes `None` into
+#: `model_id` for every row, polars infers `Null` for that column, and stacking it beside an arm
+#: that did call a model fails on a String/Null mismatch. The columns and their types are stated
+#: once, here, and every trace frame goes through `_trace_frame`.
+TRACE_SCHEMA: Final[dict[str, pl.DataType | type[pl.DataType]]] = {
+    "tick": pl.Int64,
+    "actor": pl.String,
+    "role": pl.String,
+    "region": pl.String,
+    "policy": pl.String,
+    "model_id": pl.String,
+    "prompt_hash": pl.String,
+    "response_hash": pl.String,
+    "action": pl.String,
+    "intensity": pl.Float64,
+    "priority": pl.String,
+    "rationale": pl.String,
+    "outcome": pl.String,
+    "trigger": pl.String,
+    "levers": pl.String,
+    "latency_ms": pl.Float64,
+}
+
+
+def _trace_frame(rows: Sequence[dict[str, object]]) -> pl.DataFrame:
+    """The decision trace of one run, with its columns typed whether or not a model was called."""
+    if not rows:
+        return pl.DataFrame(schema=TRACE_SCHEMA)
+    return pl.DataFrame(rows, schema=TRACE_SCHEMA, strict=False)

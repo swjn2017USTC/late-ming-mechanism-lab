@@ -585,9 +585,9 @@ def test_decision_json_is_validated_against_the_role_space() -> None:
 
 def test_the_trace_table_carries_what_a_reader_needs_to_audit_a_decision() -> None:
     """The columns the smoke run writes, checked as a contract rather than as a layout."""
-    from late_ming_lab.experiments.institutional_smoke import _empty_trace
+    from late_ming_lab.experiments.institutional_smoke import TRACE_SCHEMA
 
-    columns = set(_empty_trace().columns)
+    columns = set(TRACE_SCHEMA)
     assert {
         "tick",
         "actor",
