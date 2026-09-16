@@ -1447,7 +1447,14 @@ def write_reproduction_guide(root: str | Path) -> Path:
 
 
 def _tree_dirty(root: Path) -> bool:
-    """Whether the working tree carries uncommitted changes, asked of git rather than assumed."""
+    """Whether the working tree carries uncommitted changes, asked of git rather than assumed.
+
+    The bundle itself is excluded. It is the file this pass is about to write, so counting it would
+    make the answer depend on whether a previous pass had run: the first pass on a clean tree would
+    record `False`, and the second — finding nothing changed but the bundle — would record `True`.
+    What the field is for is telling a reader whether the code that produced the artifacts is the
+    committed code, and the bundle's own bytes are never part of that answer.
+    """
     try:
         completed = subprocess.run(
             ["git", "status", "--porcelain"],
@@ -1458,7 +1465,8 @@ def _tree_dirty(root: Path) -> bool:
         )
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return False
-    return bool(completed.stdout.strip())
+    changed = [line for line in completed.stdout.splitlines() if not line.endswith(BUNDLE_PATH)]
+    return bool(changed)
 
 
 def build_release_bundle(

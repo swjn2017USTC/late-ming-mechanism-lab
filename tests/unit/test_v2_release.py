@@ -278,6 +278,14 @@ def test_the_release_pass_is_deterministic_and_does_not_tag_itself() -> None:
         assert all(RELEASE_TAG in refusal for refusal in first.refusals)
 
 
+def test_the_bundle_does_not_count_itself_as_a_dirty_tree() -> None:
+    """Running the pass twice must not flip `tree_dirty`: the bundle is not part of the answer."""
+    first = json.loads((ROOT / "docs/v2/release-bundle.json").read_text())["tree_dirty"]
+    build_v2_release(ROOT)
+    second = json.loads((ROOT / "docs/v2/release-bundle.json").read_text())["tree_dirty"]
+    assert first == second, "the flag depended on a previous pass having run"
+
+
 def test_the_bundle_binds_the_inputs_a_reader_must_check() -> None:
     """A bundle that omits an input is not a bundle; the manifest names each one."""
     import subprocess
