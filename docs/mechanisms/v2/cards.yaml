@@ -1,0 +1,381 @@
+schema_version: mechanism-cards-v2
+translation_version: zh-v2.0
+cards:
+- id: M001
+  name: Fiscal Extraction Inversion
+  question: Does pressing the fiscal apparatus harder collect less of what it is owed?
+  v1_status: CONDITIONAL
+  v2_status: CONDITIONAL
+  change_reason: 'unchanged, and now attributed: the V2 factorial crosses the extraction
+    policy with the price structure, and the inversion reading follows the policy
+    in every cell — present in both escalating cells and absent in both fixed ones
+    — so the conditionality is the policy and not the price lever'
+  applies_to:
+    dataset: historical-core-v1 (toy space for the factorial)
+    forcing: observed-historical
+    policy: escalating vs fixed extraction, crossed with the declared price lever
+    sample_size: 4 factorial cells x 1 seed = 4 runs; the batch declares four seeds
+      (20260915, 20260916, 20260917, 20260918) but the factorial ran 20260915
+    threshold_band: 'not threshold-dependent: the reading reads no governance line'
+  model_evidence:
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.factorial[escalating].inversion_present
+    value: 1.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.factorial[fixed].inversion_present
+    value: 0.0
+  historical_support: '`receipts-shortfall-chronic` (grade B, target): receipts below
+    quota persist across the calibration window; the inversion itself is a model-side
+    pattern the record does not name.'
+  historical_challenge: The record documents short receipts and rising assessments
+    separately; no source in the registry measures collection effort against realised
+    receipts, so the inversion's own shape is not attested.
+  counterexample: Under a fixed-effort policy the inversion is absent in every factorial
+    cell, so a claim that harder pressing always collects less is contradicted inside
+    the model.
+  falsifier: An arm that fixes collection effort and still shows the inversion would
+    falsify the policy attribution; the fixed cells already fail to show it.
+  uncertainty: The attribution is a model result on the toy space at 1 seed(s) (20260915);
+    the historical side remains a direction, not a level.
+  lineage:
+  - stage: source
+    locator: sources/registry/clusters-06-10.yaml#taxation_levies
+    detail: receipt-shortfall and quota-erosion claims, grade B, direction only
+  - stage: normalized
+    locator: data/historical_patterns/07-taxation-levies.yaml#receipts-shortfall-chronic
+    detail: the pattern the calibration window scores
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/policies/fiscal.py#ArrearsEscalation
+    detail: the escalating policy the factorial varies
+  - stage: run
+    locator: outputs/v2/p05/p05-factorial-*
+    detail: four factorial cells, one seed, historical core scenario
+  - stage: statistic
+    locator: src/late_ming_lab/analysis/mechanisms.py#extraction_inversion
+    detail: the inversion reading, threshold-free
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M001
+    detail: this card
+- id: M002
+  name: Crisis Gating
+  question: Is it the shock that produces breakdown, or the condition that lets the
+    shock reach the base?
+  v1_status: SUPPORTED
+  v2_status: CONDITIONAL
+  change_reason: 'downgraded by measurement: the gate/weather contrast on the measured
+    tax base survives the whole threshold ensemble, but the card''s *breakdown* claim
+    does not — it holds in only part of the ensemble at the protocol''s declared line,
+    so half the support is the line rather than the model'
+  applies_to:
+    dataset: historical-core-v1
+    forcing: observed-historical
+    policy: V2-P03 pilot arms (baseline, gate open, credit removed)
+    sample_size: 50,625 threshold-ensemble members over 12 runs (4 seeds); the gate
+      arms are the V2-P03 pilot's twelve runs over four seeds
+    threshold_band: 'breakdown_min_crossed 4-8, the share of the ensemble in which
+      the card''s breakdown criterion holds at each declared line: 4: 0.000, 5: 0.178,
+      6: 0.461, 7: 0.206, 8: 0.026 — the reading is reported at every declared line
+      and none of them carries the conclusion alone'
+  model_evidence:
+  - artifact: docs/v2/threshold-robustness.json
+    artifact_digest: 7a334cdc6ebb1b6845280386c1c1cf718e9d4a915b52ebbd0a617f821c2517b2
+    accessor: robustness.criteria[M002.breakdown-in-every-arm-replicate@6].holds
+    value: 0.4608
+  - artifact: docs/v2/threshold-robustness.json
+    artifact_digest: 7a334cdc6ebb1b6845280386c1c1cf718e9d4a915b52ebbd0a617f821c2517b2
+    accessor: robustness.criteria[M002.breakdown-in-every-arm-replicate@6].changes
+    value: 0.5392
+  - artifact: docs/v2/threshold-robustness.json
+    artifact_digest: 7a334cdc6ebb1b6845280386c1c1cf718e9d4a915b52ebbd0a617f821c2517b2
+    accessor: robustness.criteria[M002.base-contraction-separates-arms@6].holds
+    value: 1.0
+  historical_support: '`chongzhen-drought-sequence` and `shaanxi-net-outflow` place
+    the crisis in the late 1630s-40s; the gate is a model structure the record describes
+    only as famine migration.'
+  historical_challenge: The record has no counterpart of a closed institutional gate
+    to open, so the gate arm is a model experiment rather than a historical contrast.
+  counterexample: The gate-open arm's contraction separates from the baseline in every
+    member of the ensemble, so the *mechanism* the card names is not an artefact of
+    the lines; what moves is the binary breakdown verdict.
+  falsifier: A run in which the gate arm's tax base contracts no further than the
+    baseline's would falsify the mechanism; no member of the ensemble shows it.
+  uncertainty: The status is now explicitly threshold-dependent, and the pilot's arms
+    are the sandbox's rather than the historical core's; the historical core's own
+    gate contrast has not been run.
+  lineage:
+  - stage: source
+    locator: sources/registry/clusters-01-05.yaml#population_migration
+    detail: net-outflow and departure claims, grade B/C
+  - stage: normalized
+    locator: data/historical_patterns/04-population-migration.yaml#shaanxi-net-outflow
+    detail: the pattern the hold-out window scores
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/systems/migration.py#_permanent_gate
+    detail: the gate the arms open and close
+  - stage: run
+    locator: outputs/pilot/v2-p03/*
+    detail: twelve pilot runs, four seeds, three arms
+  - stage: statistic
+    locator: src/late_ming_lab/protocol/robustness.py
+    detail: criterion shares over the frozen 50,625-member ensemble
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M002
+    detail: this card
+- id: M003
+  name: Fiscal-Military Ratchet
+  question: Does the army's unpaid claim accumulate without ever clearing, so the
+    fiscal burden only ever rises?
+  v1_status: REJECTED
+  v2_status: REJECTED
+  change_reason: 'unchanged: V2 built the three rules by which an arrears stock can
+    fall — settlement, remission and recovery — and none of them is needed to reject
+    the strong claim, which the V1 evidence already contradicts. A rejected mechanism
+    is a result, and V2 did not resurrect it by adding a rule that would make it true'
+  applies_to:
+    dataset: historical-core-v1
+    forcing: observed-historical
+    policy: fixed and escalating extraction; the three arrears rules on and off
+    sample_size: 40 arm runs over 4 seeds (four per arm), plus the 50,625-member threshold
+      ensemble
+    threshold_band: not threshold-dependent
+  model_evidence:
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[arrears-recovery].event_counts[ARREARS_RELIEF]
+    value: 161.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[arrears-remission].event_counts[ARREARS_RELIEF]
+    value: 636.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[arrears-rules-off].event_counts[ARREARS_RELIEF]
+    value: 0.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[arrears-settlement].event_counts[ARREARS_RELIEF]
+    value: 380.0
+  historical_support: '`pay-monetised-and-arrears` (grade A, hold-out) records arrears
+    that fluctuate rather than ratchet; the V1 rejection rested on it and on the P12
+    policy runs.'
+  historical_challenge: The card's mechanism behind the declines — whether they come
+    from the payment rule, re-assessment or the extraction arm's response — is still
+    not identified.
+  counterexample: The gate-open arm's arrears reading is present in every replicate
+    while the reference arm's is absent, so the stock *can* accumulate without clearing
+    under one structure; that is a counterexample to the rejection's generality, not
+    to its own window.
+  falsifier: An arm that refuses to pay arrears in any month and still shows declines
+    would falsify the V1 rejection; V2 did not run it.
+  uncertainty: The rejection is of the strong claim at three counties and 240 ticks;
+    the persistence the V2 rules expose is a different question and is left open.
+  lineage:
+  - stage: source
+    locator: sources/registry/clusters-06-10.yaml#military_finance
+    detail: monetised pay and arrears claims, grade A
+  - stage: normalized
+    locator: data/historical_patterns/09-military-finance.yaml#pay-monetised-and-arrears
+    detail: the hold-out pattern
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/evidence/parameters.py#FiscalParameters
+    detail: arrears_settlement_share, arrears_remission_share, arrears_recovery_share
+  - stage: run
+    locator: outputs/v2/p05/p05-arrears-*
+    detail: four arms at four seeds on the historical core
+  - stage: statistic
+    locator: src/late_ming_lab/analysis/mechanisms.py#fiscal_military_ratchet
+    detail: the ratchet reading
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M003
+    detail: this card
+- id: M004
+  name: Elite Mediation Bifurcation
+  question: Does elite credit fork into two branches — mediation that keeps households
+    on the land, and accumulation that takes it?
+  v1_status: WEAK
+  v2_status: WEAK
+  change_reason: 'unchanged, with the missing half now built: V2 added the accumulating
+    branch (a loan unserviced past a term is foreclosed and the pledge transfers),
+    and it fires, so the bifurcation is no longer a structure the model lacks. The
+    card''s own falsifier — a larger base contraction in the accumulating branch than
+    in the closed-credit arm — has not been measured, so the status does not move
+    on the strength of the branch existing'
+  applies_to:
+    dataset: historical-core-v1
+    forcing: observed-historical
+    policy: credit channel with and without foreclosure
+    sample_size: 40 arm runs over 4 seeds; the accumulating branch fires 51 times
+      in one of them
+    threshold_band: not threshold-dependent
+  model_evidence:
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[elite-accumulation].event_counts[ELITE_FORECLOSURE]
+    value: 51.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[elite-accumulation].event_counts[ELITE_DEFAULT]
+    value: 2127.0
+  historical_support: '`debt-transfers-land` (grade A) records land moving to lenders
+    on default; the V1 card rested on it for the mediation side.'
+  historical_challenge: Whether a bifurcation — two branches with different trajectories
+    — is what the record shows, rather than one continuum, is not something any source
+    here states.
+  counterexample: V1's own runs show the two sides occurring together, which is why
+    the card was WEAK; V2 has not produced a run where they separate.
+  falsifier: The accumulating branch should contract the assessable base further than
+    the closed-credit arm; if it does not, the bifurcation has no second branch and
+    the card should say so in one sentence.
+  uncertainty: Two new parameters (a foreclosure term and a share) are grade S assumptions;
+    the branch fires on 51 foreclosures in one replicate of the historical core, which
+    is enough to say it is live and not enough to measure its effect.
+  lineage:
+  - stage: source
+    locator: sources/registry/clusters-06-10.yaml
+    detail: debt, mortgage and land-transfer claims
+  - stage: normalized
+    locator: data/historical_patterns/06-land-debt-elites.yaml#debt-transfers-land
+    detail: the calibration pattern
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/systems/household_survival.py#_foreclose_if_in_default
+    detail: foreclosure_after_unserviced_months, foreclosure_land_share_of_pledge
+  - stage: run
+    locator: outputs/v2/p05/p05-elite-*
+    detail: mediation-only, defaults-declared and accumulation arms
+  - stage: statistic
+    locator: src/late_ming_lab/analysis/mechanisms.py
+    detail: defaults, foreclosures and the chain movements
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M004
+    detail: this card
+- id: M005
+  name: Insurgent Consolidation
+  question: Does armed force concentrate into fewer, larger bands, and does the model's
+    own merger link produce it?
+  v1_status: SUPPORTED
+  v2_status: SUPPORTED
+  change_reason: 'unchanged status, and the link V1 could not exercise is now exercised:
+    with the merge bar at zero the merger moves 4,094 troops and the largest band''s
+    share ends at 0.34 against the reference''s 0.24, while at the maximum bar it
+    moves none. The card''s own falsifier — merges fire and the share does not rise
+    — is answered in the direction that supports the link'
+  applies_to:
+    dataset: historical-core-v1
+    forcing: observed-historical
+    policy: merge bar at zero, at the declared 0.6, and at its maximum
+    sample_size: 40 arm runs over 4 seeds; the merge reachability reading covers 223
+      band-months
+    threshold_band: not threshold-dependent for the reading; the concentration line
+      is
+  model_evidence:
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.merge_reachability.merge_events
+    value: 582.7563502243854
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[band-merge-negative-control].chains[band_chain_largest_share_end]
+    value: 0.19940185717079711
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[band-merge-positive-control].chains[band_chain_largest_share_end]
+    value: 0.34050739123831375
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[band-merge-negative-control].chains[band_chain_troops.merger]
+    value: 0.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.arms[band-merge-positive-control].chains[band_chain_troops.merger]
+    value: 4094.2597897008945
+  historical_support: '`many-bands-then-consolidation` (grade B, hold-out) records
+    many bands giving way to fewer and larger ones.'
+  historical_challenge: The record describes consolidation but not its components;
+    whether merger or simply dissolution produced it is not distinguished by any source
+    here.
+  counterexample: The negative control — bar at its maximum — shows no consolidation
+    at all, so consolidation is not automatic under crisis.
+  falsifier: Merges firing without the largest share rising would make the link decorative;
+    the positive control shows the opposite.
+  uncertainty: 'One window and one input: the P10 fixtures were not re-run, and the
+    share the positive control reaches is still below one.'
+  lineage:
+  - stage: source
+    locator: sources/registry/clusters-06-10.yaml#rebellion_armed_groups
+    detail: band formation, merger and consolidation claims
+  - stage: normalized
+    locator: data/historical_patterns/10-rebellion-armed-groups.yaml#many-bands-then-consolidation
+    detail: the hold-out pattern
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/systems/military.py#BandViolenceSystem._merge
+    detail: merge_cohesion_above and the co-location rule
+  - stage: run
+    locator: outputs/v2/p05/p05-band-merge-*
+    detail: positive and negative controls at four seeds
+  - stage: statistic
+    locator: src/late_ming_lab/analysis/band_chain.py
+    detail: the six-component attribution of concentration
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M005
+    detail: this card
+- id: M006
+  name: Famine Mortality
+  question: Does excess death from hunger carry a harvest failure into population
+    loss, and from there into labour scarcity and abandoned land?
+  v1_status: UNIDENTIFIED
+  v2_status: UNIDENTIFIED
+  change_reason: 'unchanged, and deliberately so: V2 delivered the interface and the
+    observables a mortality rule would consume, and refused to build the rule. The
+    registry''s famine cluster says in its own note that no source in it measures
+    a mortality or unmet-need series at county resolution, and the one population
+    claim is grade C with a direction and no parameter. An unidentified mechanism
+    is a result'
+  applies_to:
+    dataset: historical-core-v1
+    forcing: observed-historical
+    policy: 'not applicable: no rule exists to exercise'
+    sample_size: 'the reference run''s cohort months: 16 cohorts short of the floor,
+      longest run 48 months; no arm can bind a mortality rule because none exists'
+    threshold_band: not applicable
+  model_evidence:
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.mortality_gap.observables.cohorts_with_a_shortfall
+    value: 16.0
+  - artifact: docs/v2/mechanism-variants.json
+    artifact_digest: 6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6
+    accessor: variants.mortality_gap.observables.longest_run_below_floor_max
+    value: 48.0
+  historical_support: '`famine-lags-harvest-failure` (grade B, constraint) gives the
+    sequence; `pop-ming-qing-decline` (grade C) gives the direction of population
+    loss.'
+  historical_challenge: The sequence's last link — hunger to death — is the part no
+    source here quantifies, and the model reaches abandonment through departure instead.
+  counterexample: The model satisfies `land-abandonment-in-famine` at 1.00 with zero
+    deaths, so mortality is not necessary for the outcome the card names.
+  falsifier: A sourced county-resolution mortality series with a level would let a
+    rule be declared; until then no arm can bind and none is claimed.
+  uncertainty: 'Everything about the level: the observables exist (16 of 60 cohorts
+    short, longest run 48 months, rolling ratio 0.224) and nothing outside the model
+    exists to calibrate a rate against.'
+  lineage:
+  - stage: source
+    locator: data/normalized/evidence_ledger-01-05.yaml#pop-ming-qing-decline
+    detail: grade C, direction only, supports no parameter
+  - stage: normalized
+    locator: data/historical_patterns/02-famine.yaml
+    detail: the cluster note that states no mortality series exists
+  - stage: parameter-or-rule
+    locator: src/late_ming_lab/systems/mortality.py
+    detail: 'no rate: mortality_rule_from_evidence refuses to build one'
+  - stage: run
+    locator: outputs/v2/p05/p05-reference-*
+    detail: the reference run, from which the observables are recomputed
+  - stage: statistic
+    locator: src/late_ming_lab/analysis/mortality.py#mortality_gap_summary
+    detail: cohorts short, longest run, rolling ratio, deaths = 0
+  - stage: card
+    locator: docs/mechanisms/v2/cards.yaml#M006
+    detail: this card

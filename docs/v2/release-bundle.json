@@ -1,0 +1,145 @@
+{
+  "artifacts": [
+    {
+      "bytes": 15239,
+      "path": "data/protocol/validation-protocol-v2.yaml",
+      "sha256": "d04096a6bb84238bcaa2219f923c0c97b0eb960772843f19d9bfe70e1ef68b45"
+    },
+    {
+      "bytes": 8347,
+      "path": "data/protocol/threshold-ensemble-v2.yaml",
+      "sha256": "9399842c1fc76f7057a699d5b6154910232d556774c0887f7a52d1a0177a10e5"
+    },
+    {
+      "bytes": 23182,
+      "path": "data/protocol/model-comparison-register-v2.yaml",
+      "sha256": "316721353a4fac2207eb8426273feab624153a605964d5ca12b1f1b8e3d0ec52"
+    },
+    {
+      "bytes": 28877,
+      "path": "docs/v2/threshold-robustness.json",
+      "sha256": "7a334cdc6ebb1b6845280386c1c1cf718e9d4a915b52ebbd0a617f821c2517b2"
+    },
+    {
+      "bytes": 298060,
+      "path": "docs/v2/hold-out-diagnosis.json",
+      "sha256": "708de21bd85d354f43271d766c83cac7f8f365eeab53d92164023844d7ec097a"
+    },
+    {
+      "bytes": 288592,
+      "path": "docs/v2/mechanism-variants.json",
+      "sha256": "6ee117ece3e36981c325b6d0688a975d8f7d03d6b94d3a5072a2fc8d89ee45a6"
+    },
+    {
+      "bytes": 3108,
+      "path": "docs/v2/calibration-v2.md",
+      "sha256": "b22ac26b37b1458dd61bd95542127f269414064d0f771a7069721adda5064483"
+    },
+    {
+      "bytes": 10861,
+      "path": "outputs/v2/p06/posterior.json",
+      "sha256": "2adad653cc690e86cbf467af8496b886c44bbbd5963954ce2e38a7518c5da024"
+    },
+    {
+      "bytes": 5360,
+      "path": "outputs/v2/p07/sensitivity-manifest.json",
+      "sha256": "0f1950bbe899daa7ab1e1509079582c117588e420c456b85e6f7401149e7589b"
+    },
+    {
+      "bytes": 572,
+      "path": "outputs/v2/p08/runtime-arms.json",
+      "sha256": "e791f264b0b7f38ea9e67b5122fc261dbaf12060f96abcb46302181dfc2633e2"
+    },
+    {
+      "bytes": 2450,
+      "path": "docs/v2/mortality-gap.md",
+      "sha256": "deb8fbbb5c0325750069a6368908a6a964a23038940fa1a14e43c1aa202e2747"
+    },
+    {
+      "bytes": 8639,
+      "path": "data/normalized/v2/historical-core-v1/manifest.json",
+      "sha256": "da916ac75ed9ad8054f184107a55d4e68c45603fa9785c757f05e5245cd2bccd"
+    }
+  ],
+  "bundle_hash": "a35b214956a31508475ff066515c68694753ff08334c809b7ee87f082d6bdb59",
+  "candidate": "v0.2.0-rc1",
+  "gates": [
+    {
+      "evidence": "historical-core-v1 names 7 inputs with their SHA-256, states its rights, and its coverage report `docs/v2/coverage-historical-core-v1.md` is in the tree",
+      "gate": "Data",
+      "status": "met"
+    },
+    {
+      "evidence": "the protocol pre-registers 9 primary outcomes with a minimum substantive effect on 9 of them and 4 declared windows; the band names 8 reading lines",
+      "gate": "Outcome",
+      "status": "met"
+    },
+    {
+      "evidence": "the frozen posterior records converged=false: location moved 0.449 of the prior range; acceptance 1.000, against a declared location_change_max of 0.1 (measured 0.4491534951297869, acceptance [1.0, 1.0])",
+      "gate": "Calibration",
+      "status": "unmet"
+    },
+    {
+      "evidence": "4 of 4 rungs did not settle: morris: the trajectory bootstrap reproduced the top-4 set in 0.00 of resamples; morris: the trajectory bootstrap reproduced the top-4 set in 0.01 of resamples; sobol: the first level: nothing to compare it with; sobol: the largest S1 move against the previous level was 12.071",
+      "gate": "Sensitivity",
+      "status": "unmet"
+    },
+    {
+      "evidence": "all 28 arms that declare an effect report a configuration diff; the 12 arms declared to reproduce the reference are reported by the no-op detector, which returned 9 verdicts",
+      "gate": "Intervention",
+      "status": "met"
+    },
+    {
+      "evidence": "all 4 V1 hold-out failures carry a classification, and the freeze gate refuses a reserved-window score without the posterior hash",
+      "gate": "Hold-out",
+      "status": "met"
+    },
+    {
+      "evidence": "the runtime layer runs and refuses nothing it should not, but the arm made 0 model decisions on the historical core: its prompt is outside the fixture corpus, so M2 is incomplete and the arm is a pilot",
+      "gate": "Policy",
+      "status": "unmet"
+    },
+    {
+      "evidence": "all 6 cards carry model evidence with an artifact digest and a lineage from a source to the card, and every lineage locator resolves",
+      "gate": "Provenance",
+      "status": "met"
+    },
+    {
+      "evidence": "the bundle binds the commit, the lock, the artifacts, the reports and the translation version, each with its SHA-256",
+      "gate": "Release",
+      "status": "met"
+    }
+  ],
+  "git_sha": "411a33e434487c39e43932a2d7ebb05e24710813",
+  "reports": [
+    {
+      "path": "docs/v2/synthesis-v2.md",
+      "present": true,
+      "sha256": "64c891ab5e37f19f2cb857a6dc94d00e2c54ee24442d5090770ec3840c84ed70"
+    },
+    {
+      "path": "docs/v2/unresolved-v2.md",
+      "present": true,
+      "sha256": "8e1428fcfbf39e8ffdba1245f11422c956aaac4b08e44baa375619590edd865a"
+    },
+    {
+      "path": "docs/v2/data-rights-notice.md",
+      "present": true,
+      "sha256": "16097804ab177a5985600cfacf5e92bbdf80f73bf90417ce0c1dd699376f888c"
+    },
+    {
+      "path": "docs/v2/reproduction-guide.md",
+      "present": true,
+      "sha256": "588d2e1af1102d2bf3b2be46af3474f12496a5c00af0039e9340624e9a08c48c"
+    },
+    {
+      "path": "docs/mechanisms/v2/cards.yaml",
+      "present": true,
+      "sha256": "65849e101df217c8b68cac065a8f04c2a0b442d9dede1bc09ac9349c4ff017ef"
+    }
+  ],
+  "schema_version": "release-bundle-v2",
+  "translation_version": "zh-v2.0",
+  "tree_dirty": true,
+  "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
+}
