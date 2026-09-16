@@ -31,6 +31,7 @@ import typer
 from late_ming_lab import __version__
 from late_ming_lab.core.config import DEFAULT_ROOT_SEED, SimulationConfig
 from late_ming_lab.core.kernel import SimulationKernel
+from late_ming_lab.experiments.families import FAMILIES
 from late_ming_lab.storage.run_store import RunConflictError, RunStore
 
 app = typer.Typer(
@@ -206,11 +207,13 @@ def replay(
     typer.echo(f"run_dir: {outcome.directory}")
 
 
+#: The families `experiment` accepts, read from the registry so the help cannot list a stale set.
+EXPERIMENT_FAMILY_HELP: Final[str] = "One declared family: " + ", ".join(sorted(FAMILIES)) + "."
+
+
 @app.command("experiment")
 def experiment(
-    family: Annotated[
-        str, typer.Argument(help="ablations, morris, sobol, tipping, p10, p12, integrated.")
-    ],
+    family: Annotated[str, typer.Argument(help=EXPERIMENT_FAMILY_HELP)],
     root: Annotated[Path, typer.Option("--root", help="The repository root.")] = Path("."),
     replicates: Annotated[
         int | None,
@@ -221,7 +224,7 @@ def experiment(
     ] = None,
 ) -> None:
     """Run one declared experiment family and write its artifacts and reports."""
-    from late_ming_lab.experiments.families import FAMILIES, ExperimentError, run_family
+    from late_ming_lab.experiments.families import ExperimentError, run_family
 
     if family not in FAMILIES:
         typer.echo(
