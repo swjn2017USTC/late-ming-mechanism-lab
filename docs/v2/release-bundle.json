@@ -61,7 +61,7 @@
       "sha256": "da916ac75ed9ad8054f184107a55d4e68c45603fa9785c757f05e5245cd2bccd"
     }
   ],
-  "bundle_hash": "3b1aed0238fd1d93fb6018c2ab6543403e2a88bc1dbf6f7552b8c40822b8d3f9",
+  "bundle_hash": "d3ce70609b865d351d350ed367b79640dd627ea05862b5a770d909d8e0279aa0",
   "candidate": "v0.2.0-rc1",
   "code_digest": "184530a3beac1e7d428d01632e30feb06a0f5553a65c3c1d4715900ed56e9f56",
   "code_files": 156,
@@ -112,7 +112,7 @@
       "status": "met"
     }
   ],
-  "git_sha": "8fe9d0e18754e1764496f144793fb48077432bff",
+  "git_sha": "15ae9e9a391ac065f698071306b083fcff8abf14",
   "pyproject_sha256": "4d002943b264dc77a2998014582740ee3f05e0231633444db9a9e7f91b60be9e",
   "reports": [
     {
@@ -143,6 +143,6 @@
   ],
   "schema_version": "release-bundle-v2",
   "translation_version": "zh-v2.0",
-  "tree_dirty": true,
+  "tree_dirty": false,
   "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
 }
