@@ -61,7 +61,7 @@
       "sha256": "da916ac75ed9ad8054f184107a55d4e68c45603fa9785c757f05e5245cd2bccd"
     }
   ],
-  "bundle_hash": "a35b214956a31508475ff066515c68694753ff08334c809b7ee87f082d6bdb59",
+  "bundle_hash": "a5a7166d4b025adc283b72a77eead3e8cf3fdcfef3f36d9d78323981366f5510",
   "candidate": "v0.2.0-rc1",
   "gates": [
     {
@@ -110,7 +110,7 @@
       "status": "met"
     }
   ],
-  "git_sha": "411a33e434487c39e43932a2d7ebb05e24710813",
+  "git_sha": "daa2202501fd2188a7de1044c46a944f195f9e82",
   "reports": [
     {
       "path": "docs/v2/synthesis-v2.md",
@@ -140,6 +140,6 @@
   ],
   "schema_version": "release-bundle-v2",
   "translation_version": "zh-v2.0",
-  "tree_dirty": true,
+  "tree_dirty": false,
   "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
 }
