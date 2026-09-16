@@ -1449,11 +1449,9 @@ def write_reproduction_guide(root: str | Path) -> Path:
 def _tree_dirty(root: Path) -> bool:
     """Whether the working tree carries uncommitted changes, asked of git rather than assumed.
 
-    The bundle itself is excluded. It is the file this pass is about to write, so counting it would
-    make the answer depend on whether a previous pass had run: the first pass on a clean tree would
-    record `False`, and the second — finding nothing changed but the bundle — would record `True`.
-    What the field is for is telling a reader whether the code that produced the artifacts is the
-    committed code, and the bundle's own bytes are never part of that answer.
+    The bundle itself is excluded — see `_dirty_lines` — because the field answers whether the code
+    that produced the artifacts is the committed code, and the bundle's own bytes are never part of
+    that answer.
     """
     try:
         completed = subprocess.run(
@@ -1465,8 +1463,35 @@ def _tree_dirty(root: Path) -> bool:
         )
     except (subprocess.CalledProcessError, FileNotFoundError):  # pragma: no cover
         return False
-    changed = [line for line in completed.stdout.splitlines() if not line.endswith(BUNDLE_PATH)]
-    return bool(changed)
+    return bool(_dirty_lines(completed.stdout))
+
+
+def code_digest(root: Path) -> tuple[str, int]:
+    """The package's Python sources by content: one digest over every file's path and hash.
+
+    A commit names a state that may include uncommitted changes; this names the code itself. Two
+    checkouts of the same source under different commits produce the same digest, which is what lets
+    a reader verify the bundle without knowing which commit it came from.
+    """
+    package = root / "src"
+    if not package.is_dir():
+        return "", 0
+    entries = [
+        (path.relative_to(root).as_posix(), _digest(path))
+        for path in sorted(package.rglob("*.py"))
+        if "__pycache__" not in path.parts
+    ]
+    return hash_text(canonical_json(entries)), len(entries)
+
+
+def _dirty_lines(porcelain: str) -> tuple[str, ...]:
+    """The `git status --porcelain` lines that count as a dirty tree.
+
+    The bundle is not one of them.
+    """
+    return tuple(
+        line for line in porcelain.splitlines() if line.strip() and not line.endswith(BUNDLE_PATH)
+    )
 
 
 def build_release_bundle(
@@ -1504,11 +1529,20 @@ def build_release_bundle(
             }
         )
     lock = repository / "uv.lock"
+    sources_digest, code_files = code_digest(repository)
     payload: dict[str, object] = {
         "schema_version": "release-bundle-v2",
         "candidate": "v0.2.0-rc1",
         "git_sha": git_sha,
         "tree_dirty": _tree_dirty(repository) if tree_dirty is None else tree_dirty,
+        # The code by content, not only by commit: `git_sha` says where the tree was, this says what
+        # was in it, so a bundle built from a dirty tree still binds the code that produced it and a
+        # bundle rebuilt at a later commit with unchanged code is byte-identical.
+        "code_digest": sources_digest,
+        "code_files": code_files,
+        "pyproject_sha256": _digest(repository / "pyproject.toml")
+        if (repository / "pyproject.toml").is_file()
+        else "",
         "uv_lock_sha256": _digest(lock) if lock.is_file() else "",
         "artifacts": artifacts,
         "reports": reports,

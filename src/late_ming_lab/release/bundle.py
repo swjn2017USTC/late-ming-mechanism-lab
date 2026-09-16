@@ -32,10 +32,12 @@ from typing import Final
 
 from late_ming_lab.core.hashing import hash_text
 from late_ming_lab.synthesis.v2 import (
+    BUNDLED_ARTIFACTS,
     SynthesisError,
     V2Card,
     build_cards,
     build_release_bundle,
+    code_digest,
     write_cards,
     write_limitations,
     write_reproduction_guide,
@@ -89,6 +91,12 @@ class ReleaseOutcome:
 
 
 def _git_sha(root: Path) -> str:
+    """The commit the bundle was built at, or empty when the tree is not a git checkout.
+
+    Empty rather than a refusal: the binding is by content hash, and a bundle built outside a
+    repository (a copy, a test fixture, an unpacked archive) is still a bundle. What it is not is a
+    bundle that names a commit it did not come from, so nothing is filled in here.
+    """
     try:
         return subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -97,8 +105,8 @@ def _git_sha(root: Path) -> str:
             text=True,
             check=True,
         ).stdout.strip()
-    except (subprocess.CalledProcessError, FileNotFoundError) as error:  # pragma: no cover
-        raise ReleaseError(f"the release bundle needs the commit: {error}") from error
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return ""
 
 
 def _hashed(root: Path, relative: str) -> str:
@@ -345,13 +353,17 @@ def evaluate_gates(root: str | Path, *, cards: Sequence[V2Card] = ()) -> tuple[d
             }
         )
     lock = _hashed(repository, "uv.lock")
+    sources_digest, code_files = code_digest(repository)
+    bound = [path for path in BUNDLED_ARTIFACTS if (repository / path).is_file()]
     rows.append(
         {
             "gate": "Release",
             "status": "met" if lock else "unmet",
             "evidence": (
-                "the bundle binds the commit, the lock, the artifacts, the reports and the "
-                "translation version, each with its SHA-256"
+                f"the bundle binds the package's {code_files} sources as `{sources_digest[:16]}` "
+                f"and records the commit with its tree state, plus `uv.lock`, {len(bound)} of "
+                f"{len(BUNDLED_ARTIFACTS)} declared artifacts and the generated reports, each by "
+                "SHA-256"
                 if lock
                 else "uv.lock is not in the tree, so a bundle could not bind the environment"
             ),

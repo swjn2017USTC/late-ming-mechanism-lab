@@ -143,7 +143,8 @@ def test_the_chinese_card_has_the_same_structure_as_the_english_one() -> None:
 
 def test_an_unmet_gate_blocks_the_tag_and_is_named(tmp_path: Path) -> None:
     """The one decision the phase must not get wrong: no tag while a gate fails."""
-    gates = evaluate_gates(ROOT)
+    root = _scratch_root(tmp_path)
+    gates = evaluate_gates(root, cards=build_cards(ROOT))
     assert tuple(row["gate"] for row in gates) == (
         "Data",
         "Outcome",
@@ -158,11 +159,11 @@ def test_an_unmet_gate_blocks_the_tag_and_is_named(tmp_path: Path) -> None:
     for row in gates:
         assert row["status"] in {"met", "unmet"}
         assert row["evidence"].strip(), f"{row['gate']} is asserted without evidence"
-    report = write_limitations(ROOT, gates)
+    report = write_limitations(root, gates)
     text = report.read_text(encoding="utf-8")
     for row in gates:
         assert row["gate"] in text
-    outcome = build_v2_release(ROOT)
+    outcome = build_v2_release(root)
     unmet = outcome.unmet
     assert outcome.tagged == (not unmet)
     if unmet:
@@ -179,6 +180,51 @@ def _gate(rows: tuple[dict[str, str], ...], name: str) -> dict[str, str]:
         if row["gate"] == name:
             return row
     raise AssertionError(f"no {name} gate")
+
+
+def _scratch_root(tmp_path: Path) -> Path:
+    """A copy of everything the release pass reads, so a test can build without touching the repo.
+
+    `outputs/` holds hundreds of megabytes of runs, so the pass's declared inputs are copied by name
+    rather than by directory: the artifacts it binds, the reports it writes, the registry the
+    lineage is checked against, and the lock.
+    """
+    import shutil
+
+    from late_ming_lab.synthesis.v2 import BUNDLED_ARTIFACTS
+
+    files = (
+        *BUNDLED_ARTIFACTS,
+        "uv.lock",
+        "docs/mechanisms/cards.yaml",
+        "docs/v2/coverage-historical-core-v1.md",
+        "data/protocol/validation-protocol-v2.yaml",
+        "data/protocol/threshold-ensemble-v2.yaml",
+    )
+    for relative in files:
+        source = ROOT / relative
+        if not source.is_file():
+            continue
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(source, target)
+    for relative in (
+        "src",
+        "sources/registry",
+        "data/historical_patterns",
+        "data/mechanisms",
+        "data/normalized/v2",
+    ):
+        if (ROOT / relative).is_dir():
+            shutil.copytree(
+                ROOT / relative,
+                tmp_path / relative,
+                dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns("__pycache__"),
+            )
+    if (ROOT / "pyproject.toml").is_file():
+        shutil.copy(ROOT / "pyproject.toml", tmp_path / "pyproject.toml")
+    return tmp_path
 
 
 def _tampered_root(tmp_path: Path) -> Path:
@@ -265,12 +311,18 @@ def test_the_provenance_gate_reads_the_cards_it_just_built(tmp_path: Path) -> No
     assert _gate(evaluate_gates(root, cards=()), "Provenance")["status"] == "unmet"
 
 
-def test_the_release_pass_is_deterministic_and_does_not_tag_itself() -> None:
-    """Same code and same artifacts imply the same bytes, and the tag stays a human step."""
-    first = build_v2_release(ROOT)
-    bundle = (ROOT / "docs/v2/release-bundle.json").read_text(encoding="utf-8")
-    second = build_v2_release(ROOT)
-    assert (ROOT / "docs/v2/release-bundle.json").read_text(encoding="utf-8") == bundle
+def test_the_release_pass_is_deterministic_and_does_not_tag_itself(tmp_path: Path) -> None:
+    """Same code and same artifacts imply the same bytes, and the tag stays a human step.
+
+    The pass runs in a scratch copy, not in the repository: a test that regenerated the committed
+    documents would leave the tree it is checking dirty, and the check would then depend on which
+    revision the developer happens to be on.
+    """
+    root = _scratch_root(tmp_path)
+    first = build_v2_release(root)
+    bundle = (root / "docs/v2/release-bundle.json").read_text(encoding="utf-8")
+    second = build_v2_release(root)
+    assert (root / "docs/v2/release-bundle.json").read_text(encoding="utf-8") == bundle
     assert first.card_count == second.card_count == 6
     assert first.tagged == (not first.unmet)
     if first.unmet:
@@ -278,12 +330,49 @@ def test_the_release_pass_is_deterministic_and_does_not_tag_itself() -> None:
         assert all(RELEASE_TAG in refusal for refusal in first.refusals)
 
 
+def test_the_committed_documents_are_what_the_code_produces(tmp_path: Path) -> None:
+    """The reviewer's blocker, as a test: the committed docs must come from the committed code.
+
+    Generated documents that no longer match their generator are the failure mode this catches — a
+    card edited by hand, a status re-pinned after an artifact moved, a table written by an earlier
+    revision of the module.
+    """
+    root = _scratch_root(tmp_path)
+    build_v2_release(root)
+
+    from late_ming_lab.synthesis.v2 import CARDS_FILE
+
+    documents = [
+        CARDS_FILE,
+        "docs/mechanisms/v2/index.md",
+        "docs/mechanisms/v2/zh/index.md",
+        *(f"docs/mechanisms/v2/M00{index}.md" for index in range(1, 7)),
+        *(f"docs/mechanisms/v2/zh/M00{index}.md" for index in range(1, 7)),
+        "docs/v2/synthesis-v2.md",
+        "docs/v2/unresolved-v2.md",
+        "docs/v2/data-rights-notice.md",
+        "docs/v2/reproduction-guide.md",
+        "docs/v2/limitations-v2.md",
+    ]
+    for relative in documents:
+        generated = (root / relative).read_text(encoding="utf-8")
+        committed = (ROOT / relative).read_text(encoding="utf-8")
+        assert generated == committed, f"{relative} was not produced by this code"
+
+
 def test_the_bundle_does_not_count_itself_as_a_dirty_tree() -> None:
-    """Running the pass twice must not flip `tree_dirty`: the bundle is not part of the answer."""
-    first = json.loads((ROOT / "docs/v2/release-bundle.json").read_text())["tree_dirty"]
-    build_v2_release(ROOT)
-    second = json.loads((ROOT / "docs/v2/release-bundle.json").read_text())["tree_dirty"]
-    assert first == second, "the flag depended on a previous pass having run"
+    """The flag answers "is the code committed", and the bundle's own bytes are not part of it.
+
+    Without this the field flips between two consecutive passes: the first sees a clean tree and
+    writes `false`, the second sees the bundle it is about to write and reports `true`.
+    """
+    from late_ming_lab.synthesis.v2 import BUNDLE_PATH, _dirty_lines
+
+    assert _dirty_lines(f" M {BUNDLE_PATH}\n") == ()
+    assert _dirty_lines(" M src/late_ming_lab/synthesis/v2.py\n\n") == (
+        " M src/late_ming_lab/synthesis/v2.py",
+    )
+    assert _dirty_lines(f" M src/x.py\n?? {BUNDLE_PATH}\n") == (" M src/x.py",)
 
 
 def test_the_bundle_binds_the_inputs_a_reader_must_check() -> None:
@@ -294,9 +383,18 @@ def test_the_bundle_binds_the_inputs_a_reader_must_check() -> None:
     head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout.strip()
-    assert bundle["git_sha"] == head, "the bundle must carry the commit that produced it"
+    recorded = bundle["git_sha"]
+    assert len(recorded) == 40, f"the bundle carries {recorded!r}, not a commit"
+    # HEAD itself, or an ancestor of it: the bundle names the commit it was built at, and a later
+    # commit cannot have produced it. A sha that is not in this history is the failure to catch.
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", recorded, head], cwd=ROOT, capture_output=True
+    )
+    assert ancestor.returncode == 0, f"{recorded} is not in this repository's history"
     assert "tree_dirty" in bundle, "the bundle must say whether the tree carried changes"
     assert len(bundle["uv_lock_sha256"]) == 64
+    assert len(bundle["code_digest"]) == 64 and bundle["code_files"] > 100
+    assert len(bundle["pyproject_sha256"]) == 64
     assert bundle["candidate"] == RELEASE_TAG
     assert len(bundle["gates"]) == 9
     for section in ("artifacts", "reports"):
