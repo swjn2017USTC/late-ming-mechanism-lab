@@ -235,7 +235,17 @@ def test_a_small_real_batch_writes_an_artifact_its_report_can_be_rebuilt_from(
     assert all(arm.readings.height == len(MECHANISM_IDS) for arm in ran)
 
 
-def test_a_refused_runtime_arm_is_recorded_with_its_reason() -> None:
+def test_a_refused_runtime_arm_is_recorded_with_its_reason(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The switch, not the ambient environment, decides: off means a recorded refusal.
+
+    The test declares the condition it is about. Left to the process environment it would pass or
+    fail depending on whether an operator had exported `USTC_LLM_ENABLED=1` for a P08 run, and in
+    that state it would call the live endpoint from a test — which RULES 13 forbids and which the
+    arm is not being asked about here.
+    """
+    monkeypatch.setenv("USTC_LLM_ENABLED", "0")
     arm = run_policy_arm("ustc", replicates=1, ticks=36, warmup_ticks=12)
 
     assert arm.status == "refused"
