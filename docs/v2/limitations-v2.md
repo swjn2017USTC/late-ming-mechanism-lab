@@ -18,7 +18,7 @@ not. Hiding an unmet gate would be the one thing a release candidate must not do
 | Hold-out | **met** | all 4 V1 hold-out failures carry a classification, and the freeze gate refuses a reserved-window score without the posterior hash |
 | Policy | **unmet** | the runtime layer runs and refuses nothing it should not, but the arm made 0 model decisions on the historical core: its prompt is outside the fixture corpus, so M2 is incomplete and the arm is a pilot |
 | Provenance | **met** | all 6 cards carry model evidence with an artifact digest and a lineage from a source to the card, and every lineage locator resolves |
-| Release | **met** | the bundle binds the commit, the lock, the artifacts, the reports and the translation version, each with its SHA-256 |
+| Release | **met** | the bundle binds the package's 156 sources as `184530a3beac1e7d` and records the commit with its tree state, plus `uv.lock`, 12 of 12 declared artifacts and the generated reports, each by SHA-256 |
 
 **6 of 9 gates are met.** The unmet ones are carried as limitations rather than closed by argument:
 

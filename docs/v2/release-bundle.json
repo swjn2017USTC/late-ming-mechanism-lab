@@ -61,8 +61,10 @@
       "sha256": "da916ac75ed9ad8054f184107a55d4e68c45603fa9785c757f05e5245cd2bccd"
     }
   ],
-  "bundle_hash": "a5a7166d4b025adc283b72a77eead3e8cf3fdcfef3f36d9d78323981366f5510",
+  "bundle_hash": "3b1aed0238fd1d93fb6018c2ab6543403e2a88bc1dbf6f7552b8c40822b8d3f9",
   "candidate": "v0.2.0-rc1",
+  "code_digest": "184530a3beac1e7d428d01632e30feb06a0f5553a65c3c1d4715900ed56e9f56",
+  "code_files": 156,
   "gates": [
     {
       "evidence": "historical-core-v1 names 7 inputs with their SHA-256, states its rights, and its coverage report `docs/v2/coverage-historical-core-v1.md` is in the tree",
@@ -105,12 +107,13 @@
       "status": "met"
     },
     {
-      "evidence": "the bundle binds the commit, the lock, the artifacts, the reports and the translation version, each with its SHA-256",
+      "evidence": "the bundle binds the package's 156 sources as `184530a3beac1e7d` and records the commit with its tree state, plus `uv.lock`, 12 of 12 declared artifacts and the generated reports, each by SHA-256",
       "gate": "Release",
       "status": "met"
     }
   ],
-  "git_sha": "daa2202501fd2188a7de1044c46a944f195f9e82",
+  "git_sha": "8fe9d0e18754e1764496f144793fb48077432bff",
+  "pyproject_sha256": "4d002943b264dc77a2998014582740ee3f05e0231633444db9a9e7f91b60be9e",
   "reports": [
     {
       "path": "docs/v2/synthesis-v2.md",
@@ -140,6 +143,6 @@
   ],
   "schema_version": "release-bundle-v2",
   "translation_version": "zh-v2.0",
-  "tree_dirty": false,
+  "tree_dirty": true,
   "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
 }
