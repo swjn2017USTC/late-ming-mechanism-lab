@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Late Ming Mechanism Lab"
+type: software
+authors:
+  - family-names: "WahrFreiheit"
+version: "0.1.0"
+date-released: "2026-09-16"
+license: MIT
+repository-code: "https://github.com/swjn2017USTC/late-ming-mechanism-lab"
+url: "https://github.com/swjn2017USTC/late-ming-mechanism-lab"
+abstract: >-
+  A reproducible historical mechanism laboratory for the 1625-1644 Shaanxi-Henan crisis,
+  with explicit evidence grades, intervention tests, threshold robustness, mechanism cards,
+  and artifact provenance.
+keywords:
+  - agent-based modeling
+  - historical simulation
+  - late Ming
+  - mechanism analysis
+  - reproducible research

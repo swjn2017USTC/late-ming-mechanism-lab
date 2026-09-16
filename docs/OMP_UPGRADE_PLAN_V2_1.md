@@ -1,7 +1,7 @@
 # Late Ming Mechanism Lab V2.1 — 短封口与项目交接计划
 
 日期：2026-09-16  
-工作目录：`/Users/wahrfreiheit/OMP/late-ming-mechanism-lab`  
+工作目录：`<REPO_ROOT>`（本仓库根目录）
 当前起点：`main` at `eb3cd99571136f27b4cc58b2c24419d9390434b3`  
 执行方式：每次只给 OMP 一个 phase 的提示词；每个 phase 独立审查、提交并 `STOP`。
 
@@ -237,7 +237,7 @@ V2.1 不以“把 9 个 gate 全部跑绿”为目标。它只解决会妨碍项
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2.1-P10 — Replicate Semantics & Pilot Freeze。禁止开始 V2.1-P11。
 
@@ -283,7 +283,7 @@ V2.1 不以“把 9 个 gate 全部跑绿”为目标。它只解决会妨碍项
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2.1-P11 — Two Decisive Contrasts。禁止开始 V2.1-P12。
 
@@ -333,7 +333,7 @@ V2.1 不以“把 9 个 gate 全部跑绿”为目标。它只解决会妨碍项
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2.1-P12 — Closure Synthesis & Handoff。这是 V2.1 最后一个 phase。
 
@@ -385,4 +385,3 @@ V2.1-P12 完成后默认执行以下决定：
 - 若未来获得县级死亡、迁徙、价格、赈济或财政连续数据，再另写 V3 proposal；V3 必须先证明新数据
   能改变可识别性，而不是先扩大模型。
 - 若没有新数据，M006 保持 `UNIDENTIFIED`、P06/P07 保持 `non-converged` 都是最终有效结果。
-

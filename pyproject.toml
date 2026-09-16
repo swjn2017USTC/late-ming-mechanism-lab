@@ -3,6 +3,7 @@ name = "late-ming-mechanism-lab"
 version = "0.1.0"
 description = "Historical mechanism laboratory for the late Ming Shaanxi-Henan crisis (1625-1644)"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "arviz>=1.3.0",
@@ -30,6 +31,12 @@ dependencies = [
     "tenacity>=9.1.4",
     "typer>=0.27.2",
 ]
+
+[project.urls]
+Homepage = "https://github.com/swjn2017USTC/late-ming-mechanism-lab"
+Repository = "https://github.com/swjn2017USTC/late-ming-mechanism-lab.git"
+Documentation = "https://github.com/swjn2017USTC/late-ming-mechanism-lab#readme"
+Issues = "https://github.com/swjn2017USTC/late-ming-mechanism-lab/issues"
 
 [project.scripts]
 late-ming-lab = "late_ming_lab.cli:main"

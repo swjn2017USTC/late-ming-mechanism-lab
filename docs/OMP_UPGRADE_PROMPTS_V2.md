@@ -4,20 +4,14 @@
 
 每次只复制一个 phase 的提示词给 OMP。OMP 完成、审查、提交并停止后，再进入下一 phase。
 
-固定工作目录：
+固定工作目录（替换为本机克隆路径）：
 
 ```bash
-cd /Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+REPO_ROOT=/absolute/path/to/late-ming-mechanism-lab
+cd "$REPO_ROOT"
 ```
 
-建议先把计划复制进项目：
-
-```bash
-cp /Users/wahrfreiheit/Documents/Codex/2026-09-14/plan-omp-md/outputs/LATE_MING_MECHANISM_LAB_V2_UPGRADE_PLAN.md \
-  docs/OMP_UPGRADE_PLAN_V2.md
-cp /Users/wahrfreiheit/Documents/Codex/2026-09-14/plan-omp-md/outputs/LATE_MING_MECHANISM_LAB_V2_OMP_PROMPTS.md \
-  docs/OMP_UPGRADE_PROMPTS_V2.md
-```
+计划和提示词已经随仓库保存在 `docs/`，无需从其他本机目录复制。
 
 ---
 
@@ -25,7 +19,7 @@ cp /Users/wahrfreiheit/Documents/Codex/2026-09-14/plan-omp-md/outputs/LATE_MING_
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P00 — Baseline Freeze & Scientific Audit。禁止开始 V2-P01。
 
@@ -66,7 +60,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P01 — Evidence & Rights Spine。禁止开始 V2-P02。
 
@@ -102,7 +96,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P02 — Historical Core Dataset。禁止开始 V2-P03。
 
@@ -139,7 +133,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P03 — Outcome & Validation Protocol。禁止开始 V2-P04，也不要先看新的正式结果再定规则。
 
@@ -170,7 +164,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P04 — Failed Hold-out Mechanisms。禁止开始 V2-P05。
 
@@ -201,7 +195,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P05 — Missing Mechanism Variants。禁止开始 V2-P06。
 
@@ -235,7 +229,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P06 — Calibration V2。禁止开始 V2-P07。
 
@@ -272,7 +266,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P07 — Sensitivity & Counterfactual V2。禁止开始 V2-P08。
 
@@ -303,7 +297,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P08 — Runtime Policy Completion。禁止开始 V2-P09。
 
@@ -335,7 +329,7 @@ Acceptance：
 
 ```text
 你现在位于：
-/Users/wahrfreiheit/OMP/late-ming-mechanism-lab
+<REPO_ROOT>
 
 只执行 V2-P09 — Mechanism Synthesis & Release Candidate 2。没有后续 phase。
 

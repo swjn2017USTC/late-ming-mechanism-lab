@@ -1,6 +1,6 @@
 # Late Ming Mechanism Lab V2 升级计划
 
-> 面向 OMP 的执行规格；审阅基线：`/Users/wahrfreiheit/OMP/late-ming-mechanism-lab`，
+> 面向 OMP 的执行规格；审阅基线：`<REPO_ROOT>`（本仓库根目录），
 > HEAD `a81c223216f989150d69fe42bfe0a78f7eab1374`，tag `v0.1.0-rc1`，审阅日期 2026-09-14。
 
 ## 1. 结论与升级目标
