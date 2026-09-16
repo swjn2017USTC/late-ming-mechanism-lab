@@ -9,6 +9,8 @@ exit non-zero with the reason named.
 build    write docs/v2/baseline-v1.json from the current commit and the artifacts on disk
 verify   re-hash the tree and the frozen commit against that file; non-zero on any drift
 audit    write docs/v2/v1-acceptance-matrix.{json,md} from the frozen baseline and the cards
+v2       recompute the V2 mechanism cards, the synthesis, the rights notice, the reproduction
+         guide, the release bundle and the limitations report
 ```
 """
 
@@ -28,7 +30,7 @@ from late_ming_lab.release.baseline import (
     write_baseline,
 )
 
-ACTIONS: Final[tuple[str, ...]] = ("build", "verify", "audit")
+ACTIONS: Final[tuple[str, ...]] = ("build", "verify", "audit", "v2")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -44,7 +46,27 @@ def main(argv: list[str] | None = None) -> int:
         return _build(root)
     if action == "verify":
         return _verify(root)
-    return _audit(root)
+    if action == "audit":
+        return _audit(root)
+    return _v2(root)
+
+
+def _v2(root: Path) -> int:
+    """Recompute the V2 cards and everything the release bundle binds to them."""
+    from late_ming_lab.release.bundle import ReleaseError, build_v2_release
+
+    try:
+        outcome = build_v2_release(root)
+    except ReleaseError as error:
+        _echo(f"refused: {error}", err=True)
+        return 1
+    _echo(f"cards: {outcome.card_count} ({outcome.changed} status changed)")
+    for row in outcome.gates:
+        _echo(f"gate {row['gate']}: {row['status']}")
+    _echo(f"tagged: {outcome.tagged}")
+    for path in outcome.written:
+        _echo(f"wrote: {path}")
+    return 0 if not outcome.refusals else 1
 
 
 def _build(root: Path) -> int:

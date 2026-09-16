@@ -1,0 +1,78 @@
+# Chinese translation of the V2 mechanism cards.
+#
+# Data, not code: a translation is edited here and nowhere else, and the synthesis module reads
+# this file. The English cards in `docs/mechanisms/v2/` are the source; the generated
+# `docs/mechanisms/v2/zh/` is the translation, at the version declared below.
+schema_version: mechanism-translations-v1
+translation_version: zh-v2.0
+language: zh
+labels:
+  lineage_note: "证据链中的定位符与阶段名保留其原语言(路径、哈希与代码标识),以免与英文原稿不一致。"
+  title: "V2 机制卡索引"
+  question: "问题"
+  status: "状态"
+  applies: "结论适用范围"
+  model_evidence: "模型证据（非历史事实）"
+  record: "史料部分"
+  support: "支持"
+  challenge: "挑战"
+  counterexample: "反例"
+  falsifier: "可否证预测"
+  uncertainty: "不确定性"
+  lineage: "证据链（source → 规范化行 → 参数/规则 → 运行 → 统计量 → 卡片）"
+  source_note: "英文原稿为准；模拟支持不等于历史真相。"
+cards:
+- id: M001
+  name: "财政汲取倒转"
+  summary: "V1 为 CONDITIONAL，V2 维持 CONDITIONAL，但归因变清楚：倒转随抽取政策出现或消失，不随价格结构变化。"
+  question: "把财政机器压得更紧,是否反而收不到它应收的部分?"
+  historical_support: "`receipts-shortfall-chronic`(B 级,目标):实收低于定额在校准窗口内持续存在;但倒挂本身是模型侧的模式,史料并未如此命名。"
+  historical_challenge: "史料分别记录了短收与加派上升;登记册中没有来源把征收努力与实收放在一起度量,因此倒挂本身的形状没有直接史料支持。"
+  counterexample: "在固定努力的策略下,倒挂在所有因子格中都不出现;故「压得越紧收得越少」这一说法在模型内部即被否证。"
+  falsifier: "若某一臂固定征收努力却仍显示倒挂,则策略归因被否证;固定格已经表明它不出现。"
+  uncertainty: "归因是在玩具空间、两个种子上的模型结果;史料一侧仍是方向而非水平。"
+- id: M002
+  name: "危机闸门"
+  summary: "V1 为 SUPPORTED，V2 降为 CONDITIONAL：基期收缩的对比在全阈值带内成立，但「跨线即崩溃」的判读只在一半带内成立。"
+  question: "是冲击本身造成崩溃,还是让冲击抵达税基的条件?"
+  historical_support: "`chongzhen-drought-sequence` 与 `shaanxi-net-outflow` 把危机定位在 1630-40 年代后期;「门」是模型结构,史料只把它描述为饥荒迁徙。"
+  historical_challenge: "史料没有与「关闭的制度之门」相对应的对象,故门臂是模型实验而非历史对照。"
+  counterexample: "门开臂的收缩在集合的每一个成员里都与基线分离,故卡片所指的机制不是阈线的产物;变动的是「崩溃」这一二值判定。"
+  falsifier: "若某次运行中门臂的税基收缩不超过基线,则机制被否证;集合中没有成员如此。"
+  uncertainty: "状态现已被明确为依赖阈值,且试点各臂是沙箱而非历史核心的;历史核心自身的门对照尚未运行。"
+- id: M003
+  name: "财政-军事棘轮"
+  summary: "V1 与 V2 均为 REJECTED：V2 新增的三条清理规则并未把被否证的单调主张救回来。"
+  question: "军队的未付之claim是否持续累积而从不结清,以致财政负担只升不降?"
+  historical_support: "`pay-monetised-and-arrears`(A 级,留出)记录的是波动而非棘轮式上升;V1 的否证依赖它以及 P12 的政策运行。"
+  historical_challenge: "卡片背后导致下降的机制——来自支付规则、重新评估,还是汲取臂的回应——仍未识别。"
+  counterexample: "门开臂的欠饷读数在每一个重复中都出现,而参照臂没有,故在某种结构下存量「可以」只累积不结清;这是对否证之一般性的反例,而非对其自身窗口的反例。"
+  falsifier: "若某一臂在任何月份都拒绝支付欠饷却仍显示下降,则 V1 的否证被否证;V2 没有运行它。"
+  uncertainty: "被否证的是三县 240 tick 下的强主张;V2 规则所暴露的持续性属于另一个问题,留待处理。"
+- id: M004
+  name: "精英中介分化"
+  summary: "V1 与 V2 均为 WEAK：V2 补上了「积累/没收」这一支且确实触发，但卡片自己的证伪测试（基期收缩更大）尚未测量，状态不动。"
+  question: "精英信贷是否分化为两支——留住佃户于土地上的中介,以及夺走土地?"
+  historical_support: "`debt-transfers-land`(A 级)记录违约时土地转给贷方;V1 卡片的中介一侧即以此为据。"
+  historical_challenge: "史料所显示的究竟是分化(两支,轨迹不同),还是一个连续谱,任何来源都未说明。"
+  counterexample: "V1 自身的运行显示两侧同时发生,这正是该卡为 WEAK 的原因;V2 尚未产生两者分离的运行。"
+  falsifier: "累积支应使可评估税基的收缩大于关闭信贷的臂;若不然,分化就没有第二支,卡片应用一句话如此说明。"
+  uncertainty: "两个新参数(没收项与份额)是 S 级假设;该支在历史核心的一个重复中触发 51 次没收,足以说明它活着,不足以度量其效应。"
+- id: M005
+  name: "武装整并"
+  summary: "V1 与 V2 均为 SUPPORTED，且 V2 首次真正触发合并链：合并条归零时最大股占比由 0.24 升至 0.34，条设到上限则完全不合并。"
+  question: "武装力量是否集中为更少、更大的股,且模型自身的合并链接是否产生之?"
+  historical_support: "`many-bands-then-consolidation`(B 级,留出)记录多股让位于更少更大的股。"
+  historical_challenge: "史料描述整合但不描述其成分;究竟是合并还是单纯解散造成,本登记册中没有任何来源加以区分。"
+  counterexample: "负对照——门槛拉满——完全不见整合,故整合在危机下并非自动发生。"
+  falsifier: "若合并触发而最大份额不上升,链接即为摆设;正对照显示的正好相反。"
+  uncertainty: "一个窗口、一份输入:P10 的夹具未重跑,而正对照达到的份额仍低于一。"
+- id: M006
+  name: "饥荒死亡"
+  summary: "V1 与 V2 均为 UNIDENTIFIED：V2 交付接口与可观测量，并明确拒绝在无来源速率的情况下建规则。"
+  question: "饥饿导致的超额死亡是否把歉收传导为人口损失,再由人口损失传导为劳力短缺与抛荒?"
+  historical_support: "`famine-lags-harvest-failure`(B 级,约束)给出序列;`pop-ming-qing-decline`(C 级)给出人口损失的方向。"
+  historical_challenge: "序列的最后一环——饥饿到死亡——是本登记册中无来源给出量化的部分,而模型改由迁徙达成抛荒。"
+  counterexample: "模型在零死亡的情况下以 1.00 满足 `land-abandonment-in-famine`,故死亡率对卡片所指的结果并非必要。"
+  falsifier: "只有出现带水平的、有来源的县级死亡序列,才可能声明一条规则;在此之前没有臂可以绑定,故也不主张。"
+  uncertainty: "整体在水平上的不确定:可观测量存在(60 个队列中 16 个短缺,最长连续 48 个月,滚动比率 0.224),而模型之外没有任何东西可用于校准一个率。"
