@@ -61,7 +61,7 @@
       "sha256": "da916ac75ed9ad8054f184107a55d4e68c45603fa9785c757f05e5245cd2bccd"
     }
   ],
-  "bundle_hash": "d3ce70609b865d351d350ed367b79640dd627ea05862b5a770d909d8e0279aa0",
+  "bundle_hash": "cce01387518f403d5a5ec7d44963767c2fea3f5de6ea51ff9657458d9f792d58",
   "candidate": "v0.2.0-rc1",
   "code_digest": "184530a3beac1e7d428d01632e30feb06a0f5553a65c3c1d4715900ed56e9f56",
   "code_files": 156,
@@ -112,7 +112,7 @@
       "status": "met"
     }
   ],
-  "git_sha": "15ae9e9a391ac065f698071306b083fcff8abf14",
+  "git_sha": "9f0589a76a4a266e04ca1ffb2be51cf2e1a15af0",
   "pyproject_sha256": "4d002943b264dc77a2998014582740ee3f05e0231633444db9a9e7f91b60be9e",
   "reports": [
     {
