@@ -141,7 +141,7 @@ def run_pilot_arm(
     if output_root is not None:
         directory = RunStore(Path(output_root)).write(result)
         if protocol is not None:
-            _stamp(directory, protocol)
+            stamp_run(directory, protocol)
     measures = measures_of(
         events=result.events,
         run_id=result.manifest.run_id,
@@ -254,8 +254,12 @@ def _scenario_id(arm: str) -> str:
     return arm.lower().replace("+", "-").replace("_", "-")
 
 
-def _stamp(directory: Path, protocol: ValidationProtocol) -> Path:
-    """Record the protocol identity beside a pilot run, so a later read can refuse a stale one."""
+def stamp_run(directory: Path, protocol: ValidationProtocol) -> Path:
+    """Record the protocol identity beside a run, so a later read can refuse a stale one.
+
+    Public because more than one phase now writes it: a run scored under the frozen protocol says
+    so in its own directory, whichever batch produced it.
+    """
     path = directory / PROTOCOL_STAMP_FILE
     path.write_text(
         json.dumps(stamp_batch({}, ProtocolFreeze.of(protocol)), indent=2, sort_keys=True) + "\n",

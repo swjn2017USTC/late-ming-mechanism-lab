@@ -23,6 +23,8 @@ outputs/experiments/
 outputs/institutional/
 # V2 historical runs: artifacts are reproduced from the core, not committed, as for V1 runs.
 outputs/v2/
+# V2.1 runs, for the same reason: `late-ming-lab experiment p11` reproduces them in under a minute.
+outputs/v2_1/
 
 data/raw/private/
 sources/literature/private/

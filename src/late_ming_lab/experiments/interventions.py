@@ -166,8 +166,40 @@ def _high_relief(config: ArmConfiguration) -> ArmConfiguration:
     return config.with_updates(capacity=capacity, fiscal=fiscal, elite=elite)
 
 
+def no_elite_credit_updates() -> dict[str, float]:
+    """The declared update that closes the credit channel: ``EliteParameters``, by name.
+
+    Declared as data rather than inside the arm function so that a second phase applying the same
+    intervention — V2.1-P11 does, on the historical core — reads one declaration instead of copying
+    the numbers, which is how two arms that say they are the same arm stop being the same arm.
+    """
+    return {"loan_to_value": 0.0}
+
+
 def _no_elite_credit(config: ArmConfiguration) -> ArmConfiguration:
-    return config.with_updates(elite=config.elite.model_copy(update={"loan_to_value": 0.0}))
+    return config.with_updates(elite=config.elite.model_copy(update=no_elite_credit_updates()))
+
+
+def open_migration_exit_updates() -> tuple[dict[str, float], dict[str, float]]:
+    """The declared opening of the mobility gate: ``(MigrationParameters, HouseholdParameters)``.
+
+    Two sets move together because the gate has two leaves in this model and opening one alone
+    leaves the gate shut: a cohort becomes eligible when its rolling unmet ratio passes the
+    household line, and it still cannot leave while it cannot pay the road. The declaration is one
+    thing, and a caller that took half of it would be running a different arm under this name.
+    """
+    return (
+        {
+            "cost_tael_per_household": 0.0,
+            "cost_tael_per_adult": 0.0,
+            "transit_loss_share": 0.0,
+            "minimum_households_to_move": 1.0,
+        },
+        {
+            "permanent_migration_unmet_ratio": 0.0,
+            "temporary_migration_unmet_ratio": 0.0,
+        },
+    )
 
 
 def _no_trade_disruption(config: ArmConfiguration) -> ArmConfiguration:
@@ -185,20 +217,9 @@ def _low_repression(config: ArmConfiguration) -> ArmConfiguration:
 
 
 def _open_migration_exit(config: ArmConfiguration) -> ArmConfiguration:
-    migration = config.migration.model_copy(
-        update={
-            "cost_tael_per_household": 0.0,
-            "cost_tael_per_adult": 0.0,
-            "transit_loss_share": 0.0,
-            "minimum_households_to_move": 1.0,
-        }
-    )
-    household = config.household.model_copy(
-        update={
-            "permanent_migration_unmet_ratio": 0.0,
-            "temporary_migration_unmet_ratio": 0.0,
-        }
-    )
+    migration_updates, household_updates = open_migration_exit_updates()
+    migration = config.migration.model_copy(update=migration_updates)
+    household = config.household.model_copy(update=household_updates)
     return config.with_updates(migration=migration, household=household)
 
 

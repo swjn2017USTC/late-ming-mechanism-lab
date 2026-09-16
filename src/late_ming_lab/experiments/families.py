@@ -166,6 +166,27 @@ def _run_p06(root: Path, *, replicates: int | None, seed: int | None) -> tuple[P
     return (write_rung_table(root, tuple(rungs)), write_calibration_document(root))
 
 
+def _run_p11(root: Path, *, replicates: int | None, seed: int | None) -> tuple[Path, ...]:
+    """The V2.1-P11 contrasts: four arms, one trajectory each, and the two documents.
+
+    ``replicates`` is refused rather than ignored: the phase's design is one deterministic
+    trajectory per arm, and a caller asking for more would be asking for replays of the same run.
+    """
+    from late_ming_lab.experiments.contrasts import SEED, arm_runs, load_runs, write_documents
+
+    if replicates is not None:
+        raise ExperimentError(
+            "the p11 family has one trajectory per arm by design; it takes no replicate count"
+        )
+    if seed is not None and seed != SEED:
+        raise ExperimentError(
+            "the p11 family declares its seed with the phase; a different one would be a different "
+            "comparison and would leave a second set of runs beside the first"
+        )
+    arm_runs(root=root, seed=SEED)
+    return write_documents(root=root, runs=load_runs(root=root))
+
+
 def _run_p04(root: Path, *, replicates: int | None, seed: int | None) -> tuple[Path, ...]:
     """The V2-P04 arms, the no-op check and the generated diagnosis.
 
@@ -217,6 +238,14 @@ FAMILIES: Final[dict[str, Family]] = {
             "the V2-P04 hold-out arms on the historical core, their no-op check and the diagnosis"
         ),
         runner=_run_p04,
+    ),
+    "p11": Family(
+        name="p11",
+        description=(
+            "the V2.1-P11 contrasts on the historical core: the opened gate and the two elite "
+            "branches, one trajectory each, with their status recommendations"
+        ),
+        runner=_run_p11,
     ),
     "integrated": Family(
         name="integrated",

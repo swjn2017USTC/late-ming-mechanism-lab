@@ -25,6 +25,7 @@ def test_every_family_names_what_it_runs_and_what_it_writes() -> None:
         "p04",
         "p06",
         "p10",
+        "p11",
         "p12",
         "integrated",
         "evidence",
@@ -37,8 +38,9 @@ def test_every_family_names_what_it_runs_and_what_it_writes() -> None:
 
 
 def test_an_unknown_family_is_refused_with_the_ones_that_exist() -> None:
+    # A name no phase will take: naming the next phase here made the check expire when it arrived.
     with pytest.raises(ExperimentError, match="unknown family"):
-        run_family("p11", root=REPOSITORY)
+        run_family("no-such-family", root=REPOSITORY)
 
 
 def test_a_document_family_refuses_a_seed_it_has_no_use_for() -> None:

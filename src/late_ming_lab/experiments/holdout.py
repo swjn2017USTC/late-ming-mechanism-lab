@@ -48,12 +48,14 @@ from late_ming_lab.evidence.parameters import (
     BandParameters,
     EliteParameters,
     FiscalParameters,
+    HouseholdParameters,
     MarketParameters,
     MigrationParameters,
     core_default_band_parameters,
     core_default_elite_parameters,
     core_default_fiscal_parameters,
     core_default_governance_indicators,
+    core_default_household_parameters,
     core_default_market_parameters,
     core_default_migration_parameters,
 )
@@ -73,6 +75,7 @@ _T = TypeVar(
     FiscalParameters,
     BandParameters,
     EliteParameters,
+    HouseholdParameters,
 )
 
 #: The file an arm writes beside its run: the declaration, the diff, and the parameter sets used.
@@ -156,6 +159,7 @@ class Arm:
     fiscal: dict[str, float] = field(default_factory=dict)
     band: dict[str, float] = field(default_factory=dict)
     elite: dict[str, float] = field(default_factory=dict)
+    household: dict[str, float] = field(default_factory=dict)
 
     def market_parameters(self) -> MarketParameters:
         return self._applied(core_default_market_parameters(), self.market)
@@ -172,6 +176,9 @@ class Arm:
     def elite_parameters(self) -> EliteParameters:
         return self._applied(core_default_elite_parameters(), self.elite)
 
+    def household_parameters(self) -> HouseholdParameters:
+        return self._applied(core_default_household_parameters(), self.household)
+
     def parameter_sets(self) -> dict[str, object]:
         """The sets an arm can move, keyed by the class name the economy build takes."""
         return {
@@ -180,6 +187,7 @@ class Arm:
             "FiscalParameters": self.fiscal_parameters(),
             "BandParameters": self.band_parameters(),
             "EliteParameters": self.elite_parameters(),
+            "HouseholdParameters": self.household_parameters(),
         }
 
     @staticmethod
@@ -221,6 +229,10 @@ class Arm:
             reference = getattr(core_default_elite_parameters(), name)
             if value != reference:
                 moved[f"EliteParameters.{name}"] = float(value)
+        for name, value in self.household.items():
+            reference = getattr(core_default_household_parameters(), name)
+            if value != reference:
+                moved[f"HouseholdParameters.{name}"] = float(value)
         return moved
 
 
@@ -307,8 +319,13 @@ def run_arm(
     ticks: int = 240,
     warmup_ticks: int = 24,
     prefix: str = PREFIX,
+    policy_id: str = "p04-holdout-v1",
 ) -> ArmRun:
-    """Run one declared structure on the historical core, keeping its log."""
+    """Run one declared structure on the historical core, keeping its log.
+
+    ``prefix`` and ``policy_id`` name the phase in the run id and in the manifest, so a stored run
+    says which batch produced it rather than taking the first phase's name by default.
+    """
     economy = build_integrated_economy(HISTORICAL_SCENARIO, parameter_sets=arm.parameter_sets())
     run_config = SimulationConfig.model_validate(
         {
@@ -316,7 +333,7 @@ def run_arm(
             "warmup_ticks": warmup_ticks,
             "root_seed": root_seed,
             "scenario_id": f"{prefix}-{arm.label}",
-            "policy_id": "p04-holdout-v1",
+            "policy_id": policy_id,
         }
     )
     started = time.perf_counter()
@@ -355,9 +372,11 @@ def _write_arm_provenance(directory: Path, arm: Arm) -> Path:
     parameter sets are not part of it: without this file an arm's parameters would be recoverable
     only from the log's effects, which is what a reviewer should not have to do. The values written
     here are the ones the economy was built with, not the ones the declaration named.
+
+    Every set the arm *can* move is written, not a chosen pair: a reader can then see the value in
+    use for each set the arm's own declaration touches, and an arm that moves a set this file did
+    not carry would be the one failure the file exists to prevent.
     """
-    market = arm.market_parameters()
-    migration = arm.migration_parameters()
     path = directory / ARM_PROVENANCE_FILE
     path.write_text(
         json.dumps(
@@ -367,8 +386,12 @@ def _write_arm_provenance(directory: Path, arm: Arm) -> Path:
                 "description": arm.description,
                 "expects_effect": arm.expects_effect,
                 "configuration_diff": arm.configuration_diff(),
-                "market_parameters": market.model_dump(mode="json"),
-                "migration_parameters": migration.model_dump(mode="json"),
+                "market_parameters": arm.market_parameters().model_dump(mode="json"),
+                "migration_parameters": arm.migration_parameters().model_dump(mode="json"),
+                "fiscal_parameters": arm.fiscal_parameters().model_dump(mode="json"),
+                "band_parameters": arm.band_parameters().model_dump(mode="json"),
+                "elite_parameters": arm.elite_parameters().model_dump(mode="json"),
+                "household_parameters": arm.household_parameters().model_dump(mode="json"),
             },
             indent=2,
             sort_keys=True,
