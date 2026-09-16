@@ -30,7 +30,7 @@ from late_ming_lab.release.baseline import (
     write_baseline,
 )
 
-ACTIONS: Final[tuple[str, ...]] = ("build", "verify", "audit", "v2")
+ACTIONS: Final[tuple[str, ...]] = ("build", "verify", "audit", "v2", "v2_1")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -48,6 +48,8 @@ def main(argv: list[str] | None = None) -> int:
         return _verify(root)
     if action == "audit":
         return _audit(root)
+    if action == "v2_1":
+        return _v2_1(root)
     return _v2(root)
 
 
@@ -67,6 +69,27 @@ def _v2(root: Path) -> int:
     for path in outcome.written:
         _echo(f"wrote: {path}")
     return 0 if not outcome.refusals else 1
+
+
+def _v2_1(root: Path) -> int:
+    """The V2.1 closure pass: the cards, the documents and the bundle, with the gates re-decided."""
+    from late_ming_lab.synthesis.v2_1 import run_pass
+
+    try:
+        outcome = run_pass(root)
+    except (OSError, RuntimeError) as error:
+        _echo(f"the closure pass refused: {error}", err=True)
+        return 1
+    for path in outcome.written:
+        _echo(f"wrote: {path}")
+    _echo(
+        f"cards: {outcome.card_count}, statuses moved: {outcome.moved}, "
+        f"gates met: {len(outcome.gates) - len(outcome.unmet)} of {len(outcome.gates)}"
+    )
+    for refusal in outcome.refusals:
+        _echo(f"  {refusal}")
+    _echo(f"no tag is created; the bundle is at {outcome.bundle}")
+    return 0
 
 
 def _build(root: Path) -> int:

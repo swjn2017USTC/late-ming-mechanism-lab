@@ -28,13 +28,13 @@ import subprocess
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Final, Protocol
 
 from late_ming_lab.core.hashing import hash_text
 from late_ming_lab.synthesis.v2 import (
     BUNDLED_ARTIFACTS,
+    LineageStep,
     SynthesisError,
-    V2Card,
     build_cards,
     build_release_bundle,
     code_digest,
@@ -67,6 +67,24 @@ GATES: Final[tuple[tuple[str, str], ...]] = (
     ("Provenance", "source -> normalized row -> parameter/rule -> run -> statistic -> card"),
     ("Release", "the bundle binds code, lock, data, config, artifacts, reports and translation"),
 )
+
+
+class CardLike(Protocol):
+    """What the gates read off a card: its id, its evidence and its lineage.
+
+    Structural rather than nominal, because V2.1's cards are a different model with the same
+    contract, and one gate evaluator should decide both releases. A `V2Card` satisfies it, and so
+    does a `V21Card`.
+    """
+
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def model_evidence(self) -> Sequence[object]: ...
+
+    @property
+    def lineage(self) -> Sequence[LineageStep]: ...
 
 
 class ReleaseError(RuntimeError):
@@ -193,7 +211,9 @@ def _band_lines(root: Path) -> int:
     return len(entries) if isinstance(entries, list) else 0
 
 
-def evaluate_gates(root: str | Path, *, cards: Sequence[V2Card] = ()) -> tuple[dict[str, str], ...]:
+def evaluate_gates(
+    root: str | Path, *, cards: Sequence[CardLike] = ()
+) -> tuple[dict[str, str], ...]:
     """Each gate from the plan, with the evidence that decides it.
 
     A gate is decided by what an artifact holds, not by whether its file exists: existence is
@@ -388,7 +408,7 @@ LOCATOR_ROOTS: Final[tuple[str, ...]] = (
 _LOCATOR_TOKEN: Final = re.compile(r"[A-Za-z0-9_./*\\-]+")
 
 
-def unresolved_locators(cards: Sequence[V2Card]) -> tuple[str, ...]:
+def unresolved_locators(cards: Sequence[CardLike]) -> tuple[str, ...]:
     """Every lineage locator that names a path the tree does not hold.
 
     A card's lineage is only as good as its locators: a step naming a registry file that was renamed
@@ -453,6 +473,7 @@ __all__ = [
     "GATES",
     "LOCATOR_ROOTS",
     "RELEASE_TAG",
+    "CardLike",
     "ReleaseError",
     "ReleaseOutcome",
     "build_v2_release",

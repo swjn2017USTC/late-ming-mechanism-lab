@@ -1,0 +1,150 @@
+{
+  "artifacts": [
+    {
+      "bytes": 5879,
+      "path": "docs/v2/release-bundle.json",
+      "release": "V2",
+      "sha256": "8d04c19c5ec1a912d8ba6bc0422eb01019e608fbd013fd66f63f0584762ab78a"
+    },
+    {
+      "bytes": 20569,
+      "path": "docs/mechanisms/v2/cards.yaml",
+      "release": "V2",
+      "sha256": "65849e101df217c8b68cac065a8f04c2a0b442d9dede1bc09ac9349c4ff017ef"
+    },
+    {
+      "bytes": 3456,
+      "path": "docs/v2/limitations-v2.md",
+      "release": "V2",
+      "sha256": "1807694d62b2fae398298b006e3168e9fdeecec52f88722599356a51d28db805"
+    },
+    {
+      "bytes": 3330,
+      "path": "docs/v2/unresolved-v2.md",
+      "release": "V2",
+      "sha256": "8e1428fcfbf39e8ffdba1245f11422c956aaac4b08e44baa375619590edd865a"
+    },
+    {
+      "bytes": 125970,
+      "path": "docs/v2_1/replicate-audit.json",
+      "release": "V2.1",
+      "sha256": "66112a4c1e5f0cc10845439d0d518dd72ca84b0fedd16a16c6b5d093f74ba7d3"
+    },
+    {
+      "bytes": 18295,
+      "path": "docs/v2_1/decisive-contrasts.json",
+      "release": "V2.1",
+      "sha256": "be56bb7929e149ca48b09e7fb4e8cbcbfea8369db5f7f635fd7465e923ab5eae"
+    },
+    {
+      "bytes": 3716,
+      "path": "docs/v2_1/pilot-disposition.json",
+      "release": "V2.1",
+      "sha256": "14d66fc7ebe9def85cdd46475daf27a186bcdbde5b6db6a9c9f4b82ad801aa83"
+    },
+    {
+      "bytes": 10325,
+      "path": "docs/v2_1/parameter-registry-findings.json",
+      "release": "V2.1",
+      "sha256": "e135baceea10778dbe7681b51b49f7e04d001ff5af83495bf13e9424e5b93b49"
+    }
+  ],
+  "bundle_hash": "696b40a7745d10e8fc0d21075ed9b6cb4628be8d06d74455c6cbab236766fdb4",
+  "candidate": "v0.2.0-rc1",
+  "cards": [
+    "docs/mechanisms/v2_1/M001.md",
+    "docs/mechanisms/v2_1/M002.md",
+    "docs/mechanisms/v2_1/M003.md",
+    "docs/mechanisms/v2_1/M004.md",
+    "docs/mechanisms/v2_1/M005.md",
+    "docs/mechanisms/v2_1/M006.md"
+  ],
+  "code_digest": "91b77eacf2d130ceca4a6acafc5170548678a13aa56b800f10e068a2b9db5db9",
+  "code_files": 162,
+  "gates": [
+    {
+      "evidence": "historical-core-v1 names 7 inputs with their SHA-256, states its rights, and its coverage report `docs/v2/coverage-historical-core-v1.md` is in the tree",
+      "gate": "Data",
+      "status": "met"
+    },
+    {
+      "evidence": "the protocol pre-registers 9 primary outcomes with a minimum substantive effect on 9 of them and 4 declared windows; the band names 8 reading lines",
+      "gate": "Outcome",
+      "status": "met"
+    },
+    {
+      "evidence": "the frozen posterior records converged=false: location moved 0.449 of the prior range; acceptance 1.000, against a declared location_change_max of 0.1 (measured 0.4491534951297869, acceptance [1.0, 1.0])",
+      "gate": "Calibration",
+      "status": "unmet"
+    },
+    {
+      "evidence": "4 of 4 rungs did not settle: morris: the trajectory bootstrap reproduced the top-4 set in 0.00 of resamples; morris: the trajectory bootstrap reproduced the top-4 set in 0.01 of resamples; sobol: the first level: nothing to compare it with; sobol: the largest S1 move against the previous level was 12.071",
+      "gate": "Sensitivity",
+      "status": "unmet"
+    },
+    {
+      "evidence": "all 28 arms that declare an effect report a configuration diff; the 12 arms declared to reproduce the reference are reported by the no-op detector, which returned 9 verdicts",
+      "gate": "Intervention",
+      "status": "met"
+    },
+    {
+      "evidence": "all 4 V1 hold-out failures carry a classification, and the freeze gate refuses a reserved-window score without the posterior hash",
+      "gate": "Hold-out",
+      "status": "met"
+    },
+    {
+      "evidence": "the runtime layer runs and refuses nothing it should not, but the arm made 0 model decisions on the historical core: its prompt is outside the fixture corpus, so M2 is incomplete and the arm is a pilot",
+      "gate": "Policy",
+      "status": "unmet"
+    },
+    {
+      "evidence": "all 6 cards carry model evidence with an artifact digest and a lineage from a source to the card, and every lineage locator resolves",
+      "gate": "Provenance",
+      "status": "met"
+    },
+    {
+      "evidence": "the bundle binds the package's 162 sources as `91b77eacf2d130ce` and records the commit with its tree state, plus `uv.lock`, 12 of 12 declared artifacts and the generated reports, each by SHA-256",
+      "gate": "Release",
+      "status": "met"
+    }
+  ],
+  "git_sha": "c882ec1bca8736de3c2a20318282737e8c31ad00",
+  "pyproject_sha256": "4d002943b264dc77a2998014582740ee3f05e0231633444db9a9e7f91b60be9e",
+  "reports": [
+    {
+      "path": "docs/v2_1/closure-report.md",
+      "present": true,
+      "sha256": "6e4d4a19692c076de0d2aeba0a3719d1177c74d3e2a6f388ae9f1a00f5785021"
+    },
+    {
+      "path": "docs/v2_1/limitations.md",
+      "present": true,
+      "sha256": "8a0acce1186193681c83722a510b58cd155e6c140960c7865afb29293ac569d7"
+    },
+    {
+      "path": "docs/v2_1/handoff.md",
+      "present": true,
+      "sha256": "f4d09373d20e177bd355125f0d7a38b48e9c4831d0a4098cb901fef1593255e7"
+    },
+    {
+      "path": "docs/mechanisms/v2_1/cards.yaml",
+      "present": true,
+      "sha256": "df705d12495f6be15bf14a8f6ce0255646beffd52f28faf256c8180d31601f7a"
+    },
+    {
+      "path": "docs/mechanisms/v2_1/index.md",
+      "present": true,
+      "sha256": "ffe55d884fa4bbdbc33eac7093dccb1b07ca0cca076a39ae637a8265ddfd5a51"
+    },
+    {
+      "path": "docs/mechanisms/v2_1/zh/index.md",
+      "present": true,
+      "sha256": "ab952cc4535e4115fc8caa37cb31d22e65350f069e27da3f899722eca6596f87"
+    }
+  ],
+  "schema_version": "release-bundle-v2_1",
+  "tag_created": false,
+  "translation_version": "zh-v2.1",
+  "tree_dirty": true,
+  "uv_lock_sha256": "46fd4623cdfee17635e40bf895e7468d6338767c9c8916080002d3bdc2bc1c7d"
+}

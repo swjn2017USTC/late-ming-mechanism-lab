@@ -1,0 +1,53 @@
+# Chinese translation of the V2.1 mechanism cards.
+#
+# Data, not code. This file holds the fields whose English changed in V2.1; every other field is
+# resolved from `data/mechanisms/v2-zh.yaml` by `synthesis/v2_1.py`, and only when the English it
+# translates is byte-identical to the V2 card's. A field that is in neither place, or whose English
+# moved, is an error rather than an English fallback.
+schema_version: mechanism-translations-v2_1
+translation_version: zh-v2.1
+language: zh
+labels:
+  title: "V2.1 机制卡索引"
+  question: "问题"
+  status: "状态"
+  applies: "结论适用范围"
+  sample: "样本语义"
+  kind: "类型"
+  independent_samples: "独立样本数"
+  model_evidence: "模型证据（非历史事实）"
+  record: "史料部分"
+  support: "支持"
+  challenge: "挑战"
+  counterexample: "反例"
+  falsifier: "可否证预测"
+  uncertainty: "不确定性"
+  lineage: "证据链（source → 规范化行 → 参数/规则 → 运行 → 统计量 → 卡片）"
+  lineage_note: "证据链中的定位符与阶段名保留其原语言（路径、哈希与代码标识），以免与英文原稿不一致。"
+  source_note: "英文原稿为准；模拟支持不等于历史真相。"
+  index_note: "中文译稿；英文原稿见 docs/mechanisms/v2_1/，以其为准。"
+  col_card: "卡片"
+  col_name: "名称"
+  col_status: "V1 → V2 → V2.1"
+  col_samples: "独立样本数"
+cards:
+- id: M001
+  summary: "V1 与 V2 均为 CONDITIONAL，V2.1 维持不变，并更正了卡片自身的样本表述：因子设计是 1 个种子下的 4 个格，每格一条轨迹，因此 4 个格是 4 个结构，而不是 4 份种子样本。"
+  sample_note: "本卡证据为四个因子格，各运行一次、无重复；独立样本数等于结构数。"
+- id: M002
+  summary: "V1 为 SUPPORTED，V2 降为 CONDITIONAL 后 V2.1 维持 CONDITIONAL：V2.1 在历史核心上补做了卡片自称尚未运行的门对照，方向与幅度都成立，但「跨线即崩溃」这一半仍依赖阈线。"
+  sample_note: "本卡证据为 2 个结构臂（参照与开门）、6 次执行、2 个独立过程；四个种子是同一条确定性轨迹的重放，不增加样本。"
+  uncertainty: "历史核心上的门对照现已完成且成立：门臂的税基收缩比参照多 0.929。仍不确定的是幅度——它既是所声明开法的属性（移徙成本归零、两条资格线归零），也是模型土地记账的属性（区域内迁徙在迁出地抛荒、迁入队列得不到土地，故反复迁徙对税基的侵蚀大于实际外流人口所对应的程度）。「崩溃」这一半仍依赖阈线，按每一条声明的线分别报告。"
+- id: M003
+  summary: "V1 与 V2 均为 REJECTED，V2.1 不变：清理规则已建，强单调主张仍被否证；卡片现说明其五个臂是四个独立过程（参照臂与「规则全关」臂逐字节相同），而不是四十份样本。"
+  sample_note: "本卡证据为 5 个结构臂、20 次执行、4 个独立过程；种子是同一条确定性轨迹的重放。"
+- id: M004
+  summary: "V1 与 V2 均为 WEAK，V2.1 不变，但首次测量了卡片自己的证伪测试：累积支的税基收缩比关闭信贷臂多 0.008，方向与卡片预测一致，但只有声明最小实质效应的四分之一，故不足以升级。"
+  sample_note: "本卡证据为 5 个结构臂、18 次执行、4 个独立过程（参照臂与中介臂、以及 P05 与 P11 两次运行的累积臂各自合并为一个过程）；种子是同一条确定性轨迹的重放。"
+  uncertainty: "证伪测试已从悬置变为已测：该支确实触发（51 次没收、13,063.8 亩转出），税基收缩比关闭信贷多 0.008——方向符合卡片预测，幅度只有声明最小实质效应的四分之一。构成该支的是两个 S 级假设（没收期限与土地份额），而比较只建立在一条确定性轨迹上：这个量级的差异不足以让本项目认定效应成立。"
+- id: M005
+  summary: "V1 与 V2 均为 SUPPORTED，V2.1 不变：合并链接已被触发，集中度读数依赖阈线；卡片现说明其对照是 3 个结构、每个一条确定性轨迹。"
+  sample_note: "本卡证据为 3 个结构臂、12 次执行、3 个独立过程；种子是同一条确定性轨迹的重放。"
+- id: M006
+  summary: "V1 与 V2 均为 UNIDENTIFIED，V2.1 不变：接口与可观测量已交付，规则仍不建；卡片现说明其所测参照运行是一条轨迹重放四次，而不是四份样本。"
+  sample_note: "本卡证据为 1 个参照臂、4 次执行、1 个独立过程；没有任何臂能绑定一条并不存在的死亡规则。"

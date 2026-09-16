@@ -1484,13 +1484,14 @@ def code_digest(root: Path) -> tuple[str, int]:
     return hash_text(canonical_json(entries)), len(entries)
 
 
-def _dirty_lines(porcelain: str) -> tuple[str, ...]:
+def _dirty_lines(porcelain: str, *, bundle_path: str = BUNDLE_PATH) -> tuple[str, ...]:
     """The `git status --porcelain` lines that count as a dirty tree.
 
-    The bundle is not one of them.
+    The bundle is not one of them, and the path is a parameter because V2.1 has a bundle of its own:
+    one implementation, asked about the bundle the caller is writing.
     """
     return tuple(
-        line for line in porcelain.splitlines() if line.strip() and not line.endswith(BUNDLE_PATH)
+        line for line in porcelain.splitlines() if line.strip() and not line.endswith(bundle_path)
     )
 
 
